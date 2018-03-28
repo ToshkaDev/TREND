@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="addContent(fragmentsMain, searchArea, filter)">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Bio</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" th:href="@{https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css}"/>
+    <link th:href="@{/css/main.css}" rel="stylesheet" type="text/css" />
+
+</head>
+<body>
+    <div th:replace="common :: main-navbar"></div>
+
+    <div style="display: none">
+        <span id="subnavigation-tab" th:text="${subnavigationTab}"></span>
+    </div>
+
+    <div class="jumbotron backgroundtheme">
+        <div class="container">
+            <div></div>
+        </div>
+    </div>
+
+
+    <div class="container-fluid">
+        <div class="form-group col-md-12">
+            <div th:fragment="addContent(fragmentsMain, searchArea, tab, filter)">
+                <div th:replace="${fragmentsMain} :: ${tab}"></div>
+                <div class="col-md-10">
+                    <div th:replace="${fragmentsMain} :: ${searchArea}"></div>
+                    <div th:replace="${filter} ? ~{${fragmentsMain} :: ${filter}} : ~{}"></div>
+               </div>
+           </div>
+        </div>
+
+
+    <div class="row">
+        <div class="col-md-12 text-center result-container">
+            <a id="results-load" class="btn btn-info btn-lg" href="#">
+                Download Results <span class="glyphicon glyphicon-download-alt"> </span>
+            </a>
+        </div>
+    </div>
+
+
+    </div>
+
+
+
+
+    <script th:src="@{https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js}"></script>
+    <script th:src="@{https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js}"></script>
+    <script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js}"></script>
+    <script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/additional-methods.min.js}"></script>
+    <script th:src="@{/js/navbar-tabs.js}"></script>
+    <script th:src="@{/js/fields-processing.js}"></script>
+    <script th:src="@{/js/send-and-process-data.js}"></script>
+    <script th:src="@{${specificJs}}"></script>
+
+    <div th:replace="common :: copy"></div>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+    <div th:fragment="evolution-navbar">
+        <div class="col-md-2">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <ul class="nav nav-pills nav-stacked">
+                        <li id="createCogs"><a th:href="@{/evolution/create-cogs}">Create COGs</a></li>
+                        <li id="concatenate"><a th:href="@{/evolution/concatenate}">Concatenate MSAs</a></li>
+                        <li id="get-repr-proteins"><a th:href="@{/evolution/get-repr-proteins}">Select representative sequences</a></li>
+                        <li id="protoTree"><a th:href="@{/evolution/prototree}">Proto Tree</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="proto-tree">
+        <div class="col-md-8 my-textarea">
+            <div class="row">
+                <label class="btn btn-default btn-lg">
+                    Choose file with protein sequences <input id="first-file" type="file" style="display: none" multiple/>
+                </label>
+            </div>
+            <div class="row">
+                <label class="btn btn-default btn-lg">
+                    Choose file with tree <input id="second-file" type="file" style="display: none" multiple/>
+                </label>
+            </div>
+            <div class="row">
+                <label class="btn btn-default btn-lg">
+                    Choose file with aligned sequences <input id="aligned-file" type="file" style="display: none" multiple/>
+                </label>
+            </div>
+            <div class="row">
+                <button id="GoAsync" class="btn btn-primary btn-md pull-right" type="button">
+                    <span>Go!</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="proto-tree-filter">
+        <div class="col-md-2 panel panel-default">
+            <div class="panel-body">
+                <p class="text-primary">Set options:</p>
+                <div class="form-group">
+                    <form id="first">
+                        <small>Alignment Algorithm:</small>
+                        <select id="alignment-alg" class="form-control input-sm">
+                            <option selected='selected' value="--retree 2 --maxiterate 0">FFT-NS-2</option>
+                            <option value="--retree 2 --maxiterate 1000">FFT-NS-i</option>
+                            <option value="--localpair">L-INS-i</option>
+                            <option value="--genafpair">E-INS-i</option>
+                            <option value="--globalpair">G-INS-i</option>
+                        </select>
+                        <small>Tree Building Method:</small>
+                        <select id="tree-method" class="form-control input-sm">
+                            <option selected='selected' value="JN">Neighbour Joining</option>
+                            <option value="ML">Maximum Likelihood</option>
+                            <option value="ME">Minimum Evolution</option>
+                        </select>
+                        <small>ML tree A.A. Substitution Model</small>
+                        <select id="ml-subst-model" class="form-control input-sm">
+                            <option selected='selected' value="jtt">Jones-Taylor-Thornton (JTT) model</option>
+                            <option value="pm">Poisson model</option>
+                            <option value="eim">Equal input model</option>
+                            <option value="dm">Dayhoff model</option>
+                            <option value="dmf">Dayhoff model with Freqs. (F+)</option>
+                            <option value="jttf">JTT with Freqs. (F+) model</option>
+                            <option value="wm">WAG model</option>
+                            <option value="wmf">WAG with Freqs. (F+) model</option>
+                            <option value="lg">LG model</option>
+                            <option value="lgf">LG with Freqs. (F+) model</option>
+                            <option value="grm">General Reversible Mitochondrial (mtREV)</option>
+                            <option value="grmf">mtREV with Freqs. (F+) model</option>
+                            <option value="grc">General Reversible Chloroplast (cpREV)</option>
+                            <option value="grcf">cpREV with Freqs. (F+) model</option>
+                            <option value="grt">General Reversible Transcriptase model (rtREV)</option>
+                            <option value="grtf">rtREV with Freqs. (F+) model</option>
+                        </select>
+                        <small>NJ and ME trees A.A. Substitution Model</small>
+                        <select id="nj_me-subst-model" class="form-control input-sm">
+                            <option selected='selected' value="jtt">Jones-Taylor-Thornton (JTT) model</option>
+                            <option value="nd">No. of differences</option>
+                            <option value="pd">p-distance</option>
+                            <option value="pm">Poisson model</option>
+                            <option value="eim">Equal input model</option>
+                            <option value="dm">Dayhoff model</option>
+                        </select>
+                        <small>A.A. Substitution Rate</small>
+                        <select id="subst-rate" class="form-control input-sm">
+                            <option selected='selected' value="ur">Uniform Rates</option>
+                            <option value="ir">Has Invariant Sites (I)</option>
+                            <option value="gir">Gamma Distributed With Invariant Sites (G+I)</option>
+                        </select>
+                        <small>Initial tree for ML</small>
+                        <select id="initial-tree-ml" class="form-control input-sm">
+                            <option selected='selected' value="ur">Make initial tree automatically (Default - NJ/BioNJ)</option>
+                            <option value="ir">Make initial tree automatically (Maximum parsimony)</option>
+                            <option value="gir">Make initial tree automatically (Neighbor joining)</option>
+                        </select>
+                        <small>Gaps and Missing Data</small>
+                        <select id="gaps-missing" class="form-control input-sm">
+                            <option selected='selected' value="compDel">Complete deletion</option>
+                            <option value="partDel">Partial deletion</option>
+                            <option value="pairDel">Pairwise deletion</option>
+                        </select>
+                        <small>Site Coverage Cutoff</small>
+                        <input value="95" id="site-cov-cutoff" name="site-cov-cutoff" type="text" class="form-control input-sm"/>
+                        <small>NJ and ME Test</small>
+                        <select id="nj_me-phylo-test" class="form-control input-sm">
+                            <option selected='selected' value="none">None</option>
+                            <option value="bm">Bootstrap method</option>
+                            <option value="ib">Interior-branch test</option>
+                        </select>
+                        <small>ML Test</small>
+                        <select id="ml-phylo-test" class="form-control input-sm">
+                            <option selected='selected' value="none">None</option>
+                            <option value="bm">Bootstrap method</option>
+                        </select>
+                        <small>Number of replicates</small>
+                        <input value="100" id="number-of-replicates" name="number-of-replicates" type="text" class="form-control input-sm"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="evolution-create-cogs">
+        <div class="col-md-8 my-textarea">
+            <div class="row">
+                <label class="btn btn-default btn-lg">
+                    Choose Files <input id="first-file" type="file" style="display: none" multiple/>
+                </label>
+                <span class='label label-info' id="first-file-info"></span>
+            </div>
+            <div class="row">
+                <button id="GoAsync" class="btn btn-primary btn-md pull-right" type="button">
+                    <span>Go!</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div th:fragment="evolution-concatenate">
+        <div class="col-md-8 my-textarea">
+            <div class="row">
+                <label class="btn btn-default btn-lg">
+                    Choose files to be aligned and concatenated <input id="first-file" type="file" style="display: none" multiple/>
+                </label>
+            </div>
+            <div class="row">
+                <label class="btn btn-default btn-lg">
+                    Provide files with COGs <input id="second-file" type="file" style="display: none" multiple/>
+                </label>
+            </div>
+            <div class="row">
+                <label class="btn btn-default btn-lg">
+                    Provide list of organism names <input id="organisms-file" type="file" style="display: none" multiple/>
+                </label>
+            </div>
+            <div class="row">
+                <button id="GoAsync" class="btn btn-primary btn-md pull-right" type="button">
+                    <span>Go!</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="evolution-createCogs-filter">
+        <div class="col-md-2 panel panel-default">
+            <div class="panel-body">
+                <p class="text-primary">Set options:</p>
+                <div class="form-group">
+                    <form id="first">
+                        <small>File delimiter:</small>
+                        <select id="first-delim" class="form-control input-sm">
+                            <option selected='selected' disabled="disabled">select</option>
+                            <option>tab</option>
+                            <option>comma</option>
+                            <option>semicolon</option>
+                            <option>vertical bar</option>
+                        </select>
+                        <small>File column:</small>
+                        <input id="first-col" name="first-col" type="text" class="form-control input-sm"/>
+                        <small>Identity threshold:</small>
+                        <input id="identity-threshold" name="identity-threshold" type="text" class="form-control input-sm"/>
+                        <small>Coverage threshold:</small>
+                        <input id="coverage-threshold" name="coverage-threshold" type="text" class="form-control input-sm"/>
+                        <small>E-value threshold:</small>
+                        <input id="evalue-threshold" name="evalue-threshold" type="text" class="form-control input-sm"/>
+                        <small>Merge:</small>
+                        <label class="radio-inline">
+                            <input name="merge" type="radio" value="yes" checked="checked" />yes
+                        </label>
+                        <label class="radio-inline">
+                            <input name="merge" type="radio" value="no"/>no
+                        </label>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="evolution-concatenate-filter">
+        <div class="col-md-2 panel panel-default">
+            <div class="panel-body">
+                <p class="text-primary" data-toggle="tooltip" title="In case you provide your set of sequences to be concatenated">
+                    Set options <span class="fa fa-question"></span>
+                </p>
+                <div class="form-group">
+                    <form id="first">
+                        <small>Organism name column (default 2):</small>
+                        <input id="organism-name-col" name="organism-name-col" type="text" class="form-control input-sm"/>
+                        <small>Protein name column (default 1):</small>
+                        <input id="protein-name-col" name="protein-name-col" type="text" class="form-control input-sm"/>
+                        <small>COG identifier column(if present):</small>
+                        <input id="cogId-col" name="cogId-col" type="text" class="form-control input-sm"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>

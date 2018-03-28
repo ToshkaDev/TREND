@@ -1,0 +1,60 @@
+body {
+	font: 1.4em Arial, helvetica, sans-serif;
+	margin: 0;
+	padding: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/*Navigation bar styles*/
+.navbar-inverse {
+	font-size:110%;
+	color:white;
+	background-color:#800000; /*#264040*/
+}
+
+.navbar-inverse .navbar-nav > .active{
+      color: white;
+      background: #cc0000;
+ }
+ 
+.navbar-inverse .navbar-nav > .active > a, 
+.navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus {
+      color: white;
+      background: #cc0000;
+ }
+ 
+.navbar-inverse .navbar-nav > .open > a, 
+.navbar-inverse .navbar-nav > .open > a:hover, 
+.navbar-inverse .navbar-nav > .open > a:focus {
+      color: white;
+      background: #cc0000; /*#10311F;*/
+}
+
+nav div.bottom-nav-bar { 
+    height:7px;
+    background-color:#ff4d4d;
+ }
+ 
+ /*End of navigation bar styles */
+ 
+.my-textarea {
+	margin-right: 2em;
+}
+#Go{
+	width:7em;
+}
+
+div.panel-body {
+	padding: 2px;
+}
+
+
+label.error {
+    font-size:small;
+    color: #3399ff;
+
+}

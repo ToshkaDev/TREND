@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="main-navbar">
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bu-navbar">
+                        <span class="sr-only">Toggle Dropdown</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="@{/home}" style="font-size:120%; color:#D8F0E3">Bioinformatics Universe</a>
+                </div>
+
+                <div class="navbar-collapse" id="bu-navbar">
+                    <ul class="nav navbar-nav">
+                        <li id="home"><a th:href="@{/home}">Home</a></li>
+                        <li id="sequence"><a th:href="@{/sequence}">Sequence</a></li>
+                        <li id="domain"><a th:href="@{/domain}">Domain</a></li>
+                        <li id="evolution"><a th:href="@{/evolution}">Evolution</a></li>
+                        <li id="blast"><a th:href="@{/blast}">Blast </a></li>
+                        <li id="protocols"><a th:href="@{/protocols}">Protocols </a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li id="help"><a th:href="@{/help}">Help</a></li>
+                        <li id="about"><a th:href="@{/about}">About</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="bottom-nav-bar"></div>
+        </nav>
+
+        <div style="display: none">
+            <span id="mainTab" th:text="${mainTab}"></span>
+        </div>
+
+    </div>
+
+    <div th:fragment="copy">
+        &copy; 2017 Vadim Gumerov
+    </div>
+
+</body>
+
+</html>
