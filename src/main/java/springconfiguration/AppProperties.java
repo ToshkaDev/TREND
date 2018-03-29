@@ -27,6 +27,16 @@ public class AppProperties {
     private String resultFilePrefix = "bio-universe-";
     private String postfix = ".txt";
 
+    private String hmmscanDbPath = "/home/Soft/hmmer/pfam31_0/Pfam-A.hmm";
+    private String rpsblastDbPath = "/home/vadim/Softs/rpsblastdb/";
+    private String rpsprocDbPath = "/home/vadim/Softs/rpsbproc/data/";
+    private String rpsblastSpDb = "Cdd_NCBI";
+
+    private String hmmscanPath = "/usr/local/bin/hmmscan";
+    private String rpsblastPath = "/home/Soft/blast/ncbi-blast-2.6.0+/bin/rpsblast";
+    private String rpsbprocPath = "";
+    private String tmhmm2Path = "/home/vadim/Soft/tmhmm-2.0c/bin/tmhmm";
+
 
     public String getWorkingDirLocation() {
         return workingDirLocation;
@@ -150,5 +160,69 @@ public class AppProperties {
 
     public void setConcatenate(String concatenate) {
         this.concatenate = concatenate;
+    }
+
+    public String getHmmscanDbPath() {
+        return hmmscanDbPath;
+    }
+
+    public void setHmmscanDbPath(String hmmscanDbPath) {
+        this.hmmscanDbPath = hmmscanDbPath;
+    }
+
+    public String getRpsblastDbPath() {
+        return rpsblastDbPath;
+    }
+
+    public void setRpsblastDbPath(String rpsblastDbPath) {
+        this.rpsblastDbPath = rpsblastDbPath;
+    }
+
+    public String getRpsprocDbPath() {
+        return rpsprocDbPath;
+    }
+
+    public void setRpsprocDbPath(String rpsprocDbPath) {
+        this.rpsprocDbPath = rpsprocDbPath;
+    }
+
+    public String getRpsblastSpDb() {
+        return rpsblastSpDb;
+    }
+
+    public void setRpsblastSpDb(String rpsblastSpDb) {
+        this.rpsblastSpDb = rpsblastSpDb;
+    }
+
+    public String getHmmscanPath() {
+        return hmmscanPath;
+    }
+
+    public void setHmmscanPath(String hmmscanPath) {
+        this.hmmscanPath = hmmscanPath;
+    }
+
+    public String getRpsblastPath() {
+        return rpsblastPath;
+    }
+
+    public void setRpsblastPath(String rpsblastPath) {
+        this.rpsblastPath = rpsblastPath;
+    }
+
+    public String getRpsbprocPath() {
+        return rpsbprocPath;
+    }
+
+    public void setRpsbprocPath(String rpsbprocPath) {
+        this.rpsbprocPath = rpsbprocPath;
+    }
+
+    public String getTmhmm2Path() {
+        return tmhmm2Path;
+    }
+
+    public void setTmhmm2Path(String tmhmm2Path) {
+        this.tmhmm2Path = tmhmm2Path;
     }
 }

@@ -11,7 +11,7 @@ public class ProtoTreeRequest {
     private MultipartFile thirdFile;
     private String thirdFileTextArea;
 
-    private String alignmentAlg;
+
     private String treeBuildMethod;
     private String aaSubstModel;
     private String aaSubstRate;
@@ -20,9 +20,13 @@ public class ProtoTreeRequest {
     private String SiteCovCutOff;
     private String phylogenyTest;
     private String numberOrReplicates;
-    private String alignThreads;
     private String treeThreads;
+
+    private String alignmentAlg;
+    private String alignThreads;
     private String reorderOrNot;
+
+    private String domainPredictionProgram;
 
     private String commandToBeProcessedBy;
 
@@ -165,6 +169,14 @@ public class ProtoTreeRequest {
 
     public void setReorderOrNot(String reorderOrNot) {
         this.reorderOrNot = reorderOrNot;
+    }
+
+    public String getDomainPredictionProgram() {
+        return domainPredictionProgram;
+    }
+
+    public void setDomainPredictionProgram(String domainPredictionProgram) {
+        this.domainPredictionProgram = domainPredictionProgram;
     }
 
     public String getCommandToBeProcessedBy() {

@@ -8,13 +8,10 @@ public class ProtoTreeInternal {
     private String secondFileName;
     private String thirdFileName;
 
-    private String alignmentOutputFileName;
     private String alignmentAlg;
     private String alignThreads;
     private String reorderOrNot;
 
-    private String svgOutputFileName;
-    private String newickOutputFileName;
     private String treeBuildMethod;
     private String aaSubstModel;
     private String aaSubstRate;
@@ -25,16 +22,12 @@ public class ProtoTreeInternal {
     private String numberOrReplicates;
     private String treeThreads;
 
-    private String iFileTypeForDomainsProc;
-    private String domainPredictionType;
-	private String tmhhmmResultFileName;
+    private String domainPredictionProgram;
 	//e-value for Hmmscan and RpsBlast
 	private String eValue;
-	private String domainPredThreads;
 
     private String  commandToBeProcessedBy;
-    private List<String> fieldsForAlignment = new LinkedList<>();
-    private List<String> fieldsForTreeBuild = new LinkedList<>();
+    private List<String> fieldsForAlignmentAndTreeBuild = new LinkedList<>();
     private List<String> fieldsForProtFeature = new LinkedList<>();
 
     private List<String> allFields = new LinkedList<>();
@@ -68,21 +61,6 @@ public class ProtoTreeInternal {
         this.thirdFileName = thirdFileName;
     }
 
-    public String getNewickOutputFileName() {
-        return newickOutputFileName;
-    }
-
-    public void setNewickOutputFileName(String newickOutputFileName) {
-        this.newickOutputFileName = newickOutputFileName;
-    }
-
-    public String getAlignmentOutputFileName() {
-        return alignmentOutputFileName;
-    }
-
-    public void setAlignmentOutputFileName(String alignmentOutputFileName) {
-        this.alignmentOutputFileName = alignmentOutputFileName;
-    }
 
     public String getAlignmentAlg() {
         return alignmentAlg;
@@ -180,28 +158,12 @@ public class ProtoTreeInternal {
         this.reorderOrNot = reorderOrNot;
     }
 
-    public String getiFileTypeForDomainsProc() {
-        return iFileTypeForDomainsProc;
+    public String getDomainPredictionProgram() {
+        return domainPredictionProgram;
     }
 
-    public void setiFileTypeForDomainsProc(String iFileTypeForDomainsProc) {
-        this.iFileTypeForDomainsProc = iFileTypeForDomainsProc;
-    }
-
-    public String getDomainPredictionType() {
-        return domainPredictionType;
-    }
-
-    public void setDomainPredictionType(String domainPredictionType) {
-        this.domainPredictionType = domainPredictionType;
-    }
-
-    public String getTmhhmmResultFileName() {
-        return tmhhmmResultFileName;
-    }
-
-    public void setTmhhmmResultFileName(String tmhhmmResultFileName) {
-        this.tmhhmmResultFileName = tmhhmmResultFileName;
+    public void setDomainPredictionProgram(String domainPredictionProgram) {
+        this.domainPredictionProgram = domainPredictionProgram;
     }
 
     public String geteValue() {
@@ -212,38 +174,26 @@ public class ProtoTreeInternal {
         this.eValue = eValue;
     }
 
-    public String getDomainPredThreads() {
-        return domainPredThreads;
-    }
-
-    public void setDomainPredThreads(String domainPredThreads) {
-        this.domainPredThreads = domainPredThreads;
-    }
 
     public void setFields() {
-        fieldsForAlignment.add(getAlignmentOutputFileName());
-        fieldsForAlignment.add(getAlignmentAlg());
-        fieldsForAlignment.add(getAlignThreads());
-        fieldsForAlignment.add(getReorderOrNot());
-        fieldsForTreeBuild.add(getSvgOutputFileName());
-        fieldsForTreeBuild.add(getNewickOutputFileName());
-        fieldsForTreeBuild.add(getTreeBuildMethod());
-        fieldsForTreeBuild.add(getAaSubstModel());
-        fieldsForTreeBuild.add(getAaSubstRate());
-        fieldsForTreeBuild.add(getInitialTreeForMl());
-        fieldsForTreeBuild.add(getGapsAndMissingData());
-        fieldsForTreeBuild.add(getSiteCovCutOff());
-        fieldsForTreeBuild.add(getPhylogenyTest());
-        fieldsForTreeBuild.add(getNumberOrReplicates());
-        fieldsForTreeBuild.add(getTreeThreads());
-        fieldsForProtFeature.add(getiFileTypeForDomainsProc());
-        fieldsForProtFeature.add(getDomainPredictionType());
-        fieldsForProtFeature.add(getTmhhmmResultFileName());
-        fieldsForProtFeature.add(geteValue());
-        fieldsForProtFeature.add(getDomainPredThreads());
+        fieldsForAlignmentAndTreeBuild.add(getAlignmentAlg());
+        fieldsForAlignmentAndTreeBuild.add(getAlignThreads());
+        fieldsForAlignmentAndTreeBuild.add(getReorderOrNot());
 
-        allFields.addAll(fieldsForAlignment);
-        allFields.addAll(fieldsForTreeBuild);
+        fieldsForAlignmentAndTreeBuild.add(getTreeBuildMethod());
+        fieldsForAlignmentAndTreeBuild.add(getAaSubstModel());
+        fieldsForAlignmentAndTreeBuild.add(getAaSubstRate());
+        fieldsForAlignmentAndTreeBuild.add(getInitialTreeForMl());
+        fieldsForAlignmentAndTreeBuild.add(getGapsAndMissingData());
+        fieldsForAlignmentAndTreeBuild.add(getSiteCovCutOff());
+        fieldsForAlignmentAndTreeBuild.add(getPhylogenyTest());
+        fieldsForAlignmentAndTreeBuild.add(getNumberOrReplicates());
+        fieldsForAlignmentAndTreeBuild.add(getTreeThreads());
+
+        fieldsForProtFeature.add(getDomainPredictionProgram());
+        fieldsForProtFeature.add(geteValue());
+
+        allFields.addAll(fieldsForAlignmentAndTreeBuild);
         allFields.addAll(fieldsForProtFeature);
 
         allFields.add(getFirstFileName());
@@ -259,11 +209,11 @@ public class ProtoTreeInternal {
         return allFields;
     }
 
-    public String getSvgOutputFileName() {
-        return svgOutputFileName;
+    public List<String> getFieldsForAlignmentAndTreeBuild() {
+        return fieldsForAlignmentAndTreeBuild;
     }
 
-    public void setSvgOutputFileName(String svgOutputFileName) {
-        this.svgOutputFileName = svgOutputFileName;
+    public List<String> getFieldsForProtFeature() {
+        return fieldsForProtFeature;
     }
 }

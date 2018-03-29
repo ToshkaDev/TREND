@@ -3,7 +3,6 @@ package serviceimpl;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static converters.ConverterMain.fromEvolRequestToEvolInternal;
 import static converters.ConverterMain.fromProtoTreeRequestToProtoTreeInternal;
-import static converters.ConverterMain.fromSeqRequestToSeqInternal;
 
 import java.io.*;
 import java.time.LocalDateTime;
@@ -16,10 +15,8 @@ import biojobs.BioJobResultDao;
 import enums.ParamPrefixes;
 import model.internal.EvolutionInternal;
 import model.internal.ProtoTreeInternal;
-import model.internal.SequenceInternal;
 import model.request.EvolutionRequest;
 import model.request.ProtoTreeRequest;
-import model.request.SequenceRequest;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -131,6 +128,66 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
     public ProtoTreeInternal storeFilesAndPrepareCommandArgumentsP(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
         ProtoTreeInternal protoTreeInternal = storeFileAndGetInternalRepresentationP(protoTreeRequest);
         protoTreeInternal.setFields();
+
+
+        List<String> argsForProteinFeatures = new LinkedList<>();
+        List<String> argsForAlignmentAndTree = new LinkedList<>();
+        List<String> argsForTreeWithDomains = new LinkedList<>();
+
+
+        String hmmscanOrRpsbOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+        String rpsbProcOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+        String tmhmmscanOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+        String proteinFeaturesOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+        String eValueThreashold = "0.01";
+        String numberOfThreads = "4";
+        argsForProteinFeatures.addAll(Arrays.asList(
+                protoTreeInternal.getFirstFileName(),
+                protoTreeInternal.getDomainPredictionProgram(),
+                ParamPrefixes.OUTPUT_FOURTH.getPrefix() + hmmscanOrRpsbOutFile,
+                ParamPrefixes.OUTPUT_FIFTH.getPrefix() + rpsbProcOutFile,
+                ParamPrefixes.OUTPUT_SIXTH.getPrefix() + tmhmmscanOutFile,
+                ParamPrefixes.HMMSCAN_DB_PATH.getPrefix() + super.getProperties().getHmmscanDbPath(),
+                ParamPrefixes.RPSBLAST_DB_PATH.getPrefix() + super.getProperties().getRpsblastDbPath(),
+                ParamPrefixes.RPSBPROC_DB_PATH.getPrefix() + super.getProperties().getRpsprocDbPath(),
+                ParamPrefixes.RPSBLAST_SP_DB.getPrefix() + super.getProperties().getRpsblastSpDb(),
+                ParamPrefixes.HMMSCAN_PATH.getPrefix() + super.getProperties().getHmmscanPath(),
+                ParamPrefixes.RPSBLAST_PATH.getPrefix() + super.getProperties().getRpsblastPath(),
+                ParamPrefixes.RPSBPROC_PATH.getPrefix() + super.getProperties().getRpsbprocPath(),
+                ParamPrefixes.TMHMM_PATH.getPrefix() + super.getProperties().getTmhmm2Path(),
+                ParamPrefixes.EVAL_THRESH.getPrefix() + eValueThreashold,
+                ParamPrefixes.THREAD.getPrefix() + numberOfThreads,
+                ParamPrefixes.OUTPUT_PROTEIN_FEAUTURES.getPrefix() + proteinFeaturesOutFile
+        ));
+
+
+        String numberOfThreadsForTree = "4";
+        String numberOfThreadsForAlgn = "4";
+        String outAlgnFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+        String outNewickTree = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+
+        argsForAlignmentAndTree.addAll(protoTreeInternal.getFieldsForAlignmentAndTreeBuild());
+        argsForAlignmentAndTree.addAll(Arrays.asList(
+                ParamPrefixes.OUTPUT_PARAMS.getPrefix() + super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix(),
+                ParamPrefixes.OUTPUT_TREE.getPrefix() + outNewickTree,
+                ParamPrefixes.THREAD.getPrefix() + numberOfThreadsForAlgn,
+                ParamPrefixes.TREE_THREAD + numberOfThreadsForTree,
+                ParamPrefixes.OUTPUT.getPrefix() + outAlgnFile
+        ));
+
+        String outNewickFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+        String outSvgFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+        String outOrderedAlgnFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+
+        argsForTreeWithDomains.addAll(Arrays.asList(
+                protoTreeInternal.getFirstFileName(),
+                ParamPrefixes.INPUT_SECOND.getPrefix() + outAlgnFile,
+                ParamPrefixes.INPUT_THIRD.getPrefix() + outNewickTree,
+                ParamPrefixes.INPUT_FOURTH.getPrefix() + proteinFeaturesOutFile,
+                ParamPrefixes.OUTPUT.getPrefix() + outOrderedAlgnFile,
+                ParamPrefixes.OUTPUT_SECOND.getPrefix() + outSvgFile,
+                ParamPrefixes.OUTPUT_THIRD.getPrefix() + outNewickFile
+        ));
         return protoTreeInternal;
 
     }
@@ -144,6 +201,7 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         List<String> argsForPrepNames = new LinkedList<>();
         List<String> argsForBlast = new LinkedList<>();
         List<String> argsForCreateCogs = new LinkedList<>();
+
         argsForPrepNames.addAll(Arrays.asList(ParamPrefixes.INPUT.getPrefix()+locations[0], ParamPrefixes.OUTPUT.getPrefix()+locations[1]));
         argsForPrepNames.addAll(evolutionInternal.getFieldForIntermScript());
 

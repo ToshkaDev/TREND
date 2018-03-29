@@ -24,7 +24,7 @@ public class ConverterMain {
         protoTreeInternal.setFirstFileName(checkForNullAndGet(ParamPrefixes.INPUT.getPrefix(), firstFileName));
         protoTreeInternal.setSecondFileName(checkForNullAndGet(ParamPrefixes.INPUT_SECOND.getPrefix(), secondFileName));
         protoTreeInternal.setThirdFileName(checkForNullAndGet(ParamPrefixes.INPUT_THIRD.getPrefix(), thirdFileName));
-        protoTreeInternal.setAlignmentAlg(checkForNullAndGet(ParamPrefixes.ALGORITHM.getPrefix(), protoTreeRequest.getAlignmentAlg()));
+
         protoTreeInternal.setTreeBuildMethod(checkForNullAndGet(ParamPrefixes.TREE_BUILD_METHOD.getPrefix(), protoTreeRequest.getTreeBuildMethod()));
         protoTreeInternal.setAaSubstModel(checkForNullAndGet(ParamPrefixes.AA_SUBST_MODEL.getPrefix(), protoTreeRequest.getAaSubstModel()));
         protoTreeInternal.setAaSubstRate(checkForNullAndGet(ParamPrefixes.AA_SUBST_RATE.getPrefix(), protoTreeRequest.getAaSubstRate()));
@@ -33,10 +33,16 @@ public class ConverterMain {
         protoTreeInternal.setSiteCovCutOff(checkForNullAndGet(ParamPrefixes.SITE_COV_CUTOFF.getPrefix(), protoTreeRequest.getSiteCovCutOff()));
         protoTreeInternal.setPhylogenyTest(checkForNullAndGet(ParamPrefixes.PHYLOGENY_TEST.getPrefix(), protoTreeRequest.getPhylogenyTest()));
         protoTreeInternal.setNumberOrReplicates(checkForNullAndGet(ParamPrefixes.NUMBER_OF_REPLICATES.getPrefix(), protoTreeRequest.getNumberOrReplicates()));
-        protoTreeInternal.setAlignThreads(checkForNullAndGet(ParamPrefixes.THREAD.getPrefix(), protoTreeRequest.getAlignThreads()));
         protoTreeInternal.setTreeThreads(checkForNullAndGet(ParamPrefixes.TREE_THREAD.getPrefix(), protoTreeRequest.getTreeThreads()));
-        protoTreeInternal.setReorderOrNot(checkForNullAndGet(ParamPrefixes.REORDER.getPrefix(), protoTreeRequest.getReorderOrNot()));
-		return protoTreeInternal;
+
+		protoTreeInternal.setAlignThreads(checkForNullAndGet(ParamPrefixes.THREAD.getPrefix(), protoTreeRequest.getAlignThreads()));
+		protoTreeInternal.setReorderOrNot(checkForNullAndGet(ParamPrefixes.REORDER.getPrefix(), protoTreeRequest.getReorderOrNot()));
+		protoTreeInternal.setAlignmentAlg(checkForNullAndGet(ParamPrefixes.ALGORITHM.getPrefix(), protoTreeRequest.getAlignmentAlg()));
+
+		protoTreeInternal.setDomainPredictionProgram(checkForNullAndGet(ParamPrefixes.DOMAINS_PREDICTION_PROGRAM.getPrefix(), protoTreeRequest.getDomainPredictionProgram()));
+
+
+        return protoTreeInternal;
 	}
 
 	public static SequenceInternal fromSeqRequestToSeqInternal(SequenceRequest sequenceRequest, String firstFileName,
