@@ -18,6 +18,12 @@ public class AppProperties {
     private String blastAllVsAllProgram = bioProgramsDir + "/blast-all-vs-all.sh";
     private String createCogs = bioProgramsDir + "/createCOGs.py";
 
+
+    private String calculateProteinFeatures = bioProgramsDir + "/getProteinFeatures.py";
+    private String alignAndBuildTree = bioProgramsDir + "/alignAndBuildTree";
+    private String addProtFeaturesToTree = bioProgramsDir + "/addProtFeaturesToTree";
+
+
     private String alignMultiple = bioProgramsDir + "/align_multiple.sh";
     private String concatenate = bioProgramsDir + "/concatenate.py";
 
@@ -160,6 +166,30 @@ public class AppProperties {
 
     public void setConcatenate(String concatenate) {
         this.concatenate = concatenate;
+    }
+
+    public String getCalculateProteinFeatures() {
+        return calculateProteinFeatures;
+    }
+
+    public void setCalculateProteinFeatures(String calculateProteinFeatures) {
+        this.calculateProteinFeatures = calculateProteinFeatures;
+    }
+
+    public String getAlignAndBuildTree() {
+        return alignAndBuildTree;
+    }
+
+    public void setAlignAndBuildTree(String alignAndBuildTree) {
+        this.alignAndBuildTree = alignAndBuildTree;
+    }
+
+    public String getAddProtFeaturesToTree() {
+        return addProtFeaturesToTree;
+    }
+
+    public void setAddProtFeaturesToTree(String addProtFeaturesToTree) {
+        this.addProtFeaturesToTree = addProtFeaturesToTree;
     }
 
     public String getHmmscanDbPath() {

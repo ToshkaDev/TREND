@@ -26,6 +26,7 @@ public class EvolutionInternal {
     private String proteinNameColumn;
     private String cogIdColumn;
 
+
     public String getFileDelim() {
         return fileDelim;
     }

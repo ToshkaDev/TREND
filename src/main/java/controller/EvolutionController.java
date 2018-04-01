@@ -24,7 +24,7 @@ import exceptions.IncorrectRequestException;
 import enums.BioPrograms;
 
 
-
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -44,6 +44,7 @@ public class EvolutionController extends BioUniverseController {
 
     @Autowired
     public final EvolutionService evolutionService;
+
 
     private static final Log logger = LogFactory.getLog(EvolutionController.class);
 
@@ -95,9 +96,9 @@ public class EvolutionController extends BioUniverseController {
             String[] locations = evolutionService.createDirs();
             protoTreeInternal = evolutionService.storeFilesAndPrepareCommandArgumentsP(protoTreeRequest);
         }
-        Integer jobId = 1;
-//        Integer jobId = protoTreeInternal.getJobId();
-//        evolutionService.runMainProgram(protoTreeInternal);
+
+        Integer jobId = protoTreeInternal.getJobId();
+        evolutionService.runMainProgramP(protoTreeInternal);
 
         return String.valueOf(jobId);
     }
@@ -148,6 +149,22 @@ public class EvolutionController extends BioUniverseController {
         BioJobResult bioJobResult = ((BioUniverseService) evolutionService).getBioJobResultDao().findByResultFileName(filename);
 
         response.setContentType("text/plain");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + bioJobResult.getResultFileName());
+
+        OutputStream outputStream = response.getOutputStream();
+        OutputStream buffOutputStream= new BufferedOutputStream(outputStream);
+        OutputStreamWriter outputwriter = new OutputStreamWriter(buffOutputStream);
+
+        outputwriter.write(bioJobResult.getResultFile());
+        outputwriter.flush();
+        outputwriter.close();
+    }
+
+    @GetMapping("/univ_files/{filename:.+}")
+    public void getFileFromDbP(@PathVariable String filename, HttpServletResponse response) throws IOException {
+        BioJobResult bioJobResult = ((BioUniverseService) evolutionService).getBioJobResultDao().findByResultFileName(filename);
+
+        response.setContentType("image/svg+xml");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + bioJobResult.getResultFileName());
 
         OutputStream outputStream = response.getOutputStream();

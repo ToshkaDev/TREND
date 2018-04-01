@@ -10,11 +10,12 @@ import model.request.ProtoTreeRequest;
 
 public interface EvolutionService {
 	void runMainProgram(EvolutionInternal evolutionInternal) throws IncorrectRequestException;
+	void runMainProgramP(ProtoTreeInternal protoTreeInternal) throws IncorrectRequestException;
 
 	String[] createDirs();
 	String[] createDirsConcat();
 
-	ProtoTreeInternal storeFilesAndPrepareCommandArgumentsP(ProtoTreeRequest protoTreeRequest);
+	ProtoTreeInternal storeFilesAndPrepareCommandArgumentsP(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException;
 	EvolutionInternal storeFilesAndPrepareCommandArguments (EvolutionRequest evolutionRequest, String[] locations) throws IncorrectRequestException;
 	EvolutionInternal storeFilesAndPrepareCommandArgumentsConcat(final EvolutionRequest evolutionRequest, String[] locations) throws IncorrectRequestException;
 	BioJob getBioJobIfFinished(int jobId);

@@ -97,34 +97,6 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         return evolutionInternal;
     }
 
-//    public EvolutionInternal storeFilesAndPrepareCommandArgumentsU(final EvolutionRequest evolutionRequest,
-//                                                                   String[] locations,
-//                                                                   int numberOfIntermScripts,
-//                                                                   Map<Integer, List<String>> intermediateParams) throws IncorrectRequestException {
-//        EvolutionInternal evolutionInternal = storeFileAndGetInternalRepresentation(evolutionRequest, locations[0]);
-//        evolutionInternal.setFields();
-//        evolutionInternal.setOutputFileName(super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix());
-//
-//        List<List<String>> listOfArgumentLists = new LinkedList<>();
-//        List<String> argsForScript = new LinkedList<>();
-//
-//        for (int i = 0; i < numberOfIntermScripts; i++) {
-//            argsForScript = new LinkedList<>();
-//            argsForScript.addAll(Arrays.asList(ParamPrefixes.INPUT.getPrefix()+locations[i], ParamPrefixes.OUTPUT.getPrefix()+locations[i+1]));
-//            if (intermediateParams.containsKey(i)) {
-//                argsForScript.addAll(intermediateParams.get(i));
-//            }
-//            listOfArgumentLists.add(argsForScript);
-//        }
-//
-//        argsForScript.add(ParamPrefixes.INPUT.getPrefix()+locations[locations.length-1]);
-//        argsForScript.addAll(evolutionInternal.getAllFields());
-//
-//
-//	    return null;
-//    }
-
-
     public ProtoTreeInternal storeFilesAndPrepareCommandArgumentsP(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
         ProtoTreeInternal protoTreeInternal = storeFileAndGetInternalRepresentationP(protoTreeRequest);
         protoTreeInternal.setFields();
@@ -179,6 +151,8 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         String outSvgFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
         String outOrderedAlgnFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
 
+        protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, outOrderedAlgnFile));
+
         argsForTreeWithDomains.addAll(Arrays.asList(
                 protoTreeInternal.getFirstFileName(),
                 ParamPrefixes.INPUT_SECOND.getPrefix() + outAlgnFile,
@@ -188,6 +162,16 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
                 ParamPrefixes.OUTPUT_SECOND.getPrefix() + outSvgFile,
                 ParamPrefixes.OUTPUT_THIRD.getPrefix() + outNewickFile
         ));
+
+        String[] arrayOfInterpreters = {super.getPython(), super.getPython(), super.getPython()};
+
+        String[] arrayOfPrograms = {super.getProperties().getCalculateProteinFeatures(),
+                super.getProperties().getAlignAndBuildTree(),
+                super.getProgram(protoTreeInternal.getCommandToBeProcessedBy())};
+        List<List<String>> listOfArgumentLists = new LinkedList<>(Arrays.asList(argsForProteinFeatures, argsForAlignmentAndTree, argsForTreeWithDomains));
+
+        prepareCommandArgumentsCommonP(protoTreeInternal, arrayOfInterpreters, arrayOfPrograms, listOfArgumentLists);
+
         return protoTreeInternal;
 
     }
@@ -238,6 +222,22 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         evolutionInternal.setCommandsAndArguments(commandsAndArguments);
     }
 
+    public void prepareCommandArgumentsCommonP(ProtoTreeInternal protoTreeInternal, String[] arrayOfInterpreters,
+                                              String[] arrayOfPrograms, List<List<String>> listOfArgumentLists) {
+        List<List<String>> commandsAndArguments = new LinkedList<>();
+
+        for (int i=0; i< arrayOfPrograms.length; i++) {
+            List<String> listOfCommandsAndArgs= new LinkedList<>();
+            listOfCommandsAndArgs.add(arrayOfInterpreters[i]);
+            listOfCommandsAndArgs.add(arrayOfPrograms[i]);
+            listOfCommandsAndArgs.addAll(listOfArgumentLists.get(i));
+            commandsAndArguments.add(listOfCommandsAndArgs);
+        }
+        int jobId = saveBioJobToDBP(protoTreeInternal);
+        protoTreeInternal.setJobId(jobId);
+        protoTreeInternal.setCommandsAndArguments(commandsAndArguments);
+    }
+
 
     @Override
     @Async
@@ -248,6 +248,14 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         saveResultFileToDB(evolutionInternal);
     }
 
+    @Override
+    @Async
+    public void runMainProgramP(ProtoTreeInternal protoTreeInternal) throws IncorrectRequestException {
+        for (List<String> commandArgument : protoTreeInternal.getCommandsAndArguments()) {
+            super.launchProcess(commandArgument);
+        }
+        saveResultToDb(protoTreeInternal);
+    }
 
 	public int saveBioJobToDB(EvolutionInternal evolutionInternal) {
 		int jobId = getLastJobId();
@@ -268,7 +276,29 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
 		return jobId;
 	}
 
-	public void saveResultFileToDB(EvolutionInternal evolutionInternal) {
+    public int saveBioJobToDBP(ProtoTreeInternal protoTreeInternal) {
+        int jobId = getLastJobId();
+
+        BioJob bioJob = new BioJob();
+        bioJob.setProgramNameName(super.getProgram(protoTreeInternal.getCommandToBeProcessedBy()));
+        bioJob.setJobId(jobId);
+        bioJob.setJobDate(LocalDateTime.now());
+        bioJob.setFinished(false);
+
+        for (String filename : protoTreeInternal.getOutputFilesNames()) {
+            BioJobResult bioJobResult = new BioJobResult();
+            bioJobResult.setResultFile("placeholder");
+            bioJobResult.setResultFileName(filename);
+            bioJobResult.setBiojob(bioJob);
+            bioJob.addToBioJobResultList(bioJobResult);
+        }
+
+        super.getBioJobDao().save(bioJob);
+        return jobId;
+    }
+
+
+    public void saveResultFileToDB(EvolutionInternal evolutionInternal) {
 		File file = null;
 		try {
 			file = getStorageService().loadAsResource(evolutionInternal.getOutputFileName()).getFile();
@@ -296,6 +326,40 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
 		bioJob.setFinished(true);
         super.getBioJobDao().save(bioJob);
 	}
+
+    public void saveResultToDb(ProtoTreeInternal protoTreeInternal) {
+	    for (String filename : protoTreeInternal.getOutputFilesNames()) {
+            saveResultFileToDBP(filename);
+        }
+        BioJob bioJob = super.getBioJobDao().findByJobId(protoTreeInternal.getJobId());
+        bioJob.setFinished(true);
+        super.getBioJobDao().save(bioJob);
+    }
+
+    private void saveResultFileToDBP(String filename) {
+        File file = null;
+        try {
+            file = getStorageService().loadAsResource(filename).getFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        StringBuilder fileAsStringBuilder = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                fileAsStringBuilder.append(line + "\n");
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Can't find file " + file.toString());
+        } catch (IOException e) {
+            System.out.println("Unable to read file " + file.toString());
+        }
+
+        BioJobResult bioJobResult = super.getBioJobResultDao().findByResultFileName(filename);
+        bioJobResult.setResultFile(fileAsStringBuilder.toString());
+        super.getBioJobResultDao().save(bioJobResult);
+    }
 
 	private Integer getLastJobId() {
         Integer lastJobId = super.getBioJobDao().getLastJobId();

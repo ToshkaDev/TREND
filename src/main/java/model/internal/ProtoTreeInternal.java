@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ProtoTreeInternal {
+    private int jobId;
+
     private String firstFileName;
     private String secondFileName;
     private String thirdFileName;
@@ -27,20 +29,48 @@ public class ProtoTreeInternal {
 	private String eValue;
 
     private String  commandToBeProcessedBy;
-    private List<String> fieldsForAlignmentAndTreeBuild = new LinkedList<>();
-    private List<String> fieldsForProtFeature = new LinkedList<>();
+    private List<List<String>> commandsAndArguments;
+    private List<String> outputFilesNames = new LinkedList<>();
 
+    private List<String> fieldsForAlignmentAndTreeBuild = new LinkedList<>();
     private List<String> allFields = new LinkedList<>();
+
+    public int getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(int jobId) {
+        this.jobId = jobId;
+    }
+
+    public List<List<String>> getCommandsAndArguments() {
+        return commandsAndArguments;
+    }
+
+    public void setCommandsAndArguments(List<List<String>> commandsAndArguments) {
+        this.commandsAndArguments = commandsAndArguments;
+    }
+
+    public List<String> getOutputFilesNames() {
+        return outputFilesNames;
+    }
+
+    public void setOutputFilesNames(List<String> outputFilesNames) {
+        this.outputFilesNames = outputFilesNames;
+    }
 
     public String getFirstFileName() {
         return firstFileName;
     }
+
     public void setFirstFileName(String firstFileName) {
         this.firstFileName = firstFileName;
     }
+
     public String getSecondFileName() {
         return secondFileName;
     }
+
     public void setSecondFileName(String secondFileName) {
         this.secondFileName = secondFileName;
     }
@@ -176,6 +206,7 @@ public class ProtoTreeInternal {
 
 
     public void setFields() {
+        fieldsForAlignmentAndTreeBuild.add(getFirstFileName());
         fieldsForAlignmentAndTreeBuild.add(getAlignmentAlg());
         fieldsForAlignmentAndTreeBuild.add(getAlignThreads());
         fieldsForAlignmentAndTreeBuild.add(getReorderOrNot());
@@ -190,11 +221,7 @@ public class ProtoTreeInternal {
         fieldsForAlignmentAndTreeBuild.add(getNumberOrReplicates());
         fieldsForAlignmentAndTreeBuild.add(getTreeThreads());
 
-        fieldsForProtFeature.add(getDomainPredictionProgram());
-        fieldsForProtFeature.add(geteValue());
-
         allFields.addAll(fieldsForAlignmentAndTreeBuild);
-        allFields.addAll(fieldsForProtFeature);
 
         allFields.add(getFirstFileName());
         if (getSecondFileName() != null) {
@@ -213,7 +240,4 @@ public class ProtoTreeInternal {
         return fieldsForAlignmentAndTreeBuild;
     }
 
-    public List<String> getFieldsForProtFeature() {
-        return fieldsForProtFeature;
-    }
 }
