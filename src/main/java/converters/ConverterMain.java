@@ -3,12 +3,8 @@ package converters;
 import enums.Delimeters;
 import enums.ParamPrefixes;
 import exceptions.IncorrectRequestException;
-import model.internal.EvolutionInternal;
 import model.internal.ProtoTreeInternal;
-import model.internal.SequenceInternal;
-import model.request.EvolutionRequest;
 import model.request.ProtoTreeRequest;
-import model.request.SequenceRequest;
 import service.StorageService;
 
 public class ConverterMain {
@@ -43,19 +39,6 @@ public class ConverterMain {
 
 
         return protoTreeInternal;
-	}
-
-	public static SequenceInternal fromSeqRequestToSeqInternal(SequenceRequest sequenceRequest, String firstFileName,
-															   String secondFileName) throws IncorrectRequestException {
-		SequenceInternal sequenceInternal = new SequenceInternal();
-		sequenceInternal.setFirstFileName(checkForNullAndGet(ParamPrefixes.INPUT.getPrefix(), firstFileName));
-		sequenceInternal.setSecondFileName(checkForNullAndGet(ParamPrefixes.INPUT_SECOND.getPrefix(), secondFileName));
-		sequenceInternal.setCommandToBeProcessedBy(sequenceRequest.getCommandToBeProcessedBy());
-		sequenceInternal.setFirstFileColumn(checkForNullAndGet(ParamPrefixes.COLUMN.getPrefix(), checkClmnAndGetString(sequenceRequest.getFirstFileColumn())));
-        sequenceInternal.setSecondFileColumn(checkForNullAndGet(ParamPrefixes.COLUMN_SECOND.getPrefix(), checkClmnAndGetString(sequenceRequest.getSecondFileColumn())));
-        sequenceInternal.setFirstFileDelim(checkForNullAndGet(ParamPrefixes.DELIM.getPrefix(), getInternalDelim(sequenceInternal.getFirstFileDelim())));
-        sequenceInternal.setSecondFileColumn(checkForNullAndGet(ParamPrefixes.DELIM_SECOND.getPrefix(), getInternalDelim(sequenceInternal.getSecondFileDelim())));
-        return sequenceInternal;
 	}
 
 	public static EvolutionInternal fromEvolRequestToEvolInternal(EvolutionRequest evolutionRequest) throws IncorrectRequestException {

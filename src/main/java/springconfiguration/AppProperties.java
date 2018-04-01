@@ -12,12 +12,6 @@ public class AppProperties {
     private String workingDirLocation = "bioinformatics-programs-workingDir";
     private String bioProgramsDir = "../bioinformatics-programs";
     private String pathToMainDirFromBioProgs = "../";
-    private String getSeqByName = bioProgramsDir + "/getSequencesByNames.py";
-    private String makeUnique = bioProgramsDir + "/getUniqueSeqs.py";
-    private String prepareNamesProgram = bioProgramsDir + "/prepareNames.sh";
-    private String blastAllVsAllProgram = bioProgramsDir + "/blast-all-vs-all.sh";
-    private String createCogs = bioProgramsDir + "/createCOGs.py";
-
 
     private String calculateProteinFeatures = bioProgramsDir + "/getProteinFeatures.py";
     private String alignAndBuildTree = bioProgramsDir + "/alignAndBuildTree";
@@ -72,14 +66,6 @@ public class AppProperties {
         this.pathToMainDirFromBioProgs = pathToMainDirFromBioProgs;
     }
 
-    public String getGetSeqByName() {
-        return getSeqByName;
-    }
-
-    public void setGetSeqByName(String getSeqByName) {
-        this.getSeqByName = getSeqByName;
-    }
-
     public String getPythonLocation() {
         return pythonLocation;
     }
@@ -96,14 +82,6 @@ public class AppProperties {
         this.resultFilePrefix = resultFilePrefix;
     }
 
-    public String getMakeUnique() {
-        return makeUnique;
-    }
-
-    public void setMakeUnique(String makeUnique) {
-        this.makeUnique = makeUnique;
-    }
-
     public String getBashLocation() {
         return bashLocation;
     }
@@ -118,30 +96,6 @@ public class AppProperties {
 
     public void setBlastpLocation(String blastpLocation) {
         this.blastpLocation = blastpLocation;
-    }
-
-    public String getPrepareNamesProgram() {
-        return prepareNamesProgram;
-    }
-
-    public void setPrepareNamesProgram(String prepareNamesProgram) {
-        this.prepareNamesProgram = prepareNamesProgram;
-    }
-
-    public String getBlastAllVsAllProgram() {
-        return blastAllVsAllProgram;
-    }
-
-    public void setBlastAllVsAllProgram(String blastAllVsAllProgram) {
-        this.blastAllVsAllProgram = blastAllVsAllProgram;
-    }
-
-    public String getCreateCogs() {
-        return createCogs;
-    }
-
-    public void setCreateCogs(String createCogs) {
-        this.createCogs = createCogs;
     }
 
     public String getPostfix() {
