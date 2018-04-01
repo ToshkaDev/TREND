@@ -9,9 +9,6 @@
             <div class="panel panel-default">
                 <div class="panel-body">
                     <ul class="nav nav-pills nav-stacked">
-                        <li id="createCogs"><a th:href="@{/evolution/create-cogs}">Create COGs</a></li>
-                        <li id="concatenate"><a th:href="@{/evolution/concatenate}">Concatenate MSAs</a></li>
-                        <li id="get-repr-proteins"><a th:href="@{/evolution/get-repr-proteins}">Select representative sequences</a></li>
                         <li id="protoTree"><a th:href="@{/evolution/prototree}">Proto Tree</a></li>
                     </ul>
                 </div>
@@ -22,19 +19,36 @@
     <div th:fragment="proto-tree">
         <div class="col-md-8 my-textarea">
             <div class="row">
+                <textarea id="first-file-area" class="form-control" placeholder="Paste names" rows="8"> </textarea>
+            </div>
+            OR <br />
+            <div class="row">
                 <label class="btn btn-default btn-lg">
                     Choose file with protein sequences <input id="first-file" type="file" style="display: none" multiple/>
                 </label>
+                <span class='label label-info' id="first-file-info"></span>
+            </div> <br /> <br />
+
+            <div class="row">
+                <textarea id="second-file-area" class="form-control" placeholder="Paste names" rows="8"> </textarea>
             </div>
+            OR <br />
             <div class="row">
                 <label class="btn btn-default btn-lg">
                     Choose file with tree <input id="second-file" type="file" style="display: none" multiple/>
                 </label>
+                <span class='label label-info' id="second-file-info"></span>
+            </div> <br /> <br />
+
+            <div class="row">
+                <textarea id="third-file-area" class="form-control" placeholder="Paste names" rows="8"> </textarea>
             </div>
+            OR <br />
             <div class="row">
                 <label class="btn btn-default btn-lg">
-                    Choose file with aligned sequences <input id="aligned-file" type="file" style="display: none" multiple/>
+                    Choose file with aligned sequences <input id="third-file" type="file" style="display: none" multiple/>
                 </label>
+                <span class='label label-info' id="third-file-info"></span>
             </div>
             <div class="row">
                 <button id="GoAsync" class="btn btn-primary btn-md pull-right" type="button">
@@ -130,102 +144,4 @@
             </div>
         </div>
     </div>
-
-    <div th:fragment="evolution-create-cogs">
-        <div class="col-md-8 my-textarea">
-            <div class="row">
-                <label class="btn btn-default btn-lg">
-                    Choose Files <input id="first-file" type="file" style="display: none" multiple/>
-                </label>
-                <span class='label label-info' id="first-file-info"></span>
-            </div>
-            <div class="row">
-                <button id="GoAsync" class="btn btn-primary btn-md pull-right" type="button">
-                    <span>Go!</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-
-    <div th:fragment="evolution-concatenate">
-        <div class="col-md-8 my-textarea">
-            <div class="row">
-                <label class="btn btn-default btn-lg">
-                    Choose files to be aligned and concatenated <input id="first-file" type="file" style="display: none" multiple/>
-                </label>
-            </div>
-            <div class="row">
-                <label class="btn btn-default btn-lg">
-                    Provide files with COGs <input id="second-file" type="file" style="display: none" multiple/>
-                </label>
-            </div>
-            <div class="row">
-                <label class="btn btn-default btn-lg">
-                    Provide list of organism names <input id="organisms-file" type="file" style="display: none" multiple/>
-                </label>
-            </div>
-            <div class="row">
-                <button id="GoAsync" class="btn btn-primary btn-md pull-right" type="button">
-                    <span>Go!</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div th:fragment="evolution-createCogs-filter">
-        <div class="col-md-2 panel panel-default">
-            <div class="panel-body">
-                <p class="text-primary">Set options:</p>
-                <div class="form-group">
-                    <form id="first">
-                        <small>File delimiter:</small>
-                        <select id="first-delim" class="form-control input-sm">
-                            <option selected='selected' disabled="disabled">select</option>
-                            <option>tab</option>
-                            <option>comma</option>
-                            <option>semicolon</option>
-                            <option>vertical bar</option>
-                        </select>
-                        <small>File column:</small>
-                        <input id="first-col" name="first-col" type="text" class="form-control input-sm"/>
-                        <small>Identity threshold:</small>
-                        <input id="identity-threshold" name="identity-threshold" type="text" class="form-control input-sm"/>
-                        <small>Coverage threshold:</small>
-                        <input id="coverage-threshold" name="coverage-threshold" type="text" class="form-control input-sm"/>
-                        <small>E-value threshold:</small>
-                        <input id="evalue-threshold" name="evalue-threshold" type="text" class="form-control input-sm"/>
-                        <small>Merge:</small>
-                        <label class="radio-inline">
-                            <input name="merge" type="radio" value="yes" checked="checked" />yes
-                        </label>
-                        <label class="radio-inline">
-                            <input name="merge" type="radio" value="no"/>no
-                        </label>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div th:fragment="evolution-concatenate-filter">
-        <div class="col-md-2 panel panel-default">
-            <div class="panel-body">
-                <p class="text-primary" data-toggle="tooltip" title="In case you provide your set of sequences to be concatenated">
-                    Set options <span class="fa fa-question"></span>
-                </p>
-                <div class="form-group">
-                    <form id="first">
-                        <small>Organism name column (default 2):</small>
-                        <input id="organism-name-col" name="organism-name-col" type="text" class="form-control input-sm"/>
-                        <small>Protein name column (default 1):</small>
-                        <input id="protein-name-col" name="protein-name-col" type="text" class="form-control input-sm"/>
-                        <small>COG identifier column(if present):</small>
-                        <input id="cogId-col" name="cogId-col" type="text" class="form-control input-sm"/>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </body>

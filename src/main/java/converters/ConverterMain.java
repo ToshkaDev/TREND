@@ -29,47 +29,12 @@ public class ConverterMain {
         protoTreeInternal.setSiteCovCutOff(checkForNullAndGet(ParamPrefixes.SITE_COV_CUTOFF.getPrefix(), protoTreeRequest.getSiteCovCutOff()));
         protoTreeInternal.setPhylogenyTest(checkForNullAndGet(ParamPrefixes.PHYLOGENY_TEST.getPrefix(), protoTreeRequest.getPhylogenyTest()));
         protoTreeInternal.setNumberOrReplicates(checkForNullAndGet(ParamPrefixes.NUMBER_OF_REPLICATES.getPrefix(), protoTreeRequest.getNumberOrReplicates()));
-        protoTreeInternal.setTreeThreads(checkForNullAndGet(ParamPrefixes.TREE_THREAD.getPrefix(), protoTreeRequest.getTreeThreads()));
-
-		protoTreeInternal.setAlignThreads(checkForNullAndGet(ParamPrefixes.THREAD.getPrefix(), protoTreeRequest.getAlignThreads()));
-		protoTreeInternal.setReorderOrNot(checkForNullAndGet(ParamPrefixes.REORDER.getPrefix(), protoTreeRequest.getReorderOrNot()));
 		protoTreeInternal.setAlignmentAlg(checkForNullAndGet(ParamPrefixes.ALGORITHM.getPrefix(), protoTreeRequest.getAlignmentAlg()));
 
 		protoTreeInternal.setDomainPredictionProgram(checkForNullAndGet(ParamPrefixes.DOMAINS_PREDICTION_PROGRAM.getPrefix(), protoTreeRequest.getDomainPredictionProgram()));
 
 
         return protoTreeInternal;
-	}
-
-	public static EvolutionInternal fromEvolRequestToEvolInternal(EvolutionRequest evolutionRequest) throws IncorrectRequestException {
-		EvolutionInternal evolutionInternal = new EvolutionInternal();
-		evolutionInternal.setFileColumn(checkForNullAndGet(ParamPrefixes.COLUMN.getPrefix(), checkClmnAndGetString(evolutionRequest.getFileColumn())));
-		evolutionInternal.setCoverageThreshold(checkForNullAndGet(ParamPrefixes.COVERAGE_THRESH.getPrefix(), checkNumAndGetString(evolutionRequest.getCoverageThreshold())));
-		evolutionInternal.setIdentityThreshold(checkForNullAndGet(ParamPrefixes.IDENTITY_THRESH.getPrefix(), checkNumAndGetString(evolutionRequest.getIdentityThreshold())));
-		evolutionInternal.setEvalueThreshold(checkForNullAndGet(ParamPrefixes.EVAL_THRESH.getPrefix(), checkNumAndGetString(evolutionRequest.getEvalueThreshold())));
-		evolutionInternal.setDoMerge(checkForNullAndGet(ParamPrefixes.MERGE.getPrefix(), evolutionRequest.getDoMerge()));
-		evolutionInternal.setFileDelim(checkForNullAndGet(ParamPrefixes.DELIM.getPrefix(), getInternalDelim(evolutionRequest.getFileDelim())));
-		evolutionInternal.setCommandToBeProcessedBy(evolutionRequest.getCommandToBeProcessedBy());
-
-
-		evolutionInternal.setOrganismNameColumn(checkForNullAndGet(ParamPrefixes.COLUMN.getPrefix(), checkClmnAndGetString(evolutionRequest.getFileColumn())));
-        evolutionInternal.setProteinNameColumn(checkForNullAndGet(ParamPrefixes.COLUMN.getPrefix(), checkClmnAndGetString(evolutionRequest.getFileColumn())));
-        evolutionInternal.setCogIdColumn(checkForNullAndGet(ParamPrefixes.COLUMN.getPrefix(), checkClmnAndGetString(evolutionRequest.getFileColumn())));
-
-
-		return evolutionInternal;
-	}
-	
-	private static String getInternalDelim(String field) throws IncorrectRequestException {
-		String internalDelim = null;
-		if (field != null) {
-			try {
-				internalDelim = Delimeters.valueOf(field.toUpperCase()).toString();
-			} catch (Exception e) {
-				throw new IncorrectRequestException("Delimiter of Request object is incorrect.", e);
-			}
-		}
-		return internalDelim;
 	}
 
 	private static String checkForNullAndGet(String paramPrefix, String param) {
@@ -79,18 +44,4 @@ public class ConverterMain {
 		return null;
 	}
 
-
-	private static String checkClmnAndGetString(Number num) {
-		if (num != null) {
-			return String.valueOf(num.intValue()-1);
-		}
-		return null;
-
-	}
-	private static String checkNumAndGetString(Number num) {
-		if (num != null) {
-			return String.valueOf(num);
-		}
-		return null;
-	}
 }

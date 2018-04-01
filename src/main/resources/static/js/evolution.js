@@ -1,82 +1,89 @@
 function getOptions() {
-    console.log("getOptions() called!")
+	var firstFile = $('#first-file')[0].files[0];
+	if (typeof $('#second-file')[0] != 'undefined') {
+	    var secondFile = $('#second-file')[0].files[0];
+    }
+    if (typeof $('#third-file')[0] != 'undefined') {
+        var thirdFile = $('#third-file')[0].files[0];
+    }
+	var firstFileArea = $('#first-file-area').val();
+	var secondFileArea = $('#second-file-area').val();
+	var thirdFileArea = $('#third-file-area').val();
+    var alignmentAlg = $('#alignment-alg').val();
+    var treeBuildMethod = $('#tree-method').val();
+
+    var mlSubstModel = $('#ml-subst-model').val();
+    var njMeSubstModel = $('#nj_me-subst-model').val();
+
+    var aaSubstRate = $('#subst-rate').val();
+    var initialTreeForMl = $('#initial-tree-ml').val();
+    var gapsAndMissingData = $('#gaps-missing').val();
+    var siteCovCutOff = $('#site-cov-cutoff').val();
+    var njMePhyloTest = $('#nj_me-phylo-test').val();
+    var mlPhyloTest = $('#ml-phylo-test').val();
+    var numberOrReplicates = $('#number-of-replicates').val();
+    var domainPredictionProgram = $('#domain-prediction-program').val() //set up!
+
+    var optionToOptionNameMain = {
+        "firstFile": firstFile,
+        "secondFile": secondFile,
+        "thirdFile": thirdFile,
+        "firstFileArea": firstFileArea,
+        "secondFileArea": secondFileArea,
+        "thirdFileArea": thirdFileArea,
+        "alignmentAlg": alignmentAlg,
+        "treeBuildMethod": treeBuildMethod,
+        "aaSubstRate": aaSubstRate,
+        "initialTreeForMl": initialTreeForMl,
+        "gapsAndMissingData": gapsAndMissingData,
+        "siteCovCutOff": siteCovCutOff,
+        "numberOrReplicates": numberOrReplicates,
+        "domainPredictionProgram": domainPredictionProgram,
+        "commandToBeProcessedBy": $('#subnavigation-tab').text()
+    }
+    var optionToOptionNameSubsModel = {
+        "mlSubstModel": mlSubstModel,
+        "njMeSubstModel": njMeSubstModel
+    }
+    var optionToOptionNamePhyloTest = {
+        "njMePhyloTest": njMePhyloTest,
+        "mlPhyloTest": mlPhyloTest
+    }
     var options = new FormData();
 
-	if (typeof $('#first-file')[0] != 'undefined') {
-		$.each($('#first-file')[0].files, function(i, file) {
-			options.append('listOfFiles', file);
-        });
+    for (optionName in optionToOptionNameMain) {
+        console.log("optionName " + optionName)
+        console.log("optionToOptionNameMain[optionName] " + optionToOptionNameMain[optionName])
+        if (optionIsDefined(optionName, optionToOptionNameMain[optionName], options)) {
+            options.append(optionName, optionToOptionNameMain[optionName]);
+        }
     }
-
-    var commandToBeProcessedBy = $('#subnavigation-tab').text();
-
-    if (commandToBeProcessedBy === "createCogs") {
-    	var fileDelim = $('#first-delim').val();
-    	var fileColumn = $('#first-col').val();
-    	var identityThreshold = $('#identity-threshold').val();
-    	var coverageThreshold = $('#coverage-threshold').val();
-    	var evalueThreshold = $('#evalue-threshold').val();
-    	var merge = $('input[name="merge"]:checked').val();
-
-
-        if (typeof fileDelim != 'undefined') {
-            if (fileDelim != null) {
-                options.append("fileDelim", fileDelim);
-            }
+    for (optionName in optionToOptionNameSubsModel) {
+        console.log("optionName " + optionName)
+        console.log("optionToOptionNameSubsModel[optionName] " + optionToOptionNameSubsModel[optionName])
+        if (optionIsDefined(optionName, optionToOptionNameSubsModel[optionName], options)) {
+            options.append("aaSubstModel", optionToOptionNameSubsModel[optionName]);
         }
-        if (typeof fileColumn != 'undefined') {
-            if (fileColumn != '') {
-                options.append("fileColumn", fileColumn);
-            }
-        }
-        if (typeof identityThreshold != 'undefined') {
-            if (identityThreshold != '') {
-                options.append("identityThreshold", identityThreshold);
-            }
-        }
-        if (typeof coverageThreshold != 'undefined') {
-            if (coverageThreshold != '') {
-                options.append("coverageThreshold", coverageThreshold);
-            }
-        }
-        if (typeof evalueThreshold != 'undefined') {
-            if (evalueThreshold != '') {
-                options.append("evalueThreshold", evalueThreshold);
-            }
-        }
-
-    } else if (commandToBeProcessedBy === "concatenate") {
-        var organismNameCol = $('#organism-name-col').val();
-        var proteinNameCol = $('#protein-name-col').val();
-        var cogIdCol = $('#cogId-col').val();
-
-
-        if (typeof organismNameCol != 'undefined') {
-            if (organismNameCol != '') {
-                options.append("organismNameCol", organismNameCol);
-            }
-        }
-        if (typeof proteinNameCol != 'undefined') {
-            if (organismNameCol != '') {
-                options.append("proteinNameCol", proteinNameCol);
-            }
-        }
-        if (typeof cogIdCol != 'undefined') {
-            if (organismNameCol != '') {
-                options.append("cogIdCol", cogIdCol);
-            }
+    }
+    for (optionName in optionToOptionNamePhyloTest) {
+        console.log("optionName " + optionName)
+        console.log("optionToOptionNamePhyloTest[optionName] " + optionToOptionNamePhyloTest[optionName])
+        if (optionIsDefined(optionName, optionToOptionNamePhyloTest[optionName], options)) {
+            options.append("phylogenyTest", optionToOptionNamePhyloTest[optionName]);
         }
     }
 
-
-
-    if (typeof commandToBeProcessedBy != 'undefined') {
-        if (commandToBeProcessedBy != '') {
-            options.append("commandToBeProcessedBy", commandToBeProcessedBy);
-        }
-    }
 
 	return options;
+}
+
+function optionIsDefined(option) {
+    if (typeof option != 'undefined') {
+        if (option != '') {
+            return true;
+        }
+    }
+    return false;
 }
 
 

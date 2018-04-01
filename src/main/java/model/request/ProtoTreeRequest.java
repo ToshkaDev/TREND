@@ -3,29 +3,21 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class ProtoTreeRequest {
     private MultipartFile firstFile;
-    private String firstFileTextArea;
-
+    private String firstFileArea;
     private MultipartFile secondFile;
-    private String secondFileTextArea;
-
+    private String secondFileArea;
     private MultipartFile thirdFile;
-    private String thirdFileTextArea;
-
+    private String thirdFileArea;
 
     private String treeBuildMethod;
     private String aaSubstModel;
     private String aaSubstRate;
     private String initialTreeForMl;
     private String gapsAndMissingData;
-    private String SiteCovCutOff;
+    private String siteCovCutOff;
     private String phylogenyTest;
     private String numberOrReplicates;
-    private String treeThreads;
-
     private String alignmentAlg;
-    private String alignThreads;
-    private String reorderOrNot;
-
     private String domainPredictionProgram;
 
     private String commandToBeProcessedBy;
@@ -36,14 +28,13 @@ public class ProtoTreeRequest {
     public void setFirstFile(MultipartFile file) {
         this.firstFile = file;
     }
-    public String getFirstFileTextArea() {
-        return firstFileTextArea;
+    public String getFirstFileArea() {
+        return firstFileArea;
     }
 
-    public void setFirstFileTextArea(String firstFileTextArea) {
-        this.firstFileTextArea = firstFileTextArea;
+    public void setFirstFileArea(String firstFileArea) {
+        this.firstFileArea = firstFileArea;
     }
-
 
     public MultipartFile getSecondFile() {
         return secondFile;
@@ -51,12 +42,12 @@ public class ProtoTreeRequest {
     public void setSecondFile(MultipartFile secondFile) {
         this.secondFile = secondFile;
     }
-    public String getSecondFileTextArea() {
-        return secondFileTextArea;
+    public String getSecondFileArea() {
+        return secondFileArea;
     }
 
-    public void setSecondFileTextArea(String secondFileTextArea) {
-        this.secondFileTextArea = secondFileTextArea;
+    public void setSecondFileArea(String secondFileArea) {
+        this.secondFileArea = secondFileArea;
     }
 
     public MultipartFile getThirdFile() {
@@ -67,12 +58,12 @@ public class ProtoTreeRequest {
         this.thirdFile = thirdFile;
     }
 
-    public String getThirdFileTextArea() {
-        return thirdFileTextArea;
+    public String getThirdFileArea() {
+        return thirdFileArea;
     }
 
-    public void setThirdFileTextArea(String thirdFileTextArea) {
-        this.thirdFileTextArea = thirdFileTextArea;
+    public void setThirdFileArea(String thirdFileArea) {
+        this.thirdFileArea = thirdFileArea;
     }
 
     public String getAlignmentAlg() {
@@ -124,11 +115,11 @@ public class ProtoTreeRequest {
     }
 
     public String getSiteCovCutOff() {
-        return SiteCovCutOff;
+        return siteCovCutOff;
     }
 
     public void setSiteCovCutOff(String siteCovCutOff) {
-        SiteCovCutOff = siteCovCutOff;
+        this.siteCovCutOff = siteCovCutOff;
     }
 
     public String getPhylogenyTest() {
@@ -145,30 +136,6 @@ public class ProtoTreeRequest {
 
     public void setNumberOrReplicates(String numberOrReplicates) {
         this.numberOrReplicates = numberOrReplicates;
-    }
-
-    public String getAlignThreads() {
-        return alignThreads;
-    }
-
-    public void setAlignThreads(String alignThreads) {
-        this.alignThreads = alignThreads;
-    }
-
-    public String getTreeThreads() {
-        return treeThreads;
-    }
-
-    public void setTreeThreads(String treeThreads) {
-        this.treeThreads = treeThreads;
-    }
-
-    public String getReorderOrNot() {
-        return reorderOrNot;
-    }
-
-    public void setReorderOrNot(String reorderOrNot) {
-        this.reorderOrNot = reorderOrNot;
     }
 
     public String getDomainPredictionProgram() {

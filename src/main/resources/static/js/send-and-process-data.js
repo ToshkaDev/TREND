@@ -10,6 +10,7 @@ $(document).ready(function (){
 
     $('#GoAsync').click(function() {
     	options = getOptions();
+    	console.log("options " + JSON.stringify(options));
     	getDataAsync(options);
     });
 });

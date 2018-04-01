@@ -1,7 +1,6 @@
 package serviceimpl;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static converters.ConverterMain.fromEvolRequestToEvolInternal;
 import static converters.ConverterMain.fromProtoTreeRequestToProtoTreeInternal;
 
 import java.io.*;
@@ -46,10 +45,13 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         protoTreeInternal.setFields();
 
 
+        List<String> argsForPrepareNames = new LinkedList<>();
         List<String> argsForProteinFeatures = new LinkedList<>();
         List<String> argsForAlignmentAndTree = new LinkedList<>();
         List<String> argsForTreeWithDomains = new LinkedList<>();
 
+
+        argsForPrepareNames.add(protoTreeInternal.getFirstFileName());
 
         String hmmscanOrRpsbOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
         String rpsbProcOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
@@ -84,6 +86,8 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
 
         argsForAlignmentAndTree.addAll(protoTreeInternal.getFieldsForAlignmentAndTreeBuild());
         argsForAlignmentAndTree.addAll(Arrays.asList(
+                ParamPrefixes.MAFFT_PATH.getPrefix() + super.getProperties().getMafft(),
+                ParamPrefixes.MEGACC_PATH.getPrefix() + super.getProperties().getMegacc(),
                 ParamPrefixes.OUTPUT_PARAMS.getPrefix() + super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix(),
                 ParamPrefixes.OUTPUT_TREE.getPrefix() + outNewickTree,
                 ParamPrefixes.THREAD.getPrefix() + numberOfThreadsForAlgn,
@@ -107,17 +111,20 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
                 ParamPrefixes.OUTPUT_THIRD.getPrefix() + outNewickFile
         ));
 
-        String[] arrayOfInterpreters = {super.getPython(), super.getPython(), super.getPython()};
+        String[] arrayOfInterpreters = {super.getPython(), super.getPython(), super.getPython(), super.getPython()};
 
-        String[] arrayOfPrograms = {super.getProperties().getCalculateProteinFeatures(),
+        String[] arrayOfPrograms = {
+                super.getProperties().getPrepareNames(),
+                super.getProperties().getCalculateProteinFeatures(),
                 super.getProperties().getAlignAndBuildTree(),
-                super.getProgram(protoTreeInternal.getCommandToBeProcessedBy())};
-        List<List<String>> listOfArgumentLists = new LinkedList<>(Arrays.asList(argsForProteinFeatures, argsForAlignmentAndTree, argsForTreeWithDomains));
+                super.getProgram(protoTreeInternal.getCommandToBeProcessedBy())
+        };
 
+        List<List<String>> listOfArgumentLists = new LinkedList<>(Arrays.asList(
+                argsForPrepareNames, argsForProteinFeatures, argsForAlignmentAndTree, argsForTreeWithDomains));
         prepareCommandArgumentsCommonP(protoTreeInternal, arrayOfInterpreters, arrayOfPrograms, listOfArgumentLists);
 
         return protoTreeInternal;
-
     }
 
     public void prepareCommandArgumentsCommonP(ProtoTreeInternal protoTreeInternal, String[] arrayOfInterpreters,
@@ -153,7 +160,6 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         bioJob.setJobId(jobId);
         bioJob.setJobDate(LocalDateTime.now());
         bioJob.setFinished(false);
-
         for (String filename : protoTreeInternal.getOutputFilesNames()) {
             BioJobResult bioJobResult = new BioJobResult();
             bioJobResult.setResultFile("placeholder");
@@ -161,7 +167,6 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
             bioJobResult.setBiojob(bioJob);
             bioJob.addToBioJobResultList(bioJobResult);
         }
-
         super.getBioJobDao().save(bioJob);
         return jobId;
     }
@@ -211,34 +216,33 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         String thirdFileName = null;
 
         if (protoTreeRequest.getFirstFile() != null) {
-            if (!isNullOrEmpty(protoTreeRequest.getFirstFileTextArea())) {
+            if (!isNullOrEmpty(protoTreeRequest.getFirstFileArea())) {
                 throw new IncorrectRequestException("firstFileTextArea and firstFileName are both not empty");
             } else {
                 firstFileName = super.getStorageService().store(protoTreeRequest.getFirstFile());
             }
-        } else if (!isNullOrEmpty(protoTreeRequest.getFirstFileTextArea())) {
-            firstFileName = super.getStorageService().createAndStore(protoTreeRequest.getFirstFileTextArea());
+        } else if (!isNullOrEmpty(protoTreeRequest.getFirstFileArea())) {
+            firstFileName = super.getStorageService().createAndStore(protoTreeRequest.getFirstFileArea());
         }
 
         if (protoTreeRequest.getSecondFile() != null) {
-            if (!isNullOrEmpty(protoTreeRequest.getSecondFileTextArea())) {
+            if (!isNullOrEmpty(protoTreeRequest.getSecondFileArea())) {
                 throw new IncorrectRequestException("secondFileTextArea and firstFileName are both not empty");
             } else {
                 secondFileName = super.getStorageService().store(protoTreeRequest.getSecondFile());
             }
-        } else if (!isNullOrEmpty(protoTreeRequest.getSecondFileTextArea())) {
-            secondFileName = super.getStorageService().createAndStore(protoTreeRequest.getSecondFileTextArea());
+        } else if (!isNullOrEmpty(protoTreeRequest.getSecondFileArea())) {
+            secondFileName = super.getStorageService().createAndStore(protoTreeRequest.getSecondFileArea());
         }
         if (protoTreeRequest.getThirdFile() != null) {
-            if (!isNullOrEmpty(protoTreeRequest.getThirdFileTextArea())) {
+            if (!isNullOrEmpty(protoTreeRequest.getThirdFileArea())) {
                 throw new IncorrectRequestException("thirdFileTextArea and thirdFileName are both not empty");
             } else {
                 thirdFileName = super.getStorageService().store(protoTreeRequest.getThirdFile());
             }
-        } else if (!isNullOrEmpty(protoTreeRequest.getThirdFileTextArea())) {
-            secondFileName = super.getStorageService().createAndStore(protoTreeRequest.getSecondFileTextArea());
+        } else if (!isNullOrEmpty(protoTreeRequest.getThirdFileArea())) {
+            secondFileName = super.getStorageService().createAndStore(protoTreeRequest.getSecondFileArea());
         }
-
         return fromProtoTreeRequestToProtoTreeInternal(protoTreeRequest, firstFileName, secondFileName, thirdFileName);
     }
 }

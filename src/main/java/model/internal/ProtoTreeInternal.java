@@ -1,5 +1,7 @@
 package model.internal;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,7 +13,6 @@ public class ProtoTreeInternal {
     private String thirdFileName;
 
     private String alignmentAlg;
-    private String alignThreads;
     private String reorderOrNot;
 
     private String treeBuildMethod;
@@ -22,7 +23,6 @@ public class ProtoTreeInternal {
     private String siteCovCutOff;
     private String phylogenyTest;
     private String numberOrReplicates;
-    private String treeThreads;
 
     private String domainPredictionProgram;
 	//e-value for Hmmscan and RpsBlast
@@ -164,22 +164,6 @@ public class ProtoTreeInternal {
         this.numberOrReplicates = numberOrReplicates;
     }
 
-    public String getAlignThreads() {
-        return alignThreads;
-    }
-
-    public void setAlignThreads(String alignThreads) {
-        this.alignThreads = alignThreads;
-    }
-
-    public String getTreeThreads() {
-        return treeThreads;
-    }
-
-    public void setTreeThreads(String treeThreads) {
-        this.treeThreads = treeThreads;
-    }
-
     public String getReorderOrNot() {
         return reorderOrNot;
     }
@@ -208,7 +192,6 @@ public class ProtoTreeInternal {
     public void setFields() {
         fieldsForAlignmentAndTreeBuild.add(getFirstFileName());
         fieldsForAlignmentAndTreeBuild.add(getAlignmentAlg());
-        fieldsForAlignmentAndTreeBuild.add(getAlignThreads());
         fieldsForAlignmentAndTreeBuild.add(getReorderOrNot());
 
         fieldsForAlignmentAndTreeBuild.add(getTreeBuildMethod());
@@ -219,7 +202,6 @@ public class ProtoTreeInternal {
         fieldsForAlignmentAndTreeBuild.add(getSiteCovCutOff());
         fieldsForAlignmentAndTreeBuild.add(getPhylogenyTest());
         fieldsForAlignmentAndTreeBuild.add(getNumberOrReplicates());
-        fieldsForAlignmentAndTreeBuild.add(getTreeThreads());
 
         allFields.addAll(fieldsForAlignmentAndTreeBuild);
 

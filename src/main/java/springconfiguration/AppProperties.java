@@ -13,6 +13,7 @@ public class AppProperties {
     private String bioProgramsDir = "../bioinformatics-programs";
     private String pathToMainDirFromBioProgs = "../";
 
+    private String prepareNames = bioProgramsDir + "/prepareNames.py";
     private String calculateProteinFeatures = bioProgramsDir + "/getProteinFeatures.py";
     private String alignAndBuildTree = bioProgramsDir + "/alignAndBuildTree";
     private String addProtFeaturesToTree = bioProgramsDir + "/addProtFeaturesToTree";
@@ -23,15 +24,17 @@ public class AppProperties {
     private String resultFilePrefix = "bio-universe-";
     private String postfix = ".txt";
 
-    private String hmmscanDbPath = "/home/Soft/hmmer/pfam31_0/Pfam-A.hmm";
+    private String hmmscanDbPath = "/home/vadim/UTOakRidge/Soft/hmmer3_data/Pfam-A.hmm";
     private String rpsblastDbPath = "/home/vadim/Softs/rpsblastdb/";
     private String rpsprocDbPath = "/home/vadim/Softs/rpsbproc/data/";
     private String rpsblastSpDb = "Cdd_NCBI";
 
-    private String hmmscanPath = "/usr/local/bin/hmmscan";
-    private String rpsblastPath = "/home/Soft/blast/ncbi-blast-2.6.0+/bin/rpsblast";
+    private String hmmscanPath = "/usr/local/bin/hmmer3/bin/hmmscan";
+    private String rpsblastPath = "/home/vadim/Softs/ncbi-blast-2.6.0+/bin/rpsblast";
     private String rpsbprocPath = "";
-    private String tmhmm2Path = "/home/vadim/Soft/tmhmm-2.0c/bin/tmhmm";
+    private String tmhmm2Path = "/home/vadim/Softs/tmhmm-2.0c/bin/tmhmm";
+    private String mafft = "/usr/bin/mafft";
+    private String megacc = "/usr/bin/megacc";
 
 
     public String getWorkingDirLocation() {
@@ -100,6 +103,14 @@ public class AppProperties {
 
     public void setPostfix(String postFix) {
         this.postfix = postFix;
+    }
+
+    public String getPrepareNames() {
+        return prepareNames;
+    }
+
+    public void setPrepareNames(String prepareNames) {
+        this.prepareNames = prepareNames;
     }
 
     public String getCalculateProteinFeatures() {
@@ -188,5 +199,21 @@ public class AppProperties {
 
     public void setTmhmm2Path(String tmhmm2Path) {
         this.tmhmm2Path = tmhmm2Path;
+    }
+
+    public String getMafft() {
+        return mafft;
+    }
+
+    public void setMafft(String mafft) {
+        this.mafft = mafft;
+    }
+
+    public String getMegacc() {
+        return megacc;
+    }
+
+    public void setMegacc(String megacc) {
+        this.megacc = megacc;
     }
 }

@@ -32,7 +32,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
- * Created by vadim on 8/13/17.
+ * Created by vadim on 03/30/18.
  */
 
 @Controller
@@ -54,7 +54,7 @@ public class EvolutionController extends BioUniverseController {
     	this.evolutionService = evolutionService;
     }
 
-    @GetMapping(value={"/prototree"})
+    @GetMapping(value={"", "/", "/prototree"})
     public String protoTree(Model model) {
         addToModelCommon(model);
         model.addAttribute("subnavigationTab", BioPrograms.PROTO_TREE.getProgramName());

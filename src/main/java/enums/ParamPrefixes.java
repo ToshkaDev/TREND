@@ -2,29 +2,18 @@ package enums;
 
 public enum  ParamPrefixes {
     INPUT("-i "),
-    WDIR("-w "),
-
-    TAXALIST("-l "),
     INPUT_SECOND("-s "),
     INPUT_THIRD("--ithird "),
     INPUT_FOURTH("-f"),
     OUTPUT("-o "),
-    DELIM("-d "),
-    COLUMN("-c "),
-    DELIM_SECOND("-t "),
-    COLUMN_SECOND("-p "),
-
     EVAL_THRESH("-e "),
-
-    IDENTITY_THRESH("-t "),
-    COVERAGE_THRESH("-v "),
-    MERGE("-m "),
-
 
     REORDER("-r "),
     ALGORITHM("-a "),
     THREAD("--thread "),
 
+    MAFFT_PATH("-f"),
+    MEGACC_PATH("-k"),
     TREE_THREAD("-u "),
     TREE_BUILD_METHOD("-m "),
     AA_SUBST_MODEL("-l "),
