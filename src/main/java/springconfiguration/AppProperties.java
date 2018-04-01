@@ -17,10 +17,6 @@ public class AppProperties {
     private String alignAndBuildTree = bioProgramsDir + "/alignAndBuildTree";
     private String addProtFeaturesToTree = bioProgramsDir + "/addProtFeaturesToTree";
 
-
-    private String alignMultiple = bioProgramsDir + "/align_multiple.sh";
-    private String concatenate = bioProgramsDir + "/concatenate.py";
-
     private String pythonLocation = "/usr/bin/python";
     private String bashLocation = "/bin/bash";
     private String blastpLocation = "/usr/bin/blastp";
@@ -104,22 +100,6 @@ public class AppProperties {
 
     public void setPostfix(String postFix) {
         this.postfix = postFix;
-    }
-
-    public String getAlignMultiple() {
-        return alignMultiple;
-    }
-
-    public void setAlignMultiple(String alignMultiple) {
-        this.alignMultiple = alignMultiple;
-    }
-
-    public String getConcatenate() {
-        return concatenate;
-    }
-
-    public void setConcatenate(String concatenate) {
-        this.concatenate = concatenate;
     }
 
     public String getCalculateProteinFeatures() {
