@@ -22,7 +22,7 @@ function getOptions() {
     var njMePhyloTest = $('#nj_me-phylo-test').val();
     var mlPhyloTest = $('#ml-phylo-test').val();
     var numberOrReplicates = $('#number-of-replicates').val();
-    var domainPredictionProgram = $('#domain-prediction-program').val() //set up!
+    //var domainPredictionProgram = $('#domain-prediction-program').val() //set up!
 
     var optionToOptionNameMain = {
         "firstFile": firstFile,
@@ -38,7 +38,7 @@ function getOptions() {
         "gapsAndMissingData": gapsAndMissingData,
         "siteCovCutOff": siteCovCutOff,
         "numberOrReplicates": numberOrReplicates,
-        "domainPredictionProgram": domainPredictionProgram,
+        //"domainPredictionProgram": domainPredictionProgram,
         "commandToBeProcessedBy": $('#subnavigation-tab').text()
     }
     var optionToOptionNameSubsModel = {
@@ -49,30 +49,30 @@ function getOptions() {
         "njMePhyloTest": njMePhyloTest,
         "mlPhyloTest": mlPhyloTest
     }
+
     var options = new FormData();
 
-    for (optionName in optionToOptionNameMain) {
+    for (var optionName in optionToOptionNameMain) {
         console.log("optionName " + optionName)
         console.log("optionToOptionNameMain[optionName] " + optionToOptionNameMain[optionName])
-        if (optionIsDefined(optionName, optionToOptionNameMain[optionName], options)) {
+        if (optionIsDefined(optionToOptionNameMain[optionName])) {
             options.append(optionName, optionToOptionNameMain[optionName]);
         }
     }
-    for (optionName in optionToOptionNameSubsModel) {
+    for (var optionName in optionToOptionNameSubsModel) {
         console.log("optionName " + optionName)
         console.log("optionToOptionNameSubsModel[optionName] " + optionToOptionNameSubsModel[optionName])
-        if (optionIsDefined(optionName, optionToOptionNameSubsModel[optionName], options)) {
+        if (optionIsDefined(optionToOptionNameSubsModel[optionName])) {
             options.append("aaSubstModel", optionToOptionNameSubsModel[optionName]);
         }
     }
-    for (optionName in optionToOptionNamePhyloTest) {
+    for (var optionName in optionToOptionNamePhyloTest) {
         console.log("optionName " + optionName)
         console.log("optionToOptionNamePhyloTest[optionName] " + optionToOptionNamePhyloTest[optionName])
-        if (optionIsDefined(optionName, optionToOptionNamePhyloTest[optionName], options)) {
+        if (optionIsDefined(optionToOptionNamePhyloTest[optionName])) {
             options.append("phylogenyTest", optionToOptionNamePhyloTest[optionName]);
         }
     }
-
 
 	return options;
 }

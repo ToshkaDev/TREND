@@ -10,7 +10,6 @@ $(document).ready(function (){
 
     $('#GoAsync').click(function() {
     	options = getOptions();
-    	console.log("options " + JSON.stringify(options));
     	getDataAsync(options);
     });
 });
@@ -47,7 +46,7 @@ function getData(options) {
 	    });
 }
 
-function getDataAsync(options, jobId) {
+function getDataAsync(options) {
     console.log("getDataAsync() called!");
 	$.ajax({
 	      type: 'POST',
