@@ -16,206 +16,93 @@ USAGE = "\nThis script align proteins using mafft in subporcess and build a phyl
 [-o || --oaligned]        -output file with aligned sequences
 [-m || --tree_method]     -method to build a tree; options:  NJ, ML, ME (default is NJ)
 [-l || --subst_model]     -amino acids substitution model (default is Jones-Taylor-Thornton (JTT) model)
-	For NJ and ME trees  -l is one of the following: ["Jones-Taylor-Thornton (JTT) model", "No. of differences", "Equal input model", 
-	"p-distance", "Poisson model", "Dayhoff model"]
-	For ML tree: ["Jones-Taylor-Thornton (JTT) model", "Poisson model", "Equal input model", 
-	"Dayhoff model", "Dayhoff model with Freqs. (F+)", "JTT with Freqs. (F+) model", "WAG model", 
-	"WAG with Freqs. (F+) model", "LG model", "LG with Freqs. (F+) model", "General Reversible Mitochondrial (mtREV)", 
-	"mtREV with Freqs. (F+) model", "General Reversible Chloroplast (cpREV)", "cpREV with Freqs. (F+) model",
-	"General Reversible Transcriptase model (rtREV)", "rtREV with Freqs. (F+) model"]
-[-g || --gaps_missing]    -how to treat gaps and missing data; one of the following: ["Complete deletion", "Partial deletion", "Pairwise deletion"]; defaultis "Complete deletion"
+			For NJ and ME trees  -l is one of the following: {"jtt": "Jones-Taylor-Thornton (JTT) model", "nd": "No. of differences", "eim": "Equal input model", 
+		"pd": "p-distance", "pm": "Poisson model", "dm": "Dayhoff model"}
+			For ML tree: {"jtt": "Jones-Taylor-Thornton (JTT) model", "pm": "Poisson model", "eim": "Equal input model", 
+		"dm": "Dayhoff model", "dmf": "Dayhoff model with Freqs. (F+)", "jttf": "JTT with Freqs. (F+) model", "wm": "WAG model", 
+		"wmf": "WAG with Freqs. (F+) model", "lg": "LG model", "lgf": "LG with Freqs. (F+) model", "grm": "General Reversible Mitochondrial (mtREV)", 
+		"grmf": "mtREV with Freqs. (F+) model", "grc": "General Reversible Chloroplast (cpREV)", "grcf": "cpREV with Freqs. (F+) model",
+		"grt": "General Reversible Transcriptase model (rtREV)", "grtf": "rtREV with Freqs. (F+) model"}
+[-g || --gaps_missing]    -how to treat gaps and missing data; one of the following: {"compDel": "Complete deletion", "partDel": "Partial deletion", "pairDel": "Pairwise deletion"}; defaultis "Complete deletion"
 [-c || --coverage_cutoff] -Site Coverage Cutoff (%) if -g (||--gaps_missing) is set to "Partial deletion"
 [-u || --cpu]             -number of threads to use for a tree building (default is 4)
-[-p || --phylo]           -phylogeny test; for NJ and ME one of the following: ["None", "Bootstrap method", "Interior-branch test"];
-	for ML: ["None", "Bootstrap method"]; default is "None"
+[-p || --phylo]           -phylogeny test; for NJ and ME one of the following: {"none": "None", "bm": "Bootstrap method", "ib": "Interior-branch test"};
+		for ML: {"none": "None", "bm": "Bootstrap method"}; default is "None"
 [-b || --bootstrap]       -number of replicates for the bootstrap testing; if not provided the bootstrap test will not run
-[-e || --initial_tree]    -initial tree for ML; on of the following: ["Make initial tree automatically (Default - NJ/BioNJ)", "Make initial tree automatically (Maximum parsimony)", "Make initial tree automatically (Neighbor joining)", 
-	"Make initial tree automatically (BioNJ)"]; default is "Make initial tree automatically (Default - NJ/BioNJ)"
-[-n || --subst_rate]      -amino acids substitution rate; on of the following: ["Uniform Rates", "Gamma Distributed (G)", "Has Invariant Sites (I)", "Gamma Distributed With Invariant Sites (G+I)"];
-	default is "Uniform Rates"
+[-e || --initial_tree]    -initial tree for ML; on of the following: {"njBio": "Make initial tree automatically (Default - NJ/BioNJ)", "mp": "Make initial tree automatically (Maximum parsimony)", "nj": "Make initial tree automatically (Neighbor joining)", 
+			"Make initial tree automatically (BioNJ)"}; default is "Make initial tree automatically (Default - NJ/BioNJ)"
+[-n || --subst_rate]      -amino acids substitution rate; on of the following: {"ur": "Uniform Rates", "gd": "Gamma Distributed (G)", "ir": "Has Invariant Sites (I)", "gir":"Gamma Distributed With Invariant Sites (G+I)"};
+		default is "Uniform Rates"
 [-x || --otree_params]    -output file with parameters for megacc tree building (extension is '.mao')
 [-z || --otree]           -output file with the constuctred tree
 '''
+
 
 
 #Inputs
 INPUT_FILE = "input.fa"
 ALGORITHM = "--localpair"
 REORDER_OR_NOT = ""
-ALIGN_THREADS = 4
+ALIGN_THREADS = "4"
 
+#Outputs
 OUTPUT_FILE_FIRST = "aligned_proteins.fa"
-OUTPUT_FILE_SECOND = None
+OUTPUT_FILE_SECOND = "paramsForTree.mao"
 OUTPUT_FILE_THIRD = "newTree"
 
+#Options
+ML_PHYLOGENY_TESTS = {"none": "None", "bm": "Bootstrap method"}
+NJ_ME_PHYLOGENY_TESTS = {"none": "None", "bm": "Bootstrap method", "ib": "Interior-branch test"}
+RATES = {"ur": "Uniform Rates", "gd": "Gamma Distributed (G)", "ir": "Has Invariant Sites (I)", "gir":"Gamma Distributed With Invariant Sites (G+I)"}
+NJ_ME_SUBSTITUTIAN_MODELS = {"jtt": "Jones-Taylor-Thornton (JTT) model", "nd": "No. of differences", "eim": "Equal input model", 
+"pd": "p-distance", "pm": "Poisson model", "dm": "Dayhoff model"}
+ML_SUBSTITUTIAN_MODELS = {"jtt": "Jones-Taylor-Thornton (JTT) model", "pm": "Poisson model", "eim": "Equal input model", 
+"dm": "Dayhoff model", "dmf": "Dayhoff model with Freqs. (F+)", "jttf": "JTT with Freqs. (F+) model", "wm": "WAG model", 
+"wmf": "WAG with Freqs. (F+) model", "lg": "LG model", "lgf": "LG with Freqs. (F+) model", "grm": "General Reversible Mitochondrial (mtREV)", 
+"grmf": "mtREV with Freqs. (F+) model", "grc": "General Reversible Chloroplast (cpREV)", "grcf": "cpREV with Freqs. (F+) model",
+"grt": "General Reversible Transcriptase model (rtREV)", "grtf": "rtREV with Freqs. (F+) model"}
+GAPS_AND_MISSING_DATA_BEHAVIOUR = {"compDel": "Complete deletion", "partDel": "Partial deletion", "pairDel": "Pairwise deletion"}
+ML_INITIAL_TREE_OPTIONS = {"njBio": "Make initial tree automatically (Default - NJ/BioNJ)", "mp": "Make initial tree automatically (Maximum parsimony)", "nj": "Make initial tree automatically (Neighbor joining)", 
+"bioNj": "Make initial tree automatically (BioNJ)"}
+
 #Parameters
-LINUX_VERSION ="7160929-x86_64 Linux"
-DATATYPE = "snProtein"
+LINUX_VERSION = "7170509-x86_64 Linux"
 MISSING_SYMBOL = "?"
 IDENTICAL_SYMBOL = "."
 GAP_SYMBOL = "-"
 NEW_SUBSECTION ="===================="
 NOT_APPLICABLE = "Not Applicable"
 DEFAULT_PATTERN_AMONG_LINEAGES = "Same (Homogeneous)"
-ML_PHYLOGENY_TESTS = ["None", "Bootstrap method"]
-NJ_ME_PHYLOGENY_TESTS = ["None", "Bootstrap method", "Interior-branch test"]
-PHYLOGENY_TEST = "None"
-BOOTSTRAPS = NOT_APPLICABLE
+TEST_OF_PHYLOGENY = "None"
+BOOTSTRAPS = "NOT_APPLICABLE"
 DEFAULT_ML_HEURISTIC_METHOD = "Nearest-Neighbor-Interchange (NNI)"
 DEFAULT_CPU_NUMBER = "4"
-
-RATES = ["Uniform Rates", "Gamma Distributed (G)", "Has Invariant Sites (I)", "Gamma Distributed With Invariant Sites (G+I)"]
-NJ_ME_SUBSTITUTIAN_MODELS = ["Jones-Taylor-Thornton (JTT) model", "No. of differences", "Equal input model", 
-"p-distance", "Poisson model", "Dayhoff model"]
-ML_SUBSTITUTIAN_MODELS = ["Jones-Taylor-Thornton (JTT) model", "Poisson model", "Equal input model", 
-"Dayhoff model", "Dayhoff model with Freqs. (F+)", "JTT with Freqs. (F+) model", "WAG model", 
-"WAG with Freqs. (F+) model", "LG model", "LG with Freqs. (F+) model", "General Reversible Mitochondrial (mtREV)", 
-"mtREV with Freqs. (F+) model", "General Reversible Chloroplast (cpREV)", "cpREV with Freqs. (F+) model",
-"General Reversible Transcriptase model (rtREV)", "rtREV with Freqs. (F+) model"]
-GAPS_AND_MISSING_DATA_BEHAVIOUR = ["Complete deletion", "Partial deletion", "Pairwise deletion"]
-ML_INITIAL_TREE_OPTIONS = ["Make initial tree automatically (Default - NJ/BioNJ)", "Make initial tree automatically (Maximum parsimony)", "Make initial tree automatically (Neighbor joining)", 
-"Make initial tree automatically (BioNJ)"]
-SUBST_MODEL = NJ_ME_SUBSTITUTIAN_MODELS[0]
-GAPS_MISSING = GAPS_AND_MISSING_DATA_BEHAVIOUR[0]
+SUBST_MODEL = NJ_ME_SUBSTITUTIAN_MODELS["jtt"]
+GAPS_MISSING = GAPS_AND_MISSING_DATA_BEHAVIOUR["compDel"]
 COVERAGE_CUTOFF = None
-TREE_THREADS = 4
-ML_INITIAL_TREE = ML_INITIAL_TREE_OPTIONS[0]
-SUBST_RATE = RATES[0]
-
+TREE_THREADS = "4"
+ML_INITIAL_TREE = ML_INITIAL_TREE_OPTIONS["njBio"]
+SUBST_RATE = RATES["ur"]
+PHYLOGENY_TEST_HEADER = {"NJ": NOT_APPLICABLE, "ML_ME": NEW_SUBSECTION}
+PROCESS_TYPES = collections.OrderedDict()
+PROCESS_TYPES_DICT = {"ML": "ppML", "ME": "ppME", "NJ": "ppNJ"}
+TREE_METHOD = "NJ"
+TREE_METHODS = {"NJ": None, "ML": None, "ME": None}
 MAFFT_PROGRAM = None 
 MEGACC_PROGRAM = None
 
 
-TREE_METHODS = {"NJ": NJ_PARAMETERS, "ML": ML_PARAMETERS, "ME": ME_PARAMETERS}
-TREE_METHOD = "NJ"
-
-NJ_PARAMETERS = {
-	"[ MEGAinfo ]":{
-		"ver=": LINUX_VERSION
-	},
-	"[ DataSettings ]":{
-		"datatype": DATATYPE,
-		"MissingBaseSymbol": MISSING_SYMBOL,
-		"IdenticalBaseSymbol": IDENTICAL_SYMBOL,
-		"GapSymbol": GAP_SYMBOL
-	},
-	"[ ProcessTypes ]":{
-		"ppInfer": "true",
-		"ppNJ": "true"
-	},
-	"[ AnalysisSettings ]":{
-		"Analysis": "Phylogeny Reconstruction",
-		"Scope": "All Selected Taxa",
-		"Statistical Method": "Neighbor-joining",
-		"Phylogeny Test": NOT_APPLICABLE,
-		"Test of Phylogeny": PHYLOGENY_TEST,
-		"No. of Bootstrap Replications": BOOTSTRAPS,
-		"Substitution Model": NEW_SUBSECTION,
-		"Substitutions Type": "Amino acid",
-		"Model/Method": SUBST_MODEL,
-		"Rates and Patterns": NEW_SUBSECTION,
-		"Rates among Sites": SUBST_RATE,
-		"Gamma Parameter": NOT_APPLICABLE,
-		"Pattern among Lineages": DEFAULT_PATTERN_AMONG_LINEAGES,
-		"Data Subset to Use": NEW_SUBSECTION,
-		"Gaps/Missing Data Treatment": GAPS_MISSING,
-		"Site Coverage Cutoff (%)": NOT_APPLICABLE,
-		"Has Time Limit": "False",
-		"Maximum Execution Time": "-1"
-	}
-}
-
-ML_PARAMETERS = {
-	"[ MEGAinfo ]":{
-		"ver=": LINUX_VERSION
-	},
-	"[ DataSettings ]":{
-		"datatype": DATATYPE,
-		"MissingBaseSymbol": MISSING_SYMBOL,
-		"IdenticalBaseSymbol": IDENTICAL_SYMBOL,
-		"GapSymbol": GAP_SYMBOL
-	},
-	"[ ProcessTypes ]":{
-		"ppInfer":"true",
-		"ppML":"true"
-	},
-	"[ AnalysisSettings ]":{
-		"Analysis": "Phylogeny Reconstruction",
-		"Scope": "All Selected Taxa",
-		"Statistical Method": "Maximum Likelihood",
-		"Phylogeny Test": NEW_SUBSECTION,
-		"Test of Phylogeny": PHYLOGENY_TEST,
-		"No. of Bootstrap Replications": BOOTSTRAPS,
-		"Substitution Model": NEW_SUBSECTION,
-		"Substitutions Type": "Amino acid",
-		"Model/Method": SUBST_MODEL,
-		"Rates and Patterns": NEW_SUBSECTION,
-		"Rates among Sites": SUBST_RATE,
-		"No of Discrete Gamma Categories": NOT_APPLICABLE,
-		"Data Subset to Use": NEW_SUBSECTION,
-		"Gaps/Missing Data Treatment": GAPS_MISSING,
-		"Site Coverage Cutoff (%)": NOT_APPLICABLE,
-		"Tree Inference Options": NEW_SUBSECTION,
-		"ML Heuristic Method": DEFAULT_ML_HEURISTIC_METHOD,
-		"Initial Tree for ML": ML_INITIAL_TREE,
-		"Branch Swap Filter": "None",
-		"System Resource Usage": NEW_SUBSECTION,
-		"Number of Threads": TREE_THREADS,
-		"Has Time Limit": "False",
-		"Maximum Execution Time": "-1"
-	}
-}
-
-ME_PARAMETERS = {
-	"[ MEGAinfo ]":{
-		"ver": LINUX_VERSION
-	},
-	"[ DataSettings ]":{
-		"datatype=": DATATYPE,
-		"MissingBaseSymbol": MISSING_SYMBOL,
-		"IdenticalBaseSymbol": IDENTICAL_SYMBOL,
-		"GapSymbol": GAP_SYMBOL
-	},
-	"[ ProcessTypes ]":{
-		"ppInfer": "true",
-		"ppME": "true"
-	},
-	"[ AnalysisSettings ]":{
-		"Analysis": "Phylogeny Reconstruction",
-		"Scope": "All Selected Taxa",
-		"Statistical Method": "Minimum Evolution method",
-		"Phylogeny Test": NEW_SUBSECTION,
-		"Test of Phylogeny": PHYLOGENY_TEST,
-		"No. of Bootstrap Replications": BOOTSTRAPS,
-		"Substitution Model": NEW_SUBSECTION,
-		"Substitutions Type": "Amino acid",
-		"Model/Method": SUBST_MODEL,
-		"Rates and Patterns": NEW_SUBSECTION,
-		"Rates among Sites": SUBST_RATE,
-		"Gamma Parameter": NOT_APPLICABLE,
-		"Pattern among Lineages": DEFAULT_PATTERN_AMONG_LINEAGES,
-		"Data Subset to Use": NEW_SUBSECTION,
-		"Gaps/Missing Data Treatment": GAPS_MISSING,
-		"Site Coverage Cutoff (%)": NOT_APPLICABLE,
-		"Tree Inference Options": NEW_SUBSECTION,
-		"ME Heuristic Method": "Close-Neighbor-Interchange (CNI)",
-		"Initial Tree for ME": "Obtain initial tree by Neighbor-Joining",
-		"ME Search Level": "1",
-		"Has Time Limit": "False",
-		"Maximum Execution Time": "-1"
-	}
-}
 
 def initialyze(argv):
-	global INPUT_FILE, ALGORITHM, REORDER_OR_NOT, MAFFT_PROGRAM, MEGACC_PROGRAM, ALIGN_THREADS, OUTPUT_FILE_FIRST, TREE_METHOD, SUBST_MODEL, GAPS_MISSING, 
-	COVERAGE_CUTOFF, TREE_THREADS, PHYLOGENY_TEST, BOOTSTRAPS, ML_INITIAL_TREE, SUBST_RATE, OUTPUT_FILE_SECOND, OUTPUT_FILE_THIRD
+	global INPUT_FILE, ALGORITHM, REORDER_OR_NOT, MAFFT_PROGRAM, MEGACC_PROGRAM, ALIGN_THREADS, OUTPUT_FILE_FIRST, TREE_METHOD, SUBST_MODEL, GAPS_MISSING, \
+	COVERAGE_CUTOFF, TREE_THREADS, TEST_OF_PHYLOGENY, BOOTSTRAPS, ML_INITIAL_TREE, SUBST_RATE, OUTPUT_FILE_SECOND, OUTPUT_FILE_THIRD, TREE_METHODS
 	try:
 		opts, args = getopt.getopt(argv[1:],"hi:a:r:k:f:t:o:m:l:g:c:u:p:b:e:n:x:z:",
 		["isequence=", "al_algorithm=", "reorder=", "megacc", "mafft=", "thread=", "oaligned=",  
 		"tree_method=", "subst_model=", "gaps_missing=", "coverage_cutoff=", 
 		"cpu=", "phylotest=" "bootstrap=", "initial_tree=", "subst_rate=", "otree_params", "otree="])
 		if len(opts) == 0:
-			raise getopt.GetoptError("Options are required\n")
+			raise getopt.GetoptError("Parameters are required\n")
 	except getopt.GetoptError as e:
 		print "===========ERROR==========\n " + str(e) + USAGE
 		sys.exit(2)
@@ -225,9 +112,9 @@ def initialyze(argv):
 			sys.exit()
 		elif opt in ("-i", "--isequence"):
 			INPUT_FILE = str(arg).strip()
-		elif opt in ("-s", "--al_algorithm"):
+		elif opt in ("-a", "--al_algorithm"):
 			param = str(arg).strip()
-			if param in ["--localpair", "--genafpair", "--globalpair", "--retree 2 --maxiterate 1000", "--retree 2 --maxiterate 0"]
+			if param in ["--localpair", "--genafpair", "--globalpair", "--retree 2 --maxiterate 1000", "--retree 2 --maxiterate 0"]:
 				ALGORITHM = param
 		elif opt in ("-r", "--reorder"):
 			param = str(arg).strip()
@@ -246,20 +133,24 @@ def initialyze(argv):
 				TREE_METHOD = param
 		elif opt in ("-l", "--subst_model"):
 			param = str(arg).strip()
-			if param in NJ_ME_SUBSTITUTIAN_MODELS or param in ML_SUBSTITUTIAN_MODELS:
-				SUBST_MODEL = param
+			if param in NJ_ME_SUBSTITUTIAN_MODELS:
+				SUBST_MODEL = NJ_ME_SUBSTITUTIAN_MODELS[param]
+			elif param in ML_SUBSTITUTIAN_MODELS:
+				SUBST_MODEL = ML_SUBSTITUTIAN_MODELS[param]
 		elif opt in ("-g", "--gaps_missing"):
 			param = str(arg).strip()
-			if param in ["Complete deletion", "Partial deletion", "Pairwise deletion"]:
-				GAPS_MISSING = param
+			if param in GAPS_AND_MISSING_DATA_BEHAVIOUR:
+				GAPS_MISSING = GAPS_AND_MISSING_DATA_BEHAVIOUR[param]
 		elif opt in ("-c", "--coverage_cutoff"):
 			COVERAGE_CUTOFF = str(arg).strip()
 		elif opt in ("-u", "--cpu"):
 			TREE_THREADS = str(arg).strip()
 		elif opt in ("-p", "--phylo"):
 			param = str(arg).strip()
-			if param in NJ_ME_PHYLOGENY_TESTS or parma in ML_PHYLOGENY_TESTS:
-				PHYLOGENY_TEST = param
+			if param in NJ_ME_PHYLOGENY_TESTS:
+				TEST_OF_PHYLOGENY = NJ_ME_PHYLOGENY_TESTS[param]
+			elif parma in ML_PHYLOGENY_TESTS:
+				TEST_OF_PHYLOGENY = ML_PHYLOGENY_TESTS[param]
 		elif opt in ("-b", "--bootstrap"):
 			param = str(arg).strip()
 			if len(param) > 0:
@@ -267,7 +158,7 @@ def initialyze(argv):
 		elif opt in ("-e", "--initial_tree"):
 			param = str(arg).strip()
 			if param in ML_INITIAL_TREE_OPTIONS:
-				ML_INITIAL_TREE = param
+				ML_INITIAL_TREE = ML_INITIAL_TREE_OPTIONS[param]
 		elif opt in ("-n", "--subst_rate"):
 			param = str(arg).strip()
 			if param in RATES:
@@ -275,10 +166,129 @@ def initialyze(argv):
 		elif opt in ("-x", "--otree_params"):
 			OUTPUT_FILE_SECOND = str(arg).strip()   
 		elif opt in ("-z", "--otree"):
-			OUTPUT_FILE_THIRD = str(arg).strip()   
+			OUTPUT_FILE_THIRD = str(arg).strip()
 
-MAFFT_PROGRAM = None 
-MEGACC_PROGRAM = None
+	if TEST_OF_PHYLOGENY == "None":
+		BOOTSTRAPS = NOT_APPLICABLE
+
+	PROCESS_TYPES["ppInfer"] = "true"
+	specificPocessTypes = PROCESS_TYPES_DICT[TREE_METHOD]
+	PROCESS_TYPES[specificPocessTypes] = "true"
+	
+	initializeTreeParams()
+	
+
+def initializeTreeParams():
+	NJ_PARAMETERS = {
+		"[ MEGAinfo ]":{
+			"ver": LINUX_VERSION
+		},
+		"[ DataSettings ]":{
+			"datatype": "snProtein",
+			"MissingBaseSymbol": MISSING_SYMBOL,
+			"IdenticalBaseSymbol": IDENTICAL_SYMBOL,
+			"GapSymbol": GAP_SYMBOL
+		},
+		"[ ProcessTypes ]":PROCESS_TYPES,
+		"[ AnalysisSettings ]":{
+			"Analysis": "Phylogeny Reconstruction",
+			"Scope": "All Selected Taxa",
+			"Statistical Method": "Neighbor-joining",
+			"Phylogeny Test": PHYLOGENY_TEST_HEADER["NJ"],
+			"Test of Phylogeny": TEST_OF_PHYLOGENY,
+			"No. of Bootstrap Replications": BOOTSTRAPS,
+			"Substitution Model": NEW_SUBSECTION,
+			"Substitutions Type": "Amino acid",
+			"Model/Method": SUBST_MODEL,
+			"Rates and Patterns": NEW_SUBSECTION,
+			"Rates among Sites": SUBST_RATE,
+			"Gamma Parameter": NOT_APPLICABLE,
+			"Pattern among Lineages": DEFAULT_PATTERN_AMONG_LINEAGES,
+			"Data Subset to Use": NEW_SUBSECTION,
+			"Gaps/Missing Data Treatment": GAPS_MISSING,
+			"Site Coverage Cutoff (%)": NOT_APPLICABLE,
+			"Has Time Limit": "False",
+			"Maximum Execution Time": "-1"
+		}
+	}
+	
+	ML_PARAMETERS = {
+		"[ MEGAinfo ]":{
+			"ver": LINUX_VERSION
+		},
+		"[ DataSettings ]":{
+			"datatype": "snProtein",
+			"MissingBaseSymbol": MISSING_SYMBOL,
+			"IdenticalBaseSymbol": IDENTICAL_SYMBOL,
+			"GapSymbol": GAP_SYMBOL
+		},
+		"[ ProcessTypes ]":PROCESS_TYPES,
+		"[ AnalysisSettings ]":{
+			"Analysis": "Phylogeny Reconstruction",
+			"Scope": "All Selected Taxa",
+			"Statistical Method": "Maximum Likelihood",
+			"Phylogeny Test": PHYLOGENY_TEST_HEADER["ML_ME"],
+			"Test of Phylogeny": TEST_OF_PHYLOGENY,
+			"No. of Bootstrap Replications": BOOTSTRAPS,
+			"Substitution Model": NEW_SUBSECTION,
+			"Substitutions Type": "Amino acid",
+			"Model/Method": SUBST_MODEL,
+			"Rates and Patterns": NEW_SUBSECTION,
+			"Rates among Sites": SUBST_RATE,
+			"No of Discrete Gamma Categories": NOT_APPLICABLE,
+			"Data Subset to Use": NEW_SUBSECTION,
+			"Gaps/Missing Data Treatment": GAPS_MISSING,
+			"Site Coverage Cutoff (%)": NOT_APPLICABLE,
+			"Tree Inference Options": NEW_SUBSECTION,
+			"ML Heuristic Method": DEFAULT_ML_HEURISTIC_METHOD,
+			"Initial Tree for ML": ML_INITIAL_TREE,
+			"Branch Swap Filter": "None",
+			"System Resource Usage": NEW_SUBSECTION,
+			"Number of Threads": TREE_THREADS,
+			"Has Time Limit": "False",
+			"Maximum Execution Time": "-1"
+		}
+	}
+
+	ME_PARAMETERS = {
+		"[ MEGAinfo ]":{
+			"ver": LINUX_VERSION
+		},
+		"[ DataSettings ]":{
+			"datatype=": "snProtein",
+			"MissingBaseSymbol": MISSING_SYMBOL,
+			"IdenticalBaseSymbol": IDENTICAL_SYMBOL,
+			"GapSymbol": GAP_SYMBOL
+		},
+		"[ ProcessTypes ]":PROCESS_TYPES,
+		"[ AnalysisSettings ]":{
+			"Analysis": "Phylogeny Reconstruction",
+			"Scope": "All Selected Taxa",
+			"Statistical Method": "Minimum Evolution method",
+			"Phylogeny Test": PHYLOGENY_TEST_HEADER["ML_ME"],
+			"Test of Phylogeny": TEST_OF_PHYLOGENY,
+			"No. of Bootstrap Replications": BOOTSTRAPS,
+			"Substitution Model": NEW_SUBSECTION,
+			"Substitutions Type": "Amino acid",
+			"Model/Method": SUBST_MODEL,
+			"Rates and Patterns": NEW_SUBSECTION,
+			"Rates among Sites": SUBST_RATE,
+			"Gamma Parameter": NOT_APPLICABLE,
+			"Pattern among Lineages": DEFAULT_PATTERN_AMONG_LINEAGES,
+			"Data Subset to Use": NEW_SUBSECTION,
+			"Gaps/Missing Data Treatment": GAPS_MISSING,
+			"Site Coverage Cutoff (%)": NOT_APPLICABLE,
+			"Tree Inference Options": NEW_SUBSECTION,
+			"ME Heuristic Method": "Close-Neighbor-Interchange (CNI)",
+			"Initial Tree for ME": "Obtain initial tree by Neighbor-Joining",
+			"ME Search Level": "1",
+			"Has Time Limit": "False",
+			"Maximum Execution Time": "-1"
+		}
+	}
+	global TREE_METHODS
+	TREE_METHODS = {"NJ": NJ_PARAMETERS, "ML": ML_PARAMETERS, "ME": ME_PARAMETERS}
+
 
 def align_sequences():
 	mafft = "mafft"
@@ -286,31 +296,35 @@ def align_sequences():
 		mafft = MAFFT_PROGRAM
 	runSubProcess(" ".join([mafft, ALGORITHM, REORDER_OR_NOT, "--thread", ALIGN_THREADS, INPUT_FILE, ">", OUTPUT_FILE_FIRST]))
 
-
 def buildTree():
 	megacc = "megacc"
 	if MEGACC_PROGRAM != None:
 		megacc = MEGACC_PROGRAM
-	treMethod = TREE_METHODS[TREE_METHOD].copy()
-	for paramName, paramValue in params:
-		 treMethod[paramName] = paramValue
-		 
+	treeMethod = TREE_METHODS[TREE_METHOD].copy()
 	with open(OUTPUT_FILE_SECOND, "w") as paramOutputFile:
-		for element, subelement in treMethod:
+		currentSection = ""
+		for element, subelement in treeMethod.items():
+			currentSection = element
 			paramOutputFile.write(element + "\n")
-			for param, val in subelement:
-				paramOutputFile.write("=".join(param, val) + "\n")
-	runSubProcess(" ".join([megacc, "-a", OUTPUT_FILE_SECOND, "-d", OUTPUT_FILE_FIRST, "-o", OUTPUT_FILE_THIRD]))
+			for param, val in subelement.items():
+				paramOutputFile.write(" = ".join([param, val]) + "\n")
+	runSubProcess(" ".join([megacc, "-a", OUTPUT_FILE_SECOND, "-d", OUTPUT_FILE_FIRST, "-n", "-o", OUTPUT_FILE_THIRD]))
 
 def runSubProcess(command):
 	try:
-		subprocess.call(command, shell=True)
+		call(command, shell=True)
 	except OSError, osError:
 		print "osError " + osError
 		print traceback.print_exc()
 
+def main(argv):
+	initialyze(argv)
+	align_sequences()
+	buildTree()
+	
 
-
+if __name__ == "__main__":
+	main(sys.argv)
 
 
 

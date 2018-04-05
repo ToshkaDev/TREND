@@ -25,7 +25,7 @@ USAGE = "\n\nThe script extracts domain information from the results of hmmscan 
  	[-e || --evalue]       - e-value threshold of a recognized domain
 	[-t || --tabformat]    - output file format as tab delimited file (yes||y or no||n, default no)
 	[-j || --jsonformat]   - output file format as json (yes||y or no||n, default yes)
-	[-u || --thread]          - number of threads for hmmscan or rpsblast; default=4
+	[-u || --thread]       - number of threads for hmmscan or rpsblast; default=4
 	[-m || --sites]        - shoud protein sites be included to the resulting file, default False
 	[-o || --ofile]        - output file with domain information for each protein in tab delimited text format
 	[-n || --osecond]      - output file with counts of each domain architecture variant in tab delimited text format

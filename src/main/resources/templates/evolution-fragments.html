@@ -109,6 +109,7 @@
                         <small>A.A. Substitution Rate</small>
                         <select id="subst-rate" class="form-control input-sm">
                             <option selected='selected' value="ur">Uniform Rates</option>
+                            <option value="gd">Gamma Distributed (G)</option>
                             <option value="ir">Has Invariant Sites (I)</option>
                             <option value="gir">Gamma Distributed With Invariant Sites (G+I)</option>
                         </select>
@@ -117,6 +118,7 @@
                             <option selected='selected' value="njBio">Make initial tree automatically (Default - NJ/BioNJ)</option>
                             <option value="mp">Make initial tree automatically (Maximum parsimony)</option>
                             <option value="nj">Make initial tree automatically (Neighbor joining)</option>
+                            <option value="bioNj">Make initial tree automatically (BioNJ)</option>
                         </select>
                         <small>Gaps and Missing Data</small>
                         <select id="gaps-missing" class="form-control input-sm">
@@ -144,4 +146,37 @@
             </div>
         </div>
     </div>
+
+
+    <div th:fragment="proto-tree-filter">
+        <div class="col-md-2 panel panel-default">
+            <div class="panel-body">
+                <p class="text-primary">Set options for protein features prediction:</p>
+                <div class="form-group">
+                    <form id="first">
+                        <div class="checkbox">
+                            <label><input type="checkbox" value="hmmer3">HMMER3</label>
+                        </div>
+                        <select id="hmmer-db" class="form-control input-sm">
+                            <option selected='selected' value="pfam31">Pfam 31</option>
+                        </select>
+                        <div class="checkbox">
+                            <label><input type="checkbox" value="rpsblast">RPSBLAST</label>
+                        </div>
+                        <select id="rpsblast-db" class="form-control input-sm">
+                            <option selected='selected' value="cdd">CDD</option>
+                            <option value="pfam">Pfam</option>
+                            <option value="COG">COG</option>
+                            <option value="kog">KOG</option>
+                            <option value="smart">SMART</option>
+                            <option value="prk">PRK</option>
+                            <option value="tigr">TIGR</option>
+                        </select>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
