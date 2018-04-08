@@ -60,7 +60,7 @@ label.error {
 }
 
 /*Filter options styles*/
-div.ml-options, div#rpsblast-db {
+div.ml-options, div#rpsblast-db, div.cov-cutoff {
     display: none;
 }
 

@@ -78,10 +78,17 @@ function takeCareOfFields() {
     });
 
 
+    $('#gaps-missing').change(function() {
+        var checkedOption = $('#gaps-missing').val();
+        if (checkedOption === "compDel" || checkedOption === "pairDel") {
+            $('.cov-cutoff').hide();
+        } else if (checkedOption === "partDel") {
+            $('.cov-cutoff').show();
+        }
+    });
 
     $('input[name="dom-prediction-program"]').change(function() {
         var checkedOption = $('input[name="dom-prediction-program"]:checked').val();
-        console.log("checkedOption " + checkedOption);
         if (checkedOption === "hmmscan") {
             $('#rpsblast-db').hide();
             $('#hmmer-db').show();
