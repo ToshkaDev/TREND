@@ -192,8 +192,11 @@ public class ProtoTreeInternal {
     public void setFields() {
         fieldsForAlignmentAndTreeBuild.add(getFirstFileName());
         fieldsForAlignmentAndTreeBuild.add(getAlignmentAlg());
-        fieldsForAlignmentAndTreeBuild.add(getReorderOrNot());
 
+        String reorderOrNot = getReorderOrNot();
+        if (reorderOrNot != null) {
+            fieldsForAlignmentAndTreeBuild.add(reorderOrNot);
+        }
         fieldsForAlignmentAndTreeBuild.add(getTreeBuildMethod());
         fieldsForAlignmentAndTreeBuild.add(getAaSubstModel());
         fieldsForAlignmentAndTreeBuild.add(getAaSubstRate());

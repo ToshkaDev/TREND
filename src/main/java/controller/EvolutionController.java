@@ -67,7 +67,6 @@ public class EvolutionController extends BioUniverseController {
     @ResponseBody
     public String processTreeRequest(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException, ExecutionException, InterruptedException {
         ProtoTreeInternal protoTreeInternal = null;
-        System.out.println("Here");
 
         //Split it to several functions because 'PROTO_TREE' method is asynchronous
         //and files in 'listOfFiles' field of evolutionRequest are got cleared at the end of request processing.

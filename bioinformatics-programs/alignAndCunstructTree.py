@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
-import sys, getopt
+import sys, getopt, os, time
 import collections
 import traceback
-from subprocess import call
+from subprocess import call, Popen
 
 
 USAGE = "\nThis script align proteins using mafft in subporcess and build a phylogenetic tree \n\n" + "python" + sys.argv[0] + '''
@@ -66,7 +66,8 @@ ML_INITIAL_TREE_OPTIONS = {"njBio": "Make initial tree automatically (Default - 
 "bioNj": "Make initial tree automatically (BioNJ)"}
 
 #Parameters
-LINUX_VERSION = "7170509-x86_64 Linux"
+#LINUX_VERSION = "7170509-x86_64 Linux"
+LINUX_VERSION = "7160929-x86_64 Linux"
 MISSING_SYMBOL = "?"
 IDENTICAL_SYMBOL = "."
 GAP_SYMBOL = "-"
@@ -149,7 +150,7 @@ def initialyze(argv):
 			param = str(arg).strip()
 			if param in NJ_ME_PHYLOGENY_TESTS:
 				TEST_OF_PHYLOGENY = NJ_ME_PHYLOGENY_TESTS[param]
-			elif parma in ML_PHYLOGENY_TESTS:
+			elif param in ML_PHYLOGENY_TESTS:
 				TEST_OF_PHYLOGENY = ML_PHYLOGENY_TESTS[param]
 		elif opt in ("-b", "--bootstrap"):
 			param = str(arg).strip()
@@ -291,12 +292,14 @@ def initializeTreeParams():
 
 
 def align_sequences():
+	print "os.getcwd() 1 " + os.getcwd()
 	mafft = "mafft"
 	if MAFFT_PROGRAM != None:
 		mafft = MAFFT_PROGRAM
-	runSubProcess(" ".join([mafft, ALGORITHM, REORDER_OR_NOT, "--thread", ALIGN_THREADS, INPUT_FILE, ">", OUTPUT_FILE_FIRST]))
+	runSubProcess(" ".join([mafft, ALGORITHM, REORDER_OR_NOT, "--thread", ALIGN_THREADS, INPUT_FILE, ">", OUTPUT_FILE_FIRST]), "align_sequences()")
 
 def buildTree():
+	print "os.getcwd() 2 " + os.getcwd()
 	megacc = "megacc"
 	if MEGACC_PROGRAM != None:
 		megacc = MEGACC_PROGRAM
@@ -308,11 +311,17 @@ def buildTree():
 			paramOutputFile.write(element + "\n")
 			for param, val in subelement.items():
 				paramOutputFile.write(" = ".join([param, val]) + "\n")
-	runSubProcess(" ".join([megacc, "-a", OUTPUT_FILE_SECOND, "-d", OUTPUT_FILE_FIRST, "-n", "-o", OUTPUT_FILE_THIRD]))
+	runSubProcess(" ".join([megacc, "-a", OUTPUT_FILE_SECOND, "-d", OUTPUT_FILE_FIRST, "-n", "-o", OUTPUT_FILE_THIRD]), "buildTree()")
 
-def runSubProcess(command):
+def runSubProcess(command, processName):
 	try:
-		call(command, shell=True)
+		proc = Popen(command, shell=True)
+		status = proc.poll()
+		while status == None:
+			print "Still runnig " + processName
+			time.sleep(0.2)
+			status = proc.poll()
+		print "Seems like finished " + processName + " " + str(status)
 	except OSError, osError:
 		print "osError " + osError
 		print traceback.print_exc()
@@ -322,6 +331,23 @@ def main(argv):
 	align_sequences()
 	buildTree()
 	
+#~ def main(argv):
+	#~ initialyze(argv)
+	#~ sub = align_sequences()
+	#~ status = sub.poll()
+	#~ while status == None:
+		#~ print "Still runnig align_sequences()"
+		#~ time.sleep(1)
+		#~ status = sub.poll()
+	#~ print "Seems like finished align_sequences() " + str(status)
+	#~ sub = buildTree()
+	#~ status = sub.poll()
+	#~ while status == None:
+		#~ print "Still runnig buildTree()"
+		#~ time.sleep(1)
+		#~ status = sub.poll()
+	#~ print "finifshed buildTree()"
+	#~ return 
 
 if __name__ == "__main__":
 	main(sys.argv)

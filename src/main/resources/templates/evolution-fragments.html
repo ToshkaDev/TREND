@@ -78,34 +78,38 @@
                             <option value="ML">Maximum Likelihood</option>
                             <option value="ME">Minimum Evolution</option>
                         </select>
-                        <small>ML tree A.A. Substitution Model</small>
-                        <select id="ml-subst-model" class="form-control input-sm">
-                            <option selected='selected' value="jtt">Jones-Taylor-Thornton (JTT) model</option>
-                            <option value="pm">Poisson model</option>
-                            <option value="eim">Equal input model</option>
-                            <option value="dm">Dayhoff model</option>
-                            <option value="dmf">Dayhoff model with Freqs. (F+)</option>
-                            <option value="jttf">JTT with Freqs. (F+) model</option>
-                            <option value="wm">WAG model</option>
-                            <option value="wmf">WAG with Freqs. (F+) model</option>
-                            <option value="lg">LG model</option>
-                            <option value="lgf">LG with Freqs. (F+) model</option>
-                            <option value="grm">General Reversible Mitochondrial (mtREV)</option>
-                            <option value="grmf">mtREV with Freqs. (F+) model</option>
-                            <option value="grc">General Reversible Chloroplast (cpREV)</option>
-                            <option value="grcf">cpREV with Freqs. (F+) model</option>
-                            <option value="grt">General Reversible Transcriptase model (rtREV)</option>
-                            <option value="grtf">rtREV with Freqs. (F+) model</option>
-                        </select>
-                        <small>NJ and ME trees A.A. Substitution Model</small>
-                        <select id="nj_me-subst-model" class="form-control input-sm">
-                            <option selected='selected' value="jtt">Jones-Taylor-Thornton (JTT) model</option>
-                            <option value="nd">No. of differences</option>
-                            <option value="pd">p-distance</option>
-                            <option value="pm">Poisson model</option>
-                            <option value="eim">Equal input model</option>
-                            <option value="dm">Dayhoff model</option>
-                        </select>
+                        <div class="ml-options">
+                            <small>A.A. Substitution Model</small>
+                            <select id="ml-subst-model" class="form-control input-sm">
+                                <option selected='selected' value="jtt">Jones-Taylor-Thornton (JTT) model</option>
+                                <option value="pm">Poisson model</option>
+                                <option value="eim">Equal input model</option>
+                                <option value="dm">Dayhoff model</option>
+                                <option value="dmf">Dayhoff model with Freqs. (F+)</option>
+                                <option value="jttf">JTT with Freqs. (F+) model</option>
+                                <option value="wm">WAG model</option>
+                                <option value="wmf">WAG with Freqs. (F+) model</option>
+                                <option value="lg">LG model</option>
+                                <option value="lgf">LG with Freqs. (F+) model</option>
+                                <option value="grm">General Reversible Mitochondrial (mtREV)</option>
+                                <option value="grmf">mtREV with Freqs. (F+) model</option>
+                                <option value="grc">General Reversible Chloroplast (cpREV)</option>
+                                <option value="grcf">cpREV with Freqs. (F+) model</option>
+                                <option value="grt">General Reversible Transcriptase model (rtREV)</option>
+                                <option value="grtf">rtREV with Freqs. (F+) model</option>
+                            </select>
+                        </div>
+                        <div class="nj-and-me-options">
+                            <small>A.A. Substitution Model</small>
+                            <select id="nj_me-subst-model" class="form-control input-sm">
+                                <option selected='selected' value="jtt">Jones-Taylor-Thornton (JTT) model</option>
+                                <option value="nd">No. of differences</option>
+                                <option value="pd">p-distance</option>
+                                <option value="pm">Poisson model</option>
+                                <option value="eim">Equal input model</option>
+                                <option value="dm">Dayhoff model</option>
+                            </select>
+                        </div>
                         <small>A.A. Substitution Rate</small>
                         <select id="subst-rate" class="form-control input-sm">
                             <option selected='selected' value="ur">Uniform Rates</option>
@@ -113,13 +117,15 @@
                             <option value="ir">Has Invariant Sites (I)</option>
                             <option value="gir">Gamma Distributed With Invariant Sites (G+I)</option>
                         </select>
-                        <small>Initial tree for ML</small>
-                        <select id="initial-tree-ml" class="form-control input-sm">
-                            <option selected='selected' value="njBio">Make initial tree automatically (Default - NJ/BioNJ)</option>
-                            <option value="mp">Make initial tree automatically (Maximum parsimony)</option>
-                            <option value="nj">Make initial tree automatically (Neighbor joining)</option>
-                            <option value="bioNj">Make initial tree automatically (BioNJ)</option>
-                        </select>
+                        <div class="ml-options">
+                            <small>Initial tree for ML</small>
+                            <select id="initial-tree-ml" class="form-control input-sm">
+                                <option selected='selected' value="njBio">Make initial tree automatically (Default - NJ/BioNJ)</option>
+                                <option value="mp">Make initial tree automatically (Maximum parsimony)</option>
+                                <option value="nj">Make initial tree automatically (Neighbor joining)</option>
+                                <option value="bioNj">Make initial tree automatically (BioNJ)</option>
+                            </select>
+                        </div>
                         <small>Gaps and Missing Data</small>
                         <select id="gaps-missing" class="form-control input-sm">
                             <option selected='selected' value="compDel">Complete deletion</option>
@@ -128,17 +134,21 @@
                         </select>
                         <small>Site Coverage Cutoff</small>
                         <input value="95" id="site-cov-cutoff" name="site-cov-cutoff" type="text" class="form-control input-sm"/>
-                        <small>NJ and ME Test</small>
-                        <select id="nj_me-phylo-test" class="form-control input-sm">
-                            <option selected='selected' value="none">None</option>
-                            <option value="bm">Bootstrap method</option>
-                            <option value="ib">Interior-branch test</option>
-                        </select>
-                        <small>ML Test</small>
-                        <select id="ml-phylo-test" class="form-control input-sm">
-                            <option selected='selected' value="none">None</option>
-                            <option value="bm">Bootstrap method</option>
-                        </select>
+                        <div class="nj-and-me-options">
+                            <small>Phylogeny Test</small>
+                            <select id="nj_me-phylo-test" class="form-control input-sm">
+                                <option selected='selected' value="none">None</option>
+                                <option value="bm">Bootstrap method</option>
+                                <option value="ib">Interior-branch test</option>
+                            </select>
+                        </div>
+                        <div class="ml-options">
+                            <small>Phylogeny Test</small>
+                            <select id="ml-phylo-test" class="form-control input-sm">
+                                <option selected='selected' value="none">None</option>
+                                <option value="bm">Bootstrap method</option>
+                            </select>
+                        </div>
                         <small>Number of replicates</small>
                         <input value="100" id="number-of-replicates" name="number-of-replicates" type="text" class="form-control input-sm"/>
                     </form>
@@ -153,26 +163,35 @@
             <div class="panel-body">
                 <p class="text-primary">Set options for protein features prediction:</p>
                 <div class="form-group">
-                    <form id="first">
-                        <div class="checkbox">
-                            <label><input type="checkbox" value="hmmer3">HMMER3</label>
+                    <form id="second">
+                        <div class="radio">
+                            <label>
+                                <input id="hmmscan" name="dom-prediction-program" type="radio" value="hmmscan" checked="checked" />HMMER3
+                            </label>
                         </div>
-                        <select id="hmmer-db" class="form-control input-sm">
-                            <option selected='selected' value="pfam31">Pfam 31</option>
-                        </select>
-                        <div class="checkbox">
-                            <label><input type="checkbox" value="rpsblast">RPSBLAST</label>
+                        <div class="radio">
+                            <label>
+                                <input id="rpsblast" name="dom-prediction-program" type="radio" value="rpsblast"  />RPSBLAST
+                            </label>
                         </div>
-                        <select id="rpsblast-db" class="form-control input-sm">
-                            <option selected='selected' value="cdd">CDD</option>
-                            <option value="pfam">Pfam</option>
-                            <option value="COG">COG</option>
-                            <option value="kog">KOG</option>
-                            <option value="smart">SMART</option>
-                            <option value="prk">PRK</option>
-                            <option value="tigr">TIGR</option>
-                        </select>
-
+                        <div id="hmmer-db">
+                            <small>HMMER Databse</small>
+                            <select class="form-control input-sm">
+                                <option id="pfam31" selected='selected' value="pfam31">Pfam 31</option>
+                            </select>
+                        </div>
+                        <div id="rpsblast-db">
+                            <small>RPSBLAST Databse</small>
+                            <select class="form-control input-sm">
+                                <option id="cdd" selected='selected' value="cdd">CDD</option>
+                                <option id="pfam" value="pfam">Pfam</option>
+                                <option id="cog" value="cog">COG</option>
+                                <option id="kog" value="kog">KOG</option>
+                                <option id="smart" value="smart">SMART</option>
+                                <option id="prk" value="prk">PRK</option>
+                                <option id="tigr" value="tigr">TIGR</option>
+                            </select>
+                        </div>
                     </form>
                 </div>
             </div>

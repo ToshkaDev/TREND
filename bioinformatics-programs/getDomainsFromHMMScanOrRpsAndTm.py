@@ -25,7 +25,7 @@ USAGE = "\n\nThe script extracts domain information from the results of hmmscan 
  	[-e || --evalue]       - e-value threshold of a recognized domain
 	[-t || --tabformat]    - output file format as tab delimited file (yes||y or no||n, default no)
 	[-j || --jsonformat]   - output file format as json (yes||y or no||n, default yes)
-	[-u || --thread]       - number of threads for hmmscan or rpsblast; default=4
+	[-u || --cpu]          - number of threads for hmmscan or rpsblast; default=4
 	[-m || --sites]        - shoud protein sites be included to the resulting file, default False
 	[-o || --ofile]        - output file with domain information for each protein in tab delimited text format
 	[-n || --osecond]      - output file with counts of each domain architecture variant in tab delimited text format
@@ -86,7 +86,7 @@ def initialyze(argv):
 	PROTEIN_TO_DOMAININFO_FILE, DOMAIN_ARCHITECT_TO_COUNT_FILE, PROTEIN_TO_DOMAININFO_JSONFILE, PROTEIN_SITES_INCLUDE
 	try:
 		opts, args = getopt.getopt(argv[1:],"hi:p:r:f:x:A:B:C:D:H:R:P:T:e:t:j:u:m:o:n:d:",["ifile=", "iprocess=", "ofourth=", "ofifth=", "osixth=", "hmmscanDbPath=", \
-		"rpsblastDbPath=", "rpsprocDbPath=", "rpsblastSpDb=", "hmmscanPath=", "rpsblastPath", "rpsbprocPath", "tmhmm2Path", "evalue=", "tabformat=", "jsonformat=", "thread=", "sites=", "ofile=", "osecond=", "othird="])
+		"rpsblastDbPath=", "rpsprocDbPath=", "rpsblastSpDb=", "hmmscanPath=", "rpsblastPath", "rpsbprocPath", "tmhmm2Path", "evalue=", "tabformat=", "jsonformat=", "cpu=", "sites=", "ofile=", "osecond=", "othird="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
@@ -105,9 +105,9 @@ def initialyze(argv):
 					PROCESS_TYPE = processType
 				else:
 					raise Exception("-p || --iprocess argument should be 'hmmscan' or 'rpsblast'")
-			elif opt in ("-u", "--thread"):
+			elif opt in ("-u", "--cpu"):
 				CPU = str(arg).strip()
-			elif opt in ("-t", "--ofourth"):
+			elif opt in ("-r", "--ofourth"):
 				OUTPUT_RPSBLAST_OR_HMMSCAN = str(arg).strip()
 			elif opt in ("-f", "--ofifth"):
 				OUTPUT_RPSBPROC = str(arg).strip()
@@ -157,7 +157,7 @@ def initialyze(argv):
 			raise Exception("-p || --iprocess is a mandatory parameter")
 		if PROCESS_TYPE == RPSBLAST:
 			if OUTPUT_RPSBLAST_OR_HMMSCAN == None or OUTPUT_RPSBPROC == None:
-				raise Exception("-t and -f (||--ofourth and --ofifth) are both mandatory parameters if -p(||--iprocess) is 'rpsblast'")
+				raise Exception("-r and -f (||--ofourth and --ofifth) are both mandatory parameters if -p(||--iprocess) is 'rpsblast'")
 	except Exception as e:
 		print "===========ERROR==========\n " + str(e) + USAGE
 		sys.exit(2)
@@ -301,11 +301,12 @@ def processHmmscan():
 	regex = re.compile(r"\s")
 	try:	
 		with open(OUTPUT_RPSBLAST_OR_HMMSCAN, "r") as hmmscanFile:
+			print "OUTPUT_RPSBLAST_OR_HMMSCAN " + OUTPUT_RPSBLAST_OR_HMMSCAN
 			for record in hmmscanFile:
 				record = record.strip()
 				recSplitted = record.split(":")
 				if recSplitted[0] == "Query":
-					proteinAndLengthList = recSplitted[1].split("[")
+					proteinAndLengthList = recSplitted[1].rpartition("[")
 					#If record is UniprotKb; need to investigate this
 					if "|" in recSplitted[1]:
 						if recSplitted[1][:2] == 'tr':
@@ -314,9 +315,10 @@ def processHmmscan():
 							currentQuery = proteinAndLengthList[0].split("|")[3].strip()
 					else:
 						currentQuery = proteinAndLengthList[0].strip()
-					proteinlen = proteinAndLengthList[1].strip().rstrip("]")
+					proteinlen = proteinAndLengthList[2].strip().rstrip("]")
 					PROT_NAME_TO_LENGTH[currentQuery] = proteinlen
 					if GET_JSON:
+						print "proteinlen "  + proteinlen
 						proteinObject = Protein(proteinlen.split("=")[1])
 						PROTREF_TO_DOMAINS[currentQuery] = proteinObject
 				elif recSplitted[0] == "Description":

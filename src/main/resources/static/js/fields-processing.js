@@ -77,6 +77,37 @@ function takeCareOfFields() {
 
     });
 
+
+
+    $('input[name="dom-prediction-program"]').change(function() {
+        var checkedOption = $('input[name="dom-prediction-program"]:checked').val();
+        console.log("checkedOption " + checkedOption);
+        if (checkedOption === "hmmscan") {
+            $('#rpsblast-db').hide();
+            $('#hmmer-db').show();
+        } else if (checkedOption === "rpsblast") {
+            $('#hmmer-db').hide();
+            $('#rpsblast-db').show();
+        }
+    });
+
+    $('#tree-method').change(function(){
+        switch ($('#tree-method').val()) {
+            case "ML":
+                $('.ml-options').show();
+                $('.nj-and-me-options').hide();
+                break;
+            case "ME":
+                $('.ml-options').hide();
+                $('.nj-and-me-options').show();
+                break;
+            case "JN":
+                $('.ml-options').hide();
+                $('.nj-and-me-options').show();
+                break;
+        }
+    });
+
     $('#first').on({
         keyup: function() {
             $('.result-container').hide();

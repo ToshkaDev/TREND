@@ -58,3 +58,12 @@ label.error {
     color: #3399ff;
 
 }
+
+/*Filter options styles*/
+div.ml-options, div#rpsblast-db {
+    display: none;
+}
+
+div.nj-and-options, div#hmmer-db {
+    display: null;
+}

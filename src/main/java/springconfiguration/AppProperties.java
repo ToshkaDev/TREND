@@ -14,9 +14,13 @@ public class AppProperties {
     private String pathToMainDirFromBioProgs = "../";
 
     private String prepareNames = bioProgramsDir + "/prepareNames.py";
-    private String calculateProteinFeatures = bioProgramsDir + "/getProteinFeatures.py";
-    private String alignAndBuildTree = bioProgramsDir + "/alignAndBuildTree";
-    private String addProtFeaturesToTree = bioProgramsDir + "/addProtFeaturesToTree";
+    private String calculateProteinFeatures = bioProgramsDir + "/getDomainsFromHMMScanOrRpsAndTm.py";
+    private String alignAndBuildTree = bioProgramsDir + "/alignAndCunstructTree.py";
+    private String addProtFeaturesToTree = bioProgramsDir + "/orderSequencesBasedOnTree_andAddDomains.py";
+
+    public String getProtoTreeProgram() {
+        return getAddProtFeaturesToTree();
+    }
 
     private String pythonLocation = "/usr/bin/python";
     private String bashLocation = "/bin/bash";

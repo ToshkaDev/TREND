@@ -20,6 +20,7 @@ public class ConverterMain {
         protoTreeInternal.setFirstFileName(checkForNullAndGet(ParamPrefixes.INPUT.getPrefix(), firstFileName));
         protoTreeInternal.setSecondFileName(checkForNullAndGet(ParamPrefixes.INPUT_SECOND.getPrefix(), secondFileName));
         protoTreeInternal.setThirdFileName(checkForNullAndGet(ParamPrefixes.INPUT_THIRD.getPrefix(), thirdFileName));
+		protoTreeInternal.setCommandToBeProcessedBy(protoTreeRequest.getCommandToBeProcessedBy());
 
         protoTreeInternal.setTreeBuildMethod(checkForNullAndGet(ParamPrefixes.TREE_BUILD_METHOD.getPrefix(), protoTreeRequest.getTreeBuildMethod()));
         protoTreeInternal.setAaSubstModel(checkForNullAndGet(ParamPrefixes.AA_SUBST_MODEL.getPrefix(), protoTreeRequest.getAaSubstModel()));

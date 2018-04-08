@@ -36,6 +36,7 @@ public class BioUniverseServiceImpl implements BioUniverseService {
         this.properties = properties;
         this.bioJobResultDao = bioJobResultDao;
         this.bioJobDao = bioJobDao;
+        programs.put(BioPrograms.PROTO_TREE.getProgramName(), properties.getProtoTreeProgram());
     }
 
     @Override
@@ -95,7 +96,8 @@ public class BioUniverseServiceImpl implements BioUniverseService {
             System.out.println(processBuilder.command());
 
             Process process = processBuilder.start();
-            BufferedReader br = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            //BufferedReader br = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             String line;
             while ((line = br.readLine()) != null) {
                 System.out.println(line);

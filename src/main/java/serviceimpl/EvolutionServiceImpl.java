@@ -42,7 +42,6 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
 
     public ProtoTreeInternal storeFilesAndPrepareCommandArgumentsP(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
         ProtoTreeInternal protoTreeInternal = storeFileAndGetInternalRepresentationP(protoTreeRequest);
-        protoTreeInternal.setFields();
 
 
         List<String> argsForPrepareNames = new LinkedList<>();
@@ -51,7 +50,10 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         List<String> argsForTreeWithDomains = new LinkedList<>();
 
 
-        argsForPrepareNames.add(protoTreeInternal.getFirstFileName());
+        String preparedFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+        argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + preparedFile));
+        protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + preparedFile);
+        protoTreeInternal.setFields();
 
         String hmmscanOrRpsbOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
         String rpsbProcOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
@@ -81,8 +83,8 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
 
         String numberOfThreadsForTree = "4";
         String numberOfThreadsForAlgn = "4";
-        String outAlgnFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
-        String outNewickTree = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+        String outAlgnFile = super.getPrefix() + UUID.randomUUID().toString() + ".fa";
+        String outNewickTree = super.getPrefix() + UUID.randomUUID().toString();
 
         argsForAlignmentAndTree.addAll(protoTreeInternal.getFieldsForAlignmentAndTreeBuild());
         argsForAlignmentAndTree.addAll(Arrays.asList(
@@ -90,8 +92,8 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
                 ParamPrefixes.MEGACC_PATH.getPrefix() + super.getProperties().getMegacc(),
                 ParamPrefixes.OUTPUT_PARAMS.getPrefix() + super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix(),
                 ParamPrefixes.OUTPUT_TREE.getPrefix() + outNewickTree,
-                ParamPrefixes.THREAD.getPrefix() + numberOfThreadsForAlgn,
-                ParamPrefixes.TREE_THREAD + numberOfThreadsForTree,
+                ParamPrefixes.THREAD_ALGN.getPrefix() + numberOfThreadsForAlgn,
+                ParamPrefixes.THREAD.getPrefix() + numberOfThreadsForTree,
                 ParamPrefixes.OUTPUT.getPrefix() + outAlgnFile
         ));
 

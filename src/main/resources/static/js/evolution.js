@@ -22,7 +22,7 @@ function getOptions() {
     var njMePhyloTest = $('#nj_me-phylo-test').val();
     var mlPhyloTest = $('#ml-phylo-test').val();
     var numberOrReplicates = $('#number-of-replicates').val();
-    //var domainPredictionProgram = $('#domain-prediction-program').val() //set up!
+    var domainPredictionProgram = $('input[name="dom-prediction-program"]:checked').val();
 
     var optionToOptionNameMain = {
         "firstFile": firstFile,
@@ -38,7 +38,7 @@ function getOptions() {
         "gapsAndMissingData": gapsAndMissingData,
         "siteCovCutOff": siteCovCutOff,
         "numberOrReplicates": numberOrReplicates,
-        //"domainPredictionProgram": domainPredictionProgram,
+        "domainPredictionProgram": domainPredictionProgram,
         "commandToBeProcessedBy": $('#subnavigation-tab').text()
     }
     var optionToOptionNameSubsModel = {
