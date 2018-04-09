@@ -3,7 +3,7 @@
 import sys, getopt, os, time
 import collections
 import traceback
-from subprocess import call, Popen
+from subprocess import Popen
 
 
 USAGE = "\nThis script align proteins using mafft in subporcess and build a phylogenetic tree \n\n" + "python" + sys.argv[0] + '''
@@ -75,12 +75,12 @@ NEW_SUBSECTION ="===================="
 NOT_APPLICABLE = "Not Applicable"
 DEFAULT_PATTERN_AMONG_LINEAGES = "Same (Homogeneous)"
 TEST_OF_PHYLOGENY = "None"
-BOOTSTRAPS = "NOT_APPLICABLE"
+BOOTSTRAPS = NOT_APPLICABLE
 DEFAULT_ML_HEURISTIC_METHOD = "Nearest-Neighbor-Interchange (NNI)"
 DEFAULT_CPU_NUMBER = "4"
 SUBST_MODEL = NJ_ME_SUBSTITUTIAN_MODELS["jtt"]
 GAPS_MISSING = GAPS_AND_MISSING_DATA_BEHAVIOUR["compDel"]
-COVERAGE_CUTOFF = None
+COVERAGE_CUTOFF = NOT_APPLICABLE
 TREE_THREADS = "4"
 ML_INITIAL_TREE = ML_INITIAL_TREE_OPTIONS["njBio"]
 SUBST_RATE = RATES["ur"]
@@ -171,7 +171,14 @@ def initialyze(argv):
 
 	if TEST_OF_PHYLOGENY == "None":
 		BOOTSTRAPS = NOT_APPLICABLE
-
+	if GAPS_MISSING != GAPS_AND_MISSING_DATA_BEHAVIOUR["partDel"]:
+		COVERAGE_CUTOFF = NOT_APPLICABLE
+		
+		
+	print "TEST_OF_PHYLOGENY " + TEST_OF_PHYLOGENY
+	print "BOOTSTRAPS " + BOOTSTRAPS
+	print "GAPS_MISSING " + GAPS_MISSING
+	print "COVERAGE_CUTOFF " + COVERAGE_CUTOFF 
 	PROCESS_TYPES["ppInfer"] = "true"
 	specificPocessTypes = PROCESS_TYPES_DICT[TREE_METHOD]
 	PROCESS_TYPES[specificPocessTypes] = "true"
@@ -207,7 +214,7 @@ def initializeTreeParams():
 			"Pattern among Lineages": DEFAULT_PATTERN_AMONG_LINEAGES,
 			"Data Subset to Use": NEW_SUBSECTION,
 			"Gaps/Missing Data Treatment": GAPS_MISSING,
-			"Site Coverage Cutoff (%)": NOT_APPLICABLE,
+			"Site Coverage Cutoff (%)": COVERAGE_CUTOFF,
 			"Has Time Limit": "False",
 			"Maximum Execution Time": "-1"
 		}
@@ -239,7 +246,7 @@ def initializeTreeParams():
 			"No of Discrete Gamma Categories": NOT_APPLICABLE,
 			"Data Subset to Use": NEW_SUBSECTION,
 			"Gaps/Missing Data Treatment": GAPS_MISSING,
-			"Site Coverage Cutoff (%)": NOT_APPLICABLE,
+			"Site Coverage Cutoff (%)": COVERAGE_CUTOFF,
 			"Tree Inference Options": NEW_SUBSECTION,
 			"ML Heuristic Method": DEFAULT_ML_HEURISTIC_METHOD,
 			"Initial Tree for ML": ML_INITIAL_TREE,
@@ -278,7 +285,7 @@ def initializeTreeParams():
 			"Pattern among Lineages": DEFAULT_PATTERN_AMONG_LINEAGES,
 			"Data Subset to Use": NEW_SUBSECTION,
 			"Gaps/Missing Data Treatment": GAPS_MISSING,
-			"Site Coverage Cutoff (%)": NOT_APPLICABLE,
+			"Site Coverage Cutoff (%)": COVERAGE_CUTOFF,
 			"Tree Inference Options": NEW_SUBSECTION,
 			"ME Heuristic Method": "Close-Neighbor-Interchange (CNI)",
 			"Initial Tree for ME": "Obtain initial tree by Neighbor-Joining",
@@ -292,14 +299,12 @@ def initializeTreeParams():
 
 
 def align_sequences():
-	print "os.getcwd() 1 " + os.getcwd()
 	mafft = "mafft"
 	if MAFFT_PROGRAM != None:
 		mafft = MAFFT_PROGRAM
 	runSubProcess(" ".join([mafft, ALGORITHM, REORDER_OR_NOT, "--thread", ALIGN_THREADS, INPUT_FILE, ">", OUTPUT_FILE_FIRST]), "align_sequences()")
 
 def buildTree():
-	print "os.getcwd() 2 " + os.getcwd()
 	megacc = "megacc"
 	if MEGACC_PROGRAM != None:
 		megacc = MEGACC_PROGRAM
@@ -319,7 +324,7 @@ def runSubProcess(command, processName):
 		status = proc.poll()
 		while status == None:
 			print "Still runnig " + processName
-			time.sleep(0.2)
+			time.sleep(0.5)
 			status = proc.poll()
 		print "Seems like finished " + processName + " " + str(status)
 	except OSError, osError:
@@ -330,24 +335,6 @@ def main(argv):
 	initialyze(argv)
 	align_sequences()
 	buildTree()
-	
-#~ def main(argv):
-	#~ initialyze(argv)
-	#~ sub = align_sequences()
-	#~ status = sub.poll()
-	#~ while status == None:
-		#~ print "Still runnig align_sequences()"
-		#~ time.sleep(1)
-		#~ status = sub.poll()
-	#~ print "Seems like finished align_sequences() " + str(status)
-	#~ sub = buildTree()
-	#~ status = sub.poll()
-	#~ while status == None:
-		#~ print "Still runnig buildTree()"
-		#~ time.sleep(1)
-		#~ status = sub.poll()
-	#~ print "finifshed buildTree()"
-	#~ return 
 
 if __name__ == "__main__":
 	main(sys.argv)

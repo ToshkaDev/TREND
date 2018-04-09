@@ -98,8 +98,12 @@ function takeCareOfFields() {
         }
     });
 
-    $('#tree-method').change(function(){
-        switch ($('#tree-method').val()) {
+
+    treeMethodToPrefix = {"ML": "ml", "ME": "nj_me", "JN": "nj_me"};
+
+    $('#tree-method').change(function() {
+        var treeMethod = $('#tree-method').val();
+        switch (treeMethod) {
             case "ML":
                 $('.ml-options').show();
                 $('.nj-and-me-options').hide();
@@ -113,7 +117,18 @@ function takeCareOfFields() {
                 $('.nj-and-me-options').show();
                 break;
         }
+        var prefix = treeMethodToPrefix[treeMethod];
+        var phylogenyTest = $("#" + prefix + "-phylo-test").val();
+        phylogenyTest != "none" ? $(".number-of-replicates").show() : $(".number-of-replicates").hide();
     });
+
+    $("#ml-phylo-test, #nj_me-phylo-test").change(function() {
+        var treeMethod = $('#tree-method').val();
+        var prefix = treeMethodToPrefix[treeMethod];
+        var phylogenyTest = $("#" + prefix + "-phylo-test").val();
+        phylogenyTest != "none" ? $(".number-of-replicates").show() : $(".number-of-replicates").hide();
+    });
+
 
     $('#first').on({
         keyup: function() {
