@@ -77,7 +77,7 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
                 ParamPrefixes.TMHMM_PATH.getPrefix() + super.getProperties().getTmhmm2Path(),
                 ParamPrefixes.EVAL_THRESH.getPrefix() + eValueThreashold,
                 ParamPrefixes.THREAD.getPrefix() + numberOfThreads,
-                ParamPrefixes.OUTPUT_PROTEIN_FEAUTURES.getPrefix() + proteinFeaturesOutFile
+                ParamPrefixes.OUTPUT_THIRD.getPrefix() + proteinFeaturesOutFile
         ));
 
 
@@ -97,8 +97,8 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
                 ParamPrefixes.OUTPUT.getPrefix() + outAlgnFile
         ));
 
-        String outNewickFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
-        String outSvgFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+        String outNewickFile = super.getPrefix() + UUID.randomUUID().toString() + ".newick";
+        String outSvgFile = super.getPrefix() + UUID.randomUUID().toString() + ".svg";
         String outOrderedAlgnFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
 
         protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, outOrderedAlgnFile));
@@ -106,7 +106,7 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         argsForTreeWithDomains.addAll(Arrays.asList(
                 protoTreeInternal.getFirstFileName(),
                 ParamPrefixes.INPUT_SECOND.getPrefix() + outAlgnFile,
-                ParamPrefixes.INPUT_THIRD.getPrefix() + outNewickTree,
+                ParamPrefixes.INPUT_THIRD.getPrefix() + outNewickTree + ".nwk",
                 ParamPrefixes.INPUT_FOURTH.getPrefix() + proteinFeaturesOutFile,
                 ParamPrefixes.OUTPUT.getPrefix() + outOrderedAlgnFile,
                 ParamPrefixes.OUTPUT_SECOND.getPrefix() + outSvgFile,

@@ -28,8 +28,8 @@ public enum  ParamPrefixes {
     OUTPUT_TREE("-z "),
 
     //protein features prediction specific parameters
-    OUTPUT_SECOND("--osecond "),
-    OUTPUT_THIRD("--othird "),
+    OUTPUT_SECOND("-n "),
+    OUTPUT_THIRD("-b "),
     OUTPUT_FOURTH("-r "),
     OUTPUT_FIFTH("-f "),
     OUTPUT_SIXTH("-x "),
@@ -41,9 +41,7 @@ public enum  ParamPrefixes {
     HMMSCAN_PATH("-H "),
     RPSBLAST_PATH("-R "),
     RPSBPROC_PATH("-P "),
-    TMHMM_PATH("-T "),
-    OUTPUT_PROTEIN_FEAUTURES("-d ")
-    ;
+    TMHMM_PATH("-T ");
 
     private String paramPrefix;
 

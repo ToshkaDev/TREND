@@ -29,7 +29,7 @@ USAGE = "\n\nThe script extracts domain information from the results of hmmscan 
 	[-m || --sites]        - shoud protein sites be included to the resulting file, default False
 	[-o || --ofile]        - output file with domain information for each protein in tab delimited text format
 	[-n || --osecond]      - output file with counts of each domain architecture variant in tab delimited text format
-	[-d || --othird]       - output file  with domain information for each protein in json format
+	[-b || --othird]       - output file  with domain information for each protein in json format
 	'''
 	
 	
@@ -85,7 +85,7 @@ def initialyze(argv):
 	OUTPUT_RPSBPROC, OUTPUT_TMHMMSCAN, HMMSCAN_DB_PATH, RPSBLAST_DB_PATH, RPSBPROC_DB_PATH, RPSBLAST_DB, CPU, EVAL_THRESHOLD, GET_TAB, GET_JSON, \
 	PROTEIN_TO_DOMAININFO_FILE, DOMAIN_ARCHITECT_TO_COUNT_FILE, PROTEIN_TO_DOMAININFO_JSONFILE, PROTEIN_SITES_INCLUDE
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:p:r:f:x:A:B:C:D:H:R:P:T:e:t:j:u:m:o:n:d:",["ifile=", "iprocess=", "ofourth=", "ofifth=", "osixth=", "hmmscanDbPath=", \
+		opts, args = getopt.getopt(argv[1:],"hi:p:r:f:x:A:B:C:D:H:R:P:T:e:t:j:u:m:o:n:b:",["ifile=", "iprocess=", "ofourth=", "ofifth=", "osixth=", "hmmscanDbPath=", \
 		"rpsblastDbPath=", "rpsprocDbPath=", "rpsblastSpDb=", "hmmscanPath=", "rpsblastPath", "rpsbprocPath", "tmhmm2Path", "evalue=", "tabformat=", "jsonformat=", "cpu=", "sites=", "ofile=", "osecond=", "othird="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
@@ -149,7 +149,7 @@ def initialyze(argv):
 				PROTEIN_TO_DOMAININFO_FILE = str(arg).strip()
 			elif opt in ("-n", "--osecond"):
 				DOMAIN_ARCHITECT_TO_COUNT_FILE = str(arg).strip()
-			elif opt in ("-d", "--othird"):
+			elif opt in ("-b", "--othird"):
 				PROTEIN_TO_DOMAININFO_JSONFILE = str(arg).strip()
 			elif opt in ("-m", "--sites"):
 				PROTEIN_SITES_INCLUDE = True

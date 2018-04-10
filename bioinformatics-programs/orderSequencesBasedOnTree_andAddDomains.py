@@ -16,8 +16,8 @@ USAGE = "\nThis script enumerates protein sequence names on the provided phyloge
 -d || --ithird        -input file with phylogenetic tree  
 -f || --ifourth       -input file with protein domains information
 [-o || --oaligned]    -output file with aligned sequences with changed protein names
-[-x || --osecond]     -output file with prepared tree with domains and changed protein names in svg format
-[-z || --othird]      -output file with prepared tree with changed protein and no domains in newick format
+[-n || --osecond]     -output file with prepared tree with domains and changed protein names in svg format
+[-b || --othird]      -output file with prepared tree with changed protein and no domains in newick format
 '''
 
 # Specified via program arguments
@@ -45,7 +45,7 @@ THIN_LINE = [0, 9, "[]", 0.2, 0.7, "black", "gray", ""]
 def initialyze(argv):
 	global SEQS, SEQS_ALIGNED, TREE_FILE, DOMAINS, OUTPUT_ALIGNED_FILENAME, OUTPUT_TREE_SVG_FILENAME, OUTPUT_TREE_NEWICK_FILENAME
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:s:d:f:o:x:z:",["isequence=", "ialigned=", "ithird=", "ifourth=", "oaligned=", "osecond=", "othird="])
+		opts, args = getopt.getopt(argv[1:],"hi:s:d:f:o:n:b:",["isequence=", "ialigned=", "ithird=", "ifourth=", "oaligned=", "osecond=", "othird="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
@@ -60,14 +60,14 @@ def initialyze(argv):
 		elif opt in ("-s", "--ialigned"):
 			SEQS_ALIGNED = str(arg).strip()
 		elif opt in ("-d", "--ithird"):
-			TREE_FILE = str(arg)
+			TREE_FILE = str(arg).strip()
 		elif opt in ("-f", "--ifourth"):
-			DOMAINS = str(arg)
+			DOMAINS = str(arg).strip()
 		elif opt in ("-o", "--oaligned"):
 			OUTPUT_ALIGNED_FILENAME = str(arg).strip()
-		elif opt in ("-x", "--osecond"):
+		elif opt in ("-n", "--osecond"):
 			OUTPUT_TREE_SVG_FILENAME = str(arg).strip()   
-		elif opt in ("-z", "--othird"):
+		elif opt in ("-b", "--othird"):
 			OUTPUT_TREE_NEWICK_FILENAME = str(arg).strip()    
 
 def prepareProteinToDomainsDict():
@@ -236,6 +236,7 @@ def layout(node):
 			add_face_to_node(seqFace, node, 0, position="aligned")
        
 def writeSeqsAndTree():
+	print "TREE_FILE " + TREE_FILE
 	tree = Tree(TREE_FILE)
 	terminals = tree.get_leaves()
 	# change protein names in datas sctrucuters and write protein sequences with changed names to file 
