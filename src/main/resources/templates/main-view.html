@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="addContent(fragmentsMain, searchArea, filter)">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="addContent(fragmentsMain, searchArea, filter, result)">
 <head>
     <meta charset="UTF-8"/>
-    <title>Bio</title>
+    <title>ProtoTree</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" th:href="@{https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css}"/>
@@ -26,24 +26,47 @@
 
     <div class="container-fluid">
         <div class="form-group col-md-12">
-            <div th:fragment="addContent(fragmentsMain, searchArea, tab, filter)">
+            <div th:fragment="addContent(fragmentsMain, searchArea, tab, filter, result)">
                 <div th:replace="${fragmentsMain} :: ${tab}"></div>
                 <div class="col-md-10">
-                    <div th:replace="${fragmentsMain} :: ${searchArea}"></div>
+                    <div th:replace="${searchArea} ? ~{${fragmentsMain} :: ${searchArea}} : ~{${fragmentsMain} :: ${result}}"></div>
                     <div th:replace="${filter} ? ~{${fragmentsMain} :: ${filter}} : ~{}"></div>
                </div>
            </div>
         </div>
 
 
-    <div class="row">
-        <div class="col-md-12 text-center result-container">
-            <a id="results-load" class="btn btn-info btn-lg" href="#">
-                Download Results <span class="glyphicon glyphicon-download-alt"> </span>
-            </a>
-        </div>
-    </div>
+        <div class="row">
+            <div class="col-md-12 text-center result-container">
+                <div class="btn-group" role="group" aria-label="...">
+                    <a id="results-show" class="btn btn-info btn-lg" href="#">
+                        Show Tree <span class="glyphicon glyphicon-new-window"> </span>
+                    </a>
+                    <a id="results-load" class="btn btn-info btn-lg" href="#">
+                        Download Tree (SVG) <span class="glyphicon glyphicon-download-alt"> </span>
+                    </a>
+                    <!--<span class="glyphicon glyphicon-menu-down"> </span>-->
+                </div>
+                <div id="options">
+                    <br/>
+                        <i class="glyphicon glyphicon-option-horizontal"> </i>
 
+                </div>
+            </div>
+            <div class="col-md-12 text-center extra-result-container">
+                <br/><br/>
+                <div class="secondary-buttons">
+                    <!--<div class="btn-group" role="group" aria-label="...">-->
+                        <a id="tree-load" class="btn btn-info btn-md" href="#">
+                            Download Tree (Newick) <span class="glyphicon glyphicon-download-alt"> </span>
+                        </a>
+                        <a id="alignment-load" class="btn btn-info btn-md" href="#">
+                            Download Alignment <span class="glyphicon glyphicon-download-alt"> </span>
+                        </a>
+                    <!--</div>-->
+                </div>
+            </div>
+        </div>
 
     </div>
 
@@ -54,9 +77,11 @@
     <script th:src="@{https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js}"></script>
     <script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js}"></script>
     <script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/additional-methods.min.js}"></script>
+    <script th:src="@{https://d3js.org/d3.v5.min.js}"></script>
+    <script th:src="@{https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js}"></script>
     <script th:src="@{/js/navbar-tabs.js}"></script>
     <script th:src="@{/js/fields-processing.js}"></script>
-    <script th:src="@{/js/send-and-process-data.js}"></script>
+    <script th:src="@{${sendOrGiveResult}}"></script>
     <script th:src="@{${specificJs}}"></script>
 
     <div th:replace="common :: copy"></div>

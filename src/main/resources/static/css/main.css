@@ -67,3 +67,17 @@ div.ml-options, div#rpsblast-db, div.cov-cutoff, div.number-of-replicates {
 div.nj-and-options, div#hmmer-db {
     display: null;
 }
+
+div.secondary-buttons, div.options {
+    display: flex;
+    justify-content:center;
+    padding-top: 4px;
+}
+
+.glyphicon.glyphicon-option-horizontal {
+    font-size: 1.5em;
+}
+
+div#svgContainer {
+    width: 800px;
+}

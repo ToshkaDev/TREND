@@ -21,7 +21,8 @@ function getOptions() {
     var phylogenyTest = getOption("phylo-test");
     var aaSubstModel = getOption("subst-model");
 
-
+    Cookies.set('HEYE', 'This');
+    console.log("cookie.get('HEYE') " + Cookies.get('HEYE'))
     var optionToOptionNameMain = {
         "firstFile": firstFile,
         "secondFile": secondFile,

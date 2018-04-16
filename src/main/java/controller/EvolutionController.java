@@ -56,11 +56,22 @@ public class EvolutionController extends BioUniverseController {
 
     @GetMapping(value={"", "/", "/prototree"})
     public String protoTree(Model model) {
-        addToModelCommon(model);
+        addToModelCommon(model, "/js/send-and-process-data.js");
         model.addAttribute("subnavigationTab", BioPrograms.PROTO_TREE.getProgramName());
         return "main-view  :: addContent(" +
                 "fragmentsMain='evolution-fragments', searchArea='proto-tree', " +
                 "tab='evolution-navbar', filter='proto-tree-filter')";
+    }
+
+    @GetMapping(value={"/tree-for-you/{jobId:.+}"})
+    public String result(@PathVariable Integer jobId, Model model) {
+        addToModelCommon(model, "/js/result-processing.js");
+        System.out.println("jobId " + jobId);
+        model.addAttribute("jobId", jobId);
+        model.addAttribute("subnavigationTab", BioPrograms.PROTO_TREE.getProgramName());
+        return "main-view  :: addContent(" +
+                "fragmentsMain='evolution-fragments', " +
+                "tab='evolution-navbar', result='result')";
     }
 
     @PostMapping(value="/process-request", produces="text/plain")
@@ -80,9 +91,9 @@ public class EvolutionController extends BioUniverseController {
         return String.valueOf(jobId);
     }
 
-    @GetMapping(value="/get-filename", produces="application/json")
+    @GetMapping(value="/tree-for-you/get-filename", produces="application/json")
     @ResponseBody
-    public Map<String, List<String>> getFileNameIfReady(@RequestParam("jobId") Integer jobId) {
+    public Map<String, List<String>> getFileNameIfReady(@RequestParam("jobId") String jobId) {
         BioJob bioJob;
         String urlPath = ServletUriComponentsBuilder.fromCurrentContextPath().path("/evolution/univ_files/").build().toString();
 
@@ -92,7 +103,7 @@ public class EvolutionController extends BioUniverseController {
         List<String> listOfResultFileNames = null;
 
 	     if (jobId != null ) {
-            bioJob = evolutionService.getBioJobIfFinished(jobId);
+            bioJob = evolutionService.getBioJobIfFinished(Integer.valueOf(jobId.split("-")[0]));
             if (bioJob != null)
                 listOfResultFileNames = bioJob.getBioJobResultList().stream().map(bjResult -> urlPath + bjResult.getResultFileName()).collect(Collectors.toList());
                 result.put("result", listOfResultFileNames);
@@ -118,8 +129,9 @@ public class EvolutionController extends BioUniverseController {
     }
 
     @Override
-    void addToModelCommon(Model model) {
+    void addToModelCommon(Model model, String sendOrGiveResult) {
         model.addAttribute("mainTab", "evolution");
+        model.addAttribute("sendOrGiveResult", sendOrGiveResult);
         model.addAttribute("specificJs", "/js/evolution.js");
     }
 

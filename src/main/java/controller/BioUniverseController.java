@@ -37,5 +37,5 @@ public abstract class BioUniverseController {
                 .body(file);
     }
 
-    abstract void addToModelCommon(Model model);
+    abstract void addToModelCommon(Model model, String sendOrGiveResult);
 }

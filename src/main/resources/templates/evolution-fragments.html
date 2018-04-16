@@ -28,28 +28,6 @@
                 </label>
                 <span class='label label-info' id="first-file-info"></span>
             </div> <br /> <br />
-
-            <div class="row">
-                <textarea id="second-file-area" class="form-control" placeholder="Paste names" rows="8"> </textarea>
-            </div>
-            OR <br />
-            <div class="row">
-                <label class="btn btn-default btn-lg">
-                    Choose file with tree <input id="second-file" type="file" style="display: none" multiple/>
-                </label>
-                <span class='label label-info' id="second-file-info"></span>
-            </div> <br /> <br />
-
-            <div class="row">
-                <textarea id="third-file-area" class="form-control" placeholder="Paste names" rows="8"> </textarea>
-            </div>
-            OR <br />
-            <div class="row">
-                <label class="btn btn-default btn-lg">
-                    Choose file with aligned sequences <input id="third-file" type="file" style="display: none" multiple/>
-                </label>
-                <span class='label label-info' id="third-file-info"></span>
-            </div>
             <div class="row">
                 <button id="GoAsync" class="btn btn-primary btn-md pull-right" type="button">
                     <span>Go!</span>
@@ -58,12 +36,23 @@
         </div>
     </div>
 
+    <div th:fragment="result">
+        <div class="col-md-8 my-result">
+            <div style="display: none">
+                <span id="jobId" th:text="${jobId}"></span>
+            </div>
+            <p>SVG Container</p>
+            <div id="svgContainer"></div>
+        </div>
+    </div>
+
     <div th:fragment="proto-tree-filter">
         <div class="col-md-2 panel panel-default">
             <div class="panel-body">
-                <p class="text-primary">Set options:</p>
+                <!--<p class="text-primary">Set options:</p>-->
                 <div class="form-group">
                     <form id="first">
+                        <p class="text-primary">Set options for alignment:</p>
                         <small>Alignment Algorithm:</small>
                         <select id="alignment-alg" class="form-control input-sm">
                             <option selected='selected' value="--retree 2 --maxiterate 0">FFT-NS-2</option>
@@ -72,6 +61,8 @@
                             <option value="--genafpair">E-INS-i</option>
                             <option value="--globalpair">G-INS-i</option>
                         </select>
+                        <br/>
+                        <p class="text-primary">Set options for tree building:</p>
                         <small>Tree Building Method:</small>
                         <select id="tree-method" class="form-control input-sm">
                             <option selected='selected' value="JN">Neighbour Joining</option>
@@ -157,14 +148,6 @@
                         </div>
                     </form>
                 </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div th:fragment="proto-tree-filter">
-        <div class="col-md-2 panel panel-default">
-            <div class="panel-body">
                 <p class="text-primary">Set options for protein features prediction:</p>
                 <div class="form-group">
                     <form id="second">
@@ -201,5 +184,4 @@
             </div>
         </div>
     </div>
-
 </body>
