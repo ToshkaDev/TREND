@@ -10,7 +10,7 @@ body {
 
 /*Navigation bar styles*/
 .navbar-inverse {
-	font-size:110%;
+	font-size:130%;
 	color:white;
 	background-color:#800000; /*#264040*/
 }
@@ -38,13 +38,27 @@ nav div.bottom-nav-bar {
     height:7px;
     background-color:#ff4d4d;
  }
+
+ div#bu-navbar {
+    margin-left: 20%;
+ }
+
+ #logo {
+    margin-left: 90%;
+ }
  
  /*End of navigation bar styles */
  
-.my-textarea {
-	margin-right: 2em;
+.proto-tree-button, .proto-tree-button:focus {
+    background-color: #666699;
+    border: 1px solid #5c5c8a;
 }
-#Go{
+.proto-tree-button:hover, .proto-tree-button:active, .proto-tree-button:visited {
+    background-color: #52527a !important;
+    border: 1px solid  #47476b;
+
+}
+#GoAsync{
 	width:7em;
 }
 
@@ -56,7 +70,13 @@ div.panel-body {
 label.error {
     font-size:small;
     color: #3399ff;
+}
 
+#choose-file {
+    background-color: #7575a3;
+}
+#first-file-info {
+    background-color: #8585ad;
 }
 
 /*Filter options styles*/
@@ -74,11 +94,36 @@ div.secondary-buttons, div.options {
     padding-top: 4px;
 }
 
+div.query-area {
+    padding-left: 15%;
+}
+
+div.result-area {
+    padding-left: 10%;
+}
+
+.my-textarea {
+	margin-right: 3em;
+}
+
 .glyphicon.glyphicon-option-horizontal {
     font-size: 1.5em;
 }
 
-div#svgContainer {
-    width: 800px;
-    border: 1px solid red;
+.fa.fa-twitter {
+    font-size: 3em;
+}
+div.result-container {
+    display: none;
+    padding: 7px;
+}
+
+.acknowledgments, #copy-right {
+    display: flex;
+    justify-content:center;
+}
+
+
+.acknowledgments-container {
+   background-color: #e0e0eb;
 }

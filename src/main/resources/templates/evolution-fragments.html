@@ -4,57 +4,75 @@
 
 <body>
 
-    <div th:fragment="evolution-navbar">
-        <div class="col-md-2">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <ul class="nav nav-pills nav-stacked">
-                        <li id="protoTree"><a th:href="@{/evolution/prototree}">Proto Tree</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!--<div th:fragment="evolution-navbar">-->
+        <!--<div class="col-md-2">-->
+            <!--<div class="panel panel-default">-->
+                <!--<div class="panel-body">-->
+                    <!--<ul class="nav nav-pills nav-stacked">-->
+                        <!--<li id="protoTree"><a th:href="@{/evolution/prototree}">Proto Tree</a></li>-->
+                    <!--</ul>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
 
     <div th:fragment="proto-tree">
         <div class="col-md-8 my-textarea">
             <div class="row">
-                <textarea id="first-file-area" class="form-control" placeholder="Paste names" rows="8"> </textarea>
+                <textarea id="first-file-area" class="form-control" rows="12"> </textarea>
             </div>
-            OR <br />
+            <br />
             <div class="row">
-                <label class="btn btn-default btn-lg">
+                <label id="choose-file" class="btn btn-primary btn-md">
                     Choose file with protein sequences <input id="first-file" type="file" style="display: none" multiple/>
                 </label>
                 <span class='label label-info' id="first-file-info"></span>
             </div> <br /> <br />
             <div class="row">
-                <button id="GoAsync" class="btn btn-primary btn-md pull-right" type="button">
-                    <span>Go!</span>
+                <button id="GoAsync" class="btn btn-primary btn-md pull-right proto-tree-button" type="button">
+                    <span>SUBMIT</span>
                 </button>
             </div>
         </div>
     </div>
 
     <div th:fragment="result">
-        <div class="col-md-8 my-result">
+        <div class="col-md-12 text-center result-container">
+            <div class="btn-group" role="group" aria-label="...">
+                <a id="results-load" class="btn btn-info btn-lg proto-tree-button" href="#">
+                    Download Tree (SVG) <span class="glyphicon glyphicon-download-alt "> </span>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-12 my-result">
             <div style="display: none">
                 <span id="jobId" th:text="${jobId}"></span>
             </div>
-            <p>SVG Container</p>
             <div id="svgContainer"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center result-container">
+                <div class="secondary-buttons">
+                    <a id="tree-load" class="btn btn-info btn-md proto-tree-button" href="#">
+                        Download Tree (Newick) <span class="glyphicon glyphicon-download-alt"> </span>
+                    </a>
+                    <a id="alignment-load" class="btn btn-info btn-md proto-tree-button" href="#">
+                        Download Alignment <span class="glyphicon glyphicon-download-alt"> </span>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
     <div th:fragment="proto-tree-filter">
         <div class="col-md-2 panel panel-default">
             <div class="panel-body">
-                <!--<p class="text-primary">Set options:</p>-->
+                <h4 class="text-primary">Set options:</h4>
                 <div class="form-group">
                     <form id="first">
-                        <p class="text-primary">Set options for alignment:</p>
-                        <small>Alignment Algorithm:</small>
-                        <select id="alignment-alg" class="form-control input-sm">
+                        <p class="text-info" >Alignment:</p>
+                        <span>Alignment Algorithm:</span>
+                        <select id="alignment-alg" class="form-control input-md">
                             <option selected='selected' value="--retree 2 --maxiterate 0">FFT-NS-2</option>
                             <option value="--retree 2 --maxiterate 1000">FFT-NS-i</option>
                             <option value="--localpair">L-INS-i</option>
@@ -62,16 +80,16 @@
                             <option value="--globalpair">G-INS-i</option>
                         </select>
                         <br/>
-                        <p class="text-primary">Set options for tree building:</p>
-                        <small>Tree Building Method:</small>
-                        <select id="tree-method" class="form-control input-sm">
+                        <p class="text-info">Tree Building:</p>
+                        <span>Tree Building Method:</span>
+                        <select id="tree-method" class="form-control input-md">
                             <option selected='selected' value="JN">Neighbour Joining</option>
                             <option value="ML">Maximum Likelihood</option>
                             <option value="ME">Minimum Evolution</option>
                         </select>
                         <div class="ml-options">
-                            <small>A.A. Substitution Model</small>
-                            <select id="ml-subst-model" class="form-control input-sm">
+                            <span>A.A. Substitution Model:</span>
+                            <select id="ml-subst-model" class="form-control input-md">
                                 <option selected='selected' value="jtt">Jones-Taylor-Thornton (JTT) model</option>
                                 <option value="pm">Poisson model</option>
                                 <option value="eim">Equal input model</option>
@@ -91,8 +109,8 @@
                             </select>
                         </div>
                         <div class="nj-and-me-options">
-                            <small>A.A. Substitution Model</small>
-                            <select id="nj_me-subst-model" class="form-control input-sm">
+                            <span>A.A. Substitution Model:<span>
+                            <select id="nj_me-subst-model" class="form-control input-md">
                                 <option selected='selected' value="jtt">Jones-Taylor-Thornton (JTT) model</option>
                                 <option value="nd">No. of differences</option>
                                 <option value="pd">p-distance</option>
@@ -101,54 +119,54 @@
                                 <option value="dm">Dayhoff model</option>
                             </select>
                         </div>
-                        <small>A.A. Substitution Rate</small>
-                        <select id="subst-rate" class="form-control input-sm">
+                        <span>A.A. Substitution Rate:<span>
+                        <select id="subst-rate" class="form-control input-md">
                             <option selected='selected' value="ur">Uniform Rates</option>
                             <option value="gd">Gamma Distributed (G)</option>
                             <option value="ir">Has Invariant Sites (I)</option>
                             <option value="gir">Gamma Distributed With Invariant Sites (G+I)</option>
                         </select>
                         <div class="ml-options">
-                            <small>Initial tree for ML</small>
-                            <select id="initial-tree-ml" class="form-control input-sm">
+                            <span>TInitial tree for ML:<span>
+                            <select id="initial-tree-ml" class="form-control input-md">
                                 <option selected='selected' value="njBio">Make initial tree automatically (Default - NJ/BioNJ)</option>
                                 <option value="mp">Make initial tree automatically (Maximum parsimony)</option>
                                 <option value="nj">Make initial tree automatically (Neighbor joining)</option>
                                 <option value="bioNj">Make initial tree automatically (BioNJ)</option>
                             </select>
                         </div>
-                        <small>Gaps and Missing Data</small>
-                        <select id="gaps-missing" class="form-control input-sm">
+                        <span>Gaps and Missing Data:<span>
+                        <select id="gaps-missing" class="form-control input-md">
                             <option selected='selected' value="compDel">Complete deletion</option>
                             <option value="partDel">Partial deletion</option>
                             <option value="pairDel">Pairwise deletion</option>
                         </select>
                         <div class="cov-cutoff">
-                            <small>Site Coverage Cutoff</small>
+                            <span>TSite Coverage Cutoff:<span>
                             <input value="95" id="site-cov-cutoff" name="site-cov-cutoff" type="text" class="form-control input-sm"/>
                         </div>
                         <div class="nj-and-me-options">
-                            <small>Phylogeny Test</small>
-                            <select id="nj_me-phylo-test" class="form-control input-sm">
+                            <span>Phylogeny Test:<span>
+                            <select id="nj_me-phylo-test" class="form-control input-md">
                                 <option selected='selected' value="none">None</option>
                                 <option value="bm">Bootstrap method</option>
                                 <option value="ib">Interior-branch test</option>
                             </select>
                         </div>
                         <div class="ml-options">
-                            <small>Phylogeny Test</small>
-                            <select id="ml-phylo-test" class="form-control input-sm">
+                            <span>Phylogeny Test:<span>
+                            <select id="ml-phylo-test" class="form-control input-md">
                                 <option selected='selected' value="none">None</option>
                                 <option value="bm">Bootstrap method</option>
                             </select>
                         </div>
                         <div class="number-of-replicates">
-                            <small>Number of replicates</small>
-                            <input value="100" id="number-of-replicates" name="number-of-replicates" type="text" class="form-control input-sm"/>
+                            <span>Number of replicates:<span>
+                            <input value="100" id="number-of-replicates" name="number-of-replicates" type="text" class="form-control input-md"/>
                         </div>
                     </form>
                 </div>
-                <p class="text-primary">Set options for protein features prediction:</p>
+                <p class="text-info">Protein Features Prediction:</p>
                 <div class="form-group">
                     <form id="second">
                         <div class="radio">
@@ -162,14 +180,14 @@
                             </label>
                         </div>
                         <div id="hmmer-db">
-                            <small>HMMER Databse</small>
-                            <select class="form-control input-sm">
+                            <span>HMMER Databse:<span>
+                            <select class="form-control input-md">
                                 <option id="pfam31" selected='selected' value="pfam31">Pfam 31</option>
                             </select>
                         </div>
                         <div id="rpsblast-db">
-                            <small>RPSBLAST Databse</small>
-                            <select class="form-control input-sm">
+                            <span>RPSBLAST Database:<span>
+                            <select class="form-control input-md">
                                 <option id="cdd" selected='selected' value="cdd">CDD</option>
                                 <option id="pfam" value="pfam">Pfam</option>
                                 <option id="cog" value="cog">COG</option>

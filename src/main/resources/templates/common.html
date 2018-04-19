@@ -12,21 +12,17 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="@{/home}" style="font-size:140%; color:#D8F0E3">ProtoTree</a>
+                    <a class="navbar-brand" id="logo" th:href="@{/prototree}" style="font-size:150%; color:#D8F0E3">ProtoTree</a>
                 </div>
 
                 <div class="navbar-collapse" id="bu-navbar">
                     <ul class="nav navbar-nav">
-                        <li id="home"><a th:href="@{/home}">Home</a></li>
-                        <li id="sequence"><a th:href="@{/sequence}">Sequence</a></li>
-                        <li id="domain"><a th:href="@{/domain}">Domain</a></li>
-                        <li id="evolution"><a th:href="@{/evolution}">Evolution</a></li>
-                        <li id="blast"><a th:href="@{/blast}">Blast </a></li>
-                        <li id="protocols"><a th:href="@{/protocols}">Protocols </a></li>
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        <li id="help"><a th:href="@{/help}">Help</a></li>
+                        <li id="home"><a th:href="@{/prototree}">Home</a></li>
                         <li id="about"><a th:href="@{/about}">About</a></li>
+                        <li id="help"><a th:href="@{/help}">Help</a></li>
+                        <li id="credits"><a th:href="@{/credits}">Credits</a></li>
+                        <li id="contact"><a th:href="@{/contact}">Contact</a></li>
+
                     </ul>
                 </div>
             </div>
@@ -39,8 +35,22 @@
 
     </div>
 
-    <div th:fragment="copy">
-        &copy; 2017 Vadim Gumerov
+
+    <div th:fragment="copy" class="acknowledgments-container">
+        <div class="row">
+            <div class="col-md-6 acknowledgments">
+                <h2> <a th:href="@{http://zhulinlab.org}"> ZHULIN LAB</a></h2>
+                <a th:href="@{http://twitter.com/zhulinlab}">
+                    <i class="fa fa-twitter"></i>
+                </a>
+            </div>
+            <div class="col-md-6 acknowledgments">
+                <a th:href="@{https://www.osu.edu}">
+                    <img th:src="@{/images/TheOhioStateUniversity-Stacked.jpg}" width="300" height="170">
+                </a>
+            </div>
+        </div>
+        <span id="copy-right">&copy; 2017 Vadim Gumerov</span>
     </div>
 
 </body>

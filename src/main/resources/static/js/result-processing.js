@@ -1,9 +1,9 @@
 $(document).ready(function (){
     var jobId = $('#jobId').text();
+
     getIfReady(jobId);
 
 });
-
 
 function getIfReady(jobId) {
     console.log('Checking if ready ');
@@ -25,13 +25,11 @@ function tryToGetFileName(jobId) {
 }
 
 function processRetrievedDataAsync(data) {
-
-//
-//    drag = d3.behavior.drag()
-//        .origin(function(d) { return d; })
-//        .on("dragstart", dragstarted)
-//        .on("drag", dragged)
-//        .on("dragend", dragended);
+    var minSvgWidth = 650;
+    var widthShrinkageFactor = 0.8;
+    var heightShrinkageFactor = 0.8;
+    var width = window.innerWidth*widthShrinkageFactor;
+    var height = window.innerHeight*heightShrinkageFactor;
 
     if (data.status[0] != 'notReady') {
         clearInterval(fileGetter);
@@ -42,9 +40,12 @@ function processRetrievedDataAsync(data) {
         if (data.result.length > 1) {
             $('#results-load').attr('href', data.result[1]);
             var tree = d3.select("div#svgContainer")
+            .style("width", width)
+            .style("height", height)
+            .style("border", "1px solid #9494b8")
             .append("svg")
-            .attr("width", 1000)
-            .attr("height", 1200)
+            .attr("width", width)
+            .attr("height", height)
             .style("pointer-events", "all")
             .call(d3.zoom().on("zoom", function() {tree.attr("transform", d3.event.transform)}))
             .append("g")
@@ -54,29 +55,11 @@ function processRetrievedDataAsync(data) {
                 console.log(xml.documentElement)
                 document.getElementById("treeContainer").appendChild(xml.documentElement);
             });
-
         }
         $('.result-container').show();
 	}
 
 }
-
-
-
-
-function dragstarted(d) {
-  d3.event.sourceEvent.stopPropagation();
-  d3.select(this).classed("dragging", true);
-}
-
-function dragged(d) {
-  d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
-}
-
-function dragended(d) {
-  d3.select(this).classed("dragging", false);
-}
-
 
 function error(jqXHR, textStatus, errorThrown) {
 	window.alert('Error happened!');

@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  */
 
 @Controller
-@RequestMapping("/evolution")
+@RequestMapping("/prototree")
 public class EvolutionController extends BioUniverseController {
 
     @Autowired
@@ -54,13 +54,12 @@ public class EvolutionController extends BioUniverseController {
     	this.evolutionService = evolutionService;
     }
 
-    @GetMapping(value={"", "/", "/prototree"})
+    @GetMapping(value={"", "/"})
     public String protoTree(Model model) {
         addToModelCommon(model, "/js/send-and-process-data.js");
         model.addAttribute("subnavigationTab", BioPrograms.PROTO_TREE.getProgramName());
         return "main-view  :: addContent(" +
-                "fragmentsMain='evolution-fragments', searchArea='proto-tree', " +
-                "tab='evolution-navbar', filter='proto-tree-filter')";
+                "fragmentsMain='evolution-fragments', searchArea='proto-tree', filter='proto-tree-filter')";
     }
 
     @GetMapping(value={"/tree-for-you/{jobId:.+}"})
@@ -95,7 +94,7 @@ public class EvolutionController extends BioUniverseController {
     @ResponseBody
     public Map<String, List<String>> getFileNameIfReady(@RequestParam("jobId") String jobId) {
         BioJob bioJob;
-        String urlPath = ServletUriComponentsBuilder.fromCurrentContextPath().path("/evolution/univ_files/").build().toString();
+        String urlPath = ServletUriComponentsBuilder.fromCurrentContextPath().path("/prototree/univ_files/").build().toString();
 
         Map<String, List<String>> result = new HashMap<>();
         result.put("status", statusNotReady);
@@ -130,7 +129,7 @@ public class EvolutionController extends BioUniverseController {
 
     @Override
     void addToModelCommon(Model model, String sendOrGiveResult) {
-        model.addAttribute("mainTab", "evolution");
+        model.addAttribute("mainTab", "home");
         model.addAttribute("sendOrGiveResult", sendOrGiveResult);
         model.addAttribute("specificJs", "/js/evolution.js");
     }

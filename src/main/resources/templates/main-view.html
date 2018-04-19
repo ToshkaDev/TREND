@@ -24,50 +24,19 @@
     </div>
 
 
+
     <div class="container-fluid">
-        <div class="form-group col-md-12">
-            <div th:fragment="addContent(fragmentsMain, searchArea, tab, filter, result)">
-                <div th:replace="${fragmentsMain} :: ${tab}"></div>
-                <div class="col-md-10">
-                    <div th:replace="${searchArea} ? ~{${fragmentsMain} :: ${searchArea}} : ~{${fragmentsMain} :: ${result}}"></div>
+        <div class="form-group">
+            <div th:fragment="addContent(fragmentsMain, searchArea, filter, result)">
+                <div class="col-md-12 query-area">
+                    <div th:replace="${searchArea} ? ~{${fragmentsMain} :: ${searchArea}} : ~{}"></div>
                     <div th:replace="${filter} ? ~{${fragmentsMain} :: ${filter}} : ~{}"></div>
-               </div>
+                </div>
+                <div class="col-md-12 result-area">
+                    <div th:replace="${result} ? ~{${fragmentsMain} :: ${result}} : ~{}"></div>
+                </div>
            </div>
         </div>
-
-
-        <div class="row">
-            <div class="col-md-12 text-center result-container">
-                <div class="btn-group" role="group" aria-label="...">
-                    <a id="results-show" class="btn btn-info btn-lg" href="#">
-                        Show Tree <span class="glyphicon glyphicon-new-window"> </span>
-                    </a>
-                    <a id="results-load" class="btn btn-info btn-lg" href="#">
-                        Download Tree (SVG) <span class="glyphicon glyphicon-download-alt"> </span>
-                    </a>
-                    <!--<span class="glyphicon glyphicon-menu-down"> </span>-->
-                </div>
-                <div id="options">
-                    <br/>
-                        <i class="glyphicon glyphicon-option-horizontal"> </i>
-
-                </div>
-            </div>
-            <div class="col-md-12 text-center extra-result-container">
-                <br/><br/>
-                <div class="secondary-buttons">
-                    <!--<div class="btn-group" role="group" aria-label="...">-->
-                        <a id="tree-load" class="btn btn-info btn-md" href="#">
-                            Download Tree (Newick) <span class="glyphicon glyphicon-download-alt"> </span>
-                        </a>
-                        <a id="alignment-load" class="btn btn-info btn-md" href="#">
-                            Download Alignment <span class="glyphicon glyphicon-download-alt"> </span>
-                        </a>
-                    <!--</div>-->
-                </div>
-            </div>
-        </div>
-
     </div>
 
 
@@ -84,6 +53,8 @@
     <script th:src="@{${sendOrGiveResult}}"></script>
     <script th:src="@{${specificJs}}"></script>
 
-    <div th:replace="common :: copy"></div>
+    <footer>
+        <div th:replace="common :: copy"></div>
+    </footer>
 </body>
 </html>
