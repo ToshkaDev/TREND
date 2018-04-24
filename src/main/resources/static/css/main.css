@@ -12,31 +12,31 @@ body {
 .navbar-inverse {
 	font-size:130%;
 	color:white;
-	background-color:#800000; /*#264040*/
+	background-color:#3F7C7A;
 }
 
 .navbar-inverse .navbar-nav > .active{
       color: white;
-      background: #cc0000;
+      background: #7FB9AB;
  }
  
 .navbar-inverse .navbar-nav > .active > a, 
 .navbar-inverse .navbar-nav > .active > a:hover,
 .navbar-inverse .navbar-nav > .active > a:focus {
       color: white;
-      background: #cc0000;
+      background: #7FB9AB;
  }
  
 .navbar-inverse .navbar-nav > .open > a, 
 .navbar-inverse .navbar-nav > .open > a:hover, 
 .navbar-inverse .navbar-nav > .open > a:focus {
       color: white;
-      background: #cc0000; /*#10311F;*/
+      background: #7FB9AB;
 }
 
 nav div.bottom-nav-bar { 
     height:7px;
-    background-color:#ff4d4d;
+    background-color: #7FB9AB;
  }
 
  div#bu-navbar {
@@ -45,6 +45,10 @@ nav div.bottom-nav-bar {
 
  #logo {
     margin-left: 90%;
+ }
+
+ .info-container {
+    padding-top: 6em;
  }
  
  /*End of navigation bar styles */
@@ -56,8 +60,8 @@ nav div.bottom-nav-bar {
 .proto-tree-button:hover, .proto-tree-button:active, .proto-tree-button:visited {
     background-color: #52527a !important;
     border: 1px solid  #47476b;
-
 }
+
 #GoAsync{
 	width:7em;
 }
@@ -110,12 +114,34 @@ div.result-area {
     font-size: 1.5em;
 }
 
-.fa.fa-twitter {
-    font-size: 3em;
+
+.social {
+    background-color: #7FB9AB;
+    font-size: 170%;
+    border-radius: 50%;
+    border-width: 2px;
+    border-color: white;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 5.5%;
+    width: 6%;
 }
+
+.social:hover, .social:active, .social:visited {
+    background-color: white;
+    color: #1DA1F2;
+    border-color: white;
+}
+
 div.result-container {
     display: none;
     padding: 7px;
+}
+
+div.raw-files-containers {
+    padding-bottom: 3em;
 }
 
 .acknowledgments, #copy-right {
@@ -125,5 +151,9 @@ div.result-container {
 
 
 .acknowledgments-container {
-   background-color: #e0e0eb;
+    background-color: #7FB9AB;
+}
+
+.footer-text {
+    color: white;
 }

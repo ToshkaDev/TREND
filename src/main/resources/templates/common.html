@@ -38,11 +38,15 @@
 
     <div th:fragment="copy" class="acknowledgments-container">
         <div class="row">
-            <div class="col-md-6 acknowledgments">
-                <h2> <a th:href="@{http://zhulinlab.org}"> ZHULIN LAB</a></h2>
-                <a th:href="@{http://twitter.com/zhulinlab}">
-                    <i class="fa fa-twitter"></i>
-                </a>
+            <div class="col-md-6 ">
+                <div class="row acknowledgments">
+                    <h2> <a th:href="@{http://zhulinlab.org}" class="footer-text">ZHULIN LAB </a></h2>
+                </div>
+                <div class="row acknowledgments">
+                    <a th:href="@{http://twitter.com/zhulinlab}" class="btn btn-default btn-sm social">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                </div>
             </div>
             <div class="col-md-6 acknowledgments">
                 <a th:href="@{https://www.osu.edu}">
@@ -50,7 +54,7 @@
                 </a>
             </div>
         </div>
-        <span id="copy-right">&copy; 2017 Vadim Gumerov</span>
+        <h4 id="copy-right" class="footer-text">&copy; 2017 Vadim Gumerov</h4>
     </div>
 
 </body>
