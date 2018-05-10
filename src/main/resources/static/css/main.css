@@ -50,9 +50,10 @@ nav div.bottom-nav-bar {
  .info-container {
     padding-top: 6em;
  }
- 
+
  /*End of navigation bar styles */
- 
+
+ /*Activity associated elements: buttons and so on*/
 .proto-tree-button, .proto-tree-button:focus {
     background-color: #666699;
     border: 1px solid #5c5c8a;
@@ -82,6 +83,7 @@ label.error {
 #first-file-info {
     background-color: #8585ad;
 }
+ /*End of Activity associated elements: buttons and so on*/
 
 /*Filter options styles*/
 div.ml-options, div#rpsblast-db, div.cov-cutoff, div.number-of-replicates {
@@ -107,34 +109,19 @@ div.result-area {
 }
 
 .my-textarea {
-	margin-right: 3em;
+	margin-right: 7em;
 }
 
 .glyphicon.glyphicon-option-horizontal {
     font-size: 1.5em;
 }
 
-
-.social {
-    background-color: #7FB9AB;
-    font-size: 170%;
-    border-radius: 50%;
-    border-width: 2px;
-    border-color: white;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 5.5%;
-    width: 6%;
+.main-container {
+    min-height: calc(100vh - 387px);
 }
 
-.social:hover, .social:active, .social:visited {
-    background-color: white;
-    color: #1DA1F2;
-    border-color: white;
-}
 
+/*Results area */
 div.result-container {
     display: none;
     padding: 7px;
@@ -144,16 +131,48 @@ div.raw-files-containers {
     padding-bottom: 3em;
 }
 
-.acknowledgments, #copy-right {
+/*End of Results container and raw files container*/
+
+/*Footer*/
+
+.social {
+    background-color: #7FB9AB;
+    font-size: 170%;
+    border-radius: 50%;
+    border-width: 2px;
+    border-color: white;
+    color: white;
+    display: flex;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    align-items: center;
+    justify-content: center;
+    height: 25.5%;
+    width: 6%;
+}
+
+.social:hover, .social:active, .social:visited {
+    background-color: white;
+    color: #1DA1F2;
+    border-color: white;
+}
+
+
+.footer-info, #copy-right {
     display: flex;
     justify-content:center;
 }
 
 
-.acknowledgments-container {
+.footer-container {
     background-color: #7FB9AB;
+    height: 200px;
 }
 
 .footer-text {
     color: white;
 }
+
+/*End of Footer*/

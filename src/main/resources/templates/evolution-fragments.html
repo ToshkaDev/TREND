@@ -3,19 +3,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <body>
-
-    <!--<div th:fragment="evolution-navbar">-->
-        <!--<div class="col-md-2">-->
-            <!--<div class="panel panel-default">-->
-                <!--<div class="panel-body">-->
-                    <!--<ul class="nav nav-pills nav-stacked">-->
-                        <!--<li id="protoTree"><a th:href="@{/evolution/prototree}">Proto Tree</a></li>-->
-                    <!--</ul>-->
-                <!--</div>-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
-
     <div th:fragment="proto-tree">
         <div class="col-md-8 my-textarea">
             <div class="row">
@@ -65,10 +52,10 @@
     <div th:fragment="proto-tree-filter">
         <div class="col-md-2 panel panel-default">
             <div class="panel-body">
-                <h4 class="text-primary">Set options:</h4>
+                <h3 class="text-primary">Set options:</h3>
                 <div class="form-group">
                     <form id="first">
-                        <p class="text-info" >Alignment:</p>
+                        <h4 class="text-info" >Alignment:</h4>
                         <span>Alignment Algorithm:</span>
                         <select id="alignment-alg" class="form-control input-md">
                             <option selected='selected' value="--retree 2 --maxiterate 0">FFT-NS-2</option>
@@ -77,8 +64,7 @@
                             <option value="--genafpair">E-INS-i</option>
                             <option value="--globalpair">G-INS-i</option>
                         </select>
-                        <br/>
-                        <p class="text-info">Tree Building:</p>
+                        <h4 class="text-info">Tree Building:</h4>
                         <span>Tree Building Method:</span>
                         <select id="tree-method" class="form-control input-md">
                             <option selected='selected' value="JN">Neighbour Joining</option>
@@ -107,7 +93,7 @@
                             </select>
                         </div>
                         <div class="nj-and-me-options">
-                            <span>A.A. Substitution Model:<span>
+                            <span>A.A. Substitution Model:</span>
                             <select id="nj_me-subst-model" class="form-control input-md">
                                 <option selected='selected' value="jtt">Jones-Taylor-Thornton (JTT) model</option>
                                 <option value="nd">No. of differences</option>
@@ -117,7 +103,7 @@
                                 <option value="dm">Dayhoff model</option>
                             </select>
                         </div>
-                        <span>A.A. Substitution Rate:<span>
+                        <span>A.A. Substitution Rate:</span>
                         <select id="subst-rate" class="form-control input-md">
                             <option selected='selected' value="ur">Uniform Rates</option>
                             <option value="gd">Gamma Distributed (G)</option>
@@ -125,7 +111,7 @@
                             <option value="gir">Gamma Distributed With Invariant Sites (G+I)</option>
                         </select>
                         <div class="ml-options">
-                            <span>TInitial tree for ML:<span>
+                            <span>Initial tree for ML:</span>
                             <select id="initial-tree-ml" class="form-control input-md">
                                 <option selected='selected' value="njBio">Make initial tree automatically (Default - NJ/BioNJ)</option>
                                 <option value="mp">Make initial tree automatically (Maximum parsimony)</option>
@@ -133,18 +119,18 @@
                                 <option value="bioNj">Make initial tree automatically (BioNJ)</option>
                             </select>
                         </div>
-                        <span>Gaps and Missing Data:<span>
+                        <span>Gaps and Missing Data:</span>
                         <select id="gaps-missing" class="form-control input-md">
                             <option selected='selected' value="compDel">Complete deletion</option>
                             <option value="partDel">Partial deletion</option>
                             <option value="pairDel">Pairwise deletion</option>
                         </select>
                         <div class="cov-cutoff">
-                            <span>TSite Coverage Cutoff:<span>
+                            <span>TSite Coverage Cutoff:</span>
                             <input value="95" id="site-cov-cutoff" name="site-cov-cutoff" type="text" class="form-control input-sm"/>
                         </div>
                         <div class="nj-and-me-options">
-                            <span>Phylogeny Test:<span>
+                            <span>Phylogeny Test:</span>
                             <select id="nj_me-phylo-test" class="form-control input-md">
                                 <option selected='selected' value="none">None</option>
                                 <option value="bm">Bootstrap method</option>
@@ -152,19 +138,19 @@
                             </select>
                         </div>
                         <div class="ml-options">
-                            <span>Phylogeny Test:<span>
+                            <span>Phylogeny Test:</span>
                             <select id="ml-phylo-test" class="form-control input-md">
                                 <option selected='selected' value="none">None</option>
                                 <option value="bm">Bootstrap method</option>
                             </select>
                         </div>
                         <div class="number-of-replicates">
-                            <span>Number of replicates:<span>
+                            <span>Number of replicates:</span>
                             <input value="100" id="number-of-replicates" name="number-of-replicates" type="text" class="form-control input-md"/>
                         </div>
                     </form>
                 </div>
-                <p class="text-info">Protein Features Prediction:</p>
+                <h4 class="text-info">Protein Features:</h4>
                 <div class="form-group">
                     <form id="second">
                         <div class="radio">
@@ -178,13 +164,13 @@
                             </label>
                         </div>
                         <div id="hmmer-db">
-                            <span>HMMER Databse:<span>
+                            <span>HMMER Databse:</span>
                             <select class="form-control input-md">
                                 <option id="pfam31" selected='selected' value="pfam31">Pfam 31</option>
                             </select>
                         </div>
                         <div id="rpsblast-db">
-                            <span>RPSBLAST Database:<span>
+                            <span>RPSBLAST Database:</span>
                             <select class="form-control input-md">
                                 <option id="cdd" selected='selected' value="cdd">CDD</option>
                                 <option id="pfam" value="pfam">Pfam</option>

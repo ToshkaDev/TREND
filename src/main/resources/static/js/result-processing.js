@@ -1,10 +1,5 @@
 $(document).ready(function (){
-    var minSvgWidth = 650;
-    var widthShrinkageFactor = 0.8;
-    var heightShrinkageFactor = 0.8;
-    var width = window.innerWidth*widthShrinkageFactor;
-    var height = window.innerHeight*heightShrinkageFactor;
-    treeContainer = prepareTreeContainer(width, height);
+
 
     var jobId = $('#jobId').text();
     getIfReady(jobId);
@@ -32,7 +27,12 @@ function tryToGetFileName(jobId) {
     });
 }
 
-function prepareTreeContainer(width, height) {
+function prepareTreeContainer() {
+    var minSvgWidth = 650;
+    var widthShrinkageFactor = 0.8;
+    var heightShrinkageFactor = 0.8;
+    var width = window.innerWidth*widthShrinkageFactor;
+    var height = window.innerHeight*heightShrinkageFactor;
     var tree = d3.select("div#svgContainer")
         .style("width", width)
         .style("height", height)
@@ -45,7 +45,7 @@ function prepareTreeContainer(width, height) {
         .append("g")
         .attr("id", "treeContainer");
 }
-function processRetrievedDataAsync(data, treeContainer, width, height) {
+function processRetrievedDataAsync(data) {
     if (data.status[0] != 'notReady') {
         clearInterval(fileGetter);
 
@@ -54,6 +54,7 @@ function processRetrievedDataAsync(data, treeContainer, width, height) {
         }
         if (data.result.length > 1) {
             $('#results-load').attr('href', data.result[1]);
+            prepareTreeContainer();
             d3.xml(data.result[1]).then(function(xml) {
                 console.log(xml.documentElement)
                 document.getElementById("treeContainer").appendChild(xml.documentElement);
