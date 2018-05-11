@@ -19,6 +19,7 @@ public class ProtoTreeRequest {
     private String numberOrReplicates;
     private String alignmentAlg;
     private String domainPredictionProgram;
+    private String domainPredictionDb;
 
     private String commandToBeProcessedBy;
 
@@ -144,6 +145,14 @@ public class ProtoTreeRequest {
 
     public void setDomainPredictionProgram(String domainPredictionProgram) {
         this.domainPredictionProgram = domainPredictionProgram;
+    }
+
+    public String getDomainPredictionDb() {
+        return domainPredictionDb;
+    }
+
+    public void setDomainPredictionDb(String domainPredictionDb) {
+        this.domainPredictionDb = domainPredictionDb;
     }
 
     public String getCommandToBeProcessedBy() {

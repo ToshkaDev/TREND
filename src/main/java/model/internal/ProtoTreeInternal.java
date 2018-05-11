@@ -25,6 +25,7 @@ public class ProtoTreeInternal {
     private String numberOrReplicates;
 
     private String domainPredictionProgram;
+    private String domainPredictionDb;
 	//e-value for Hmmscan and RpsBlast
 	private String eValue;
 
@@ -178,6 +179,14 @@ public class ProtoTreeInternal {
 
     public void setDomainPredictionProgram(String domainPredictionProgram) {
         this.domainPredictionProgram = domainPredictionProgram;
+    }
+
+    public String getDomainPredictionDb() {
+        return domainPredictionDb;
+    }
+
+    public void setDomainPredictionDb(String domainPredictionDb) {
+        this.domainPredictionDb = domainPredictionDb;
     }
 
     public String geteValue() {

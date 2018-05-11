@@ -13,13 +13,9 @@ public class ConverterMain {
 	}
 
 	public static ProtoTreeInternal fromProtoTreeRequestToProtoTreeInternal(ProtoTreeRequest protoTreeRequest,
-                                                                            String firstFileName,
-                                                                            String secondFileName,
-                                                                            String thirdFileName) {
+                                                                            String firstFileName) {
 		ProtoTreeInternal protoTreeInternal = new ProtoTreeInternal();
         protoTreeInternal.setFirstFileName(checkForNullAndGet(ParamPrefixes.INPUT.getPrefix(), firstFileName));
-        protoTreeInternal.setSecondFileName(checkForNullAndGet(ParamPrefixes.INPUT_SECOND.getPrefix(), secondFileName));
-        protoTreeInternal.setThirdFileName(checkForNullAndGet(ParamPrefixes.INPUT_THIRD.getPrefix(), thirdFileName));
 		protoTreeInternal.setCommandToBeProcessedBy(protoTreeRequest.getCommandToBeProcessedBy());
 
         protoTreeInternal.setTreeBuildMethod(checkForNullAndGet(ParamPrefixes.TREE_BUILD_METHOD.getPrefix(), protoTreeRequest.getTreeBuildMethod()));
@@ -33,6 +29,7 @@ public class ConverterMain {
 		protoTreeInternal.setAlignmentAlg(checkForNullAndGet(ParamPrefixes.ALGORITHM.getPrefix(), protoTreeRequest.getAlignmentAlg()));
 
 		protoTreeInternal.setDomainPredictionProgram(checkForNullAndGet(ParamPrefixes.DOMAINS_PREDICTION_PROGRAM.getPrefix(), protoTreeRequest.getDomainPredictionProgram()));
+		protoTreeInternal.setDomainPredictionDb(checkForNullAndGet(ParamPrefixes.DOMAINS_PREDICTION_DB.getPrefix(), protoTreeRequest.getDomainPredictionDb()));
 
 
         return protoTreeInternal;

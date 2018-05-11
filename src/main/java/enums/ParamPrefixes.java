@@ -24,6 +24,7 @@ public enum  ParamPrefixes {
     PHYLOGENY_TEST("-p "),
     NUMBER_OF_REPLICATES("-b "),
     DOMAINS_PREDICTION_PROGRAM("-p "),
+    DOMAINS_PREDICTION_DB("-D "),
     OUTPUT_PARAMS("-x "),
     OUTPUT_TREE("-z "),
 
@@ -36,7 +37,6 @@ public enum  ParamPrefixes {
     HMMSCAN_DB_PATH("-A "),
     RPSBLAST_DB_PATH("-B "),
     RPSBPROC_DB_PATH("-C "),
-    RPSBLAST_SP_DB("-D "),
 
     HMMSCAN_PATH("-H "),
     RPSBLAST_PATH("-R "),

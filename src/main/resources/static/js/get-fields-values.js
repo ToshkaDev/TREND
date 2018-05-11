@@ -18,6 +18,7 @@ function getOptions() {
     var siteCovCutOff = $('#site-cov-cutoff').val();
     var numberOrReplicates = $('#number-of-replicates').val();
     var domainPredictionProgram = $('input[name="dom-prediction-program"]:checked').val();
+
     var phylogenyTest = getOption("phylo-test");
     var aaSubstModel = getOption("subst-model");
 
@@ -50,9 +51,12 @@ function getOptions() {
         console.log("optionToOptionNameMain[optionName] " + optionToOptionNameMain[optionName])
         if (optionIsDefined(optionToOptionNameMain[optionName])) {
             options.append(optionName, optionToOptionNameMain[optionName]);
+            if (optionName === "domainPredictionProgram") {
+                setDomainPredictionDb(options, optionToOptionNameMain[optionName]);
+            }
         }
-    }
 
+    }
 	return options;
 }
 
@@ -70,6 +74,20 @@ function getOption(option) {
             break;
     }
     return optionValue;
+}
+
+function setDomainPredictionDb(options, domainPredictionProgram) {
+    console.log('domainPredictionProgram ' + domainPredictionProgram);
+    console.log("$('.hmmer-db').val() " + $('.hmmer-db').val())
+    var domainPredictionDb;
+    var dbNameFieldValue;
+    if (domainPredictionProgram == "hmmscan") {
+        dbNameFieldValue = $('.hmmer-db').val();
+        optionIsDefined(dbNameFieldValue) ?  options.append("domainPredictionDb", dbNameFieldValue) : null;
+    } else if (domainPredictionProgram == "rpsblast") {
+        dbNameFieldValue = $('.rpsblast-db').val();
+        optionIsDefined(dbNameFieldValue) ? options.append("domainPredictionDb", dbNameFieldValue) : null;
+    }
 }
 
 function optionIsDefined(option) {

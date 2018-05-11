@@ -25,17 +25,23 @@ public class AppProperties {
     private String pythonLocation = "/usr/bin/python";
     private String bashLocation = "/bin/bash";
     private String blastpLocation = "/usr/bin/blastp";
-    private String resultFilePrefix = "bio-universe-";
+    private String resultFilePrefix = "proto-tree-";
     private String postfix = ".txt";
 
-    private String hmmscanDbPath = "/home/vadim/UTOakRidge/Soft/hmmer3_data/Pfam-A.hmm";
+    private String hmmscanDbPath = "/home/vadim/UTOakRidge/Soft/hmmer3_data/";
     private String rpsblastDbPath = "/home/vadim/Softs/rpsblastdb/";
     private String rpsprocDbPath = "/home/vadim/Softs/rpsbproc/data/";
-    private String rpsblastSpDb = "Cdd_NCBI";
-
+    private String pfam = "Pfam31/Pfam-A.hmm";
+    private String rpsblastCdd = "Cdd_NCBI";
+    private String rpsblastCog = "Cog";
+    private String rpsblastKog = "Kog";
+    private String rpsblastPfam = "Pfam";
+    private String rpsblastPrk = "Prk";
+    private String rpsblastSmart = "Smart";
+    private String rpsblastTigr = "Tigr";
     private String hmmscanPath = "/usr/local/bin/hmmer3/bin/hmmscan";
     private String rpsblastPath = "/home/vadim/Softs/ncbi-blast-2.6.0+/bin/rpsblast";
-    private String rpsbprocPath = "";
+    private String rpsbprocPath = "/home/vadim/bin/rpsbproc";
     private String tmhmm2Path = "/home/vadim/Softs/tmhmm-2.0c/bin/tmhmm";
     private String mafft = "/usr/bin/mafft";
     private String megacc = "/usr/bin/megacc";
@@ -165,12 +171,68 @@ public class AppProperties {
         this.rpsprocDbPath = rpsprocDbPath;
     }
 
-    public String getRpsblastSpDb() {
-        return rpsblastSpDb;
+    public String getPfam() {
+        return pfam;
     }
 
-    public void setRpsblastSpDb(String rpsblastSpDb) {
-        this.rpsblastSpDb = rpsblastSpDb;
+    public void setPfam(String pfam) {
+        this.pfam = pfam;
+    }
+
+    public String getRpsblastCdd() {
+        return rpsblastCdd;
+    }
+
+    public void setRpsblastCdd(String rpsblastCdd) {
+        this.rpsblastCdd = rpsblastCdd;
+    }
+
+    public String getRpsblastCog() {
+        return rpsblastCog;
+    }
+
+    public void setRpsblastCog(String rpsblastCog) {
+        this.rpsblastCog = rpsblastCog;
+    }
+
+    public String getRpsblastKog() {
+        return rpsblastKog;
+    }
+
+    public void setRpsblastKog(String rpsblastKog) {
+        this.rpsblastKog = rpsblastKog;
+    }
+
+    public String getRpsblastPfam() {
+        return rpsblastPfam;
+    }
+
+    public void setRpsblastPfam(String rpsblastPfam) {
+        this.rpsblastPfam = rpsblastPfam;
+    }
+
+    public String getRpsblastPrk() {
+        return rpsblastPrk;
+    }
+
+    public void setRpsblastPrk(String rpsblastPrk) {
+        this.rpsblastPrk = rpsblastPrk;
+    }
+
+    public String getRpsblastSmart() {
+        return rpsblastSmart;
+    }
+
+    public void setRpsblastSmart(String rpsblastSmart) {
+        this.rpsblastSmart = rpsblastSmart;
+    }
+
+    public String getRpsblastTigr() {
+        return rpsblastTigr;
+    }
+
+    public void setRpsblastTigr(String rpsblastTigr) {
+        this.rpsblastTigr = rpsblastTigr;
     }
 
     public String getHmmscanPath() {

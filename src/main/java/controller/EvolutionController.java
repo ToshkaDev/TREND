@@ -131,7 +131,7 @@ public class EvolutionController extends BioUniverseController {
     void addToModelCommon(Model model, String sendOrGiveResult) {
         model.addAttribute("mainTab", "home");
         model.addAttribute("sendOrGiveResult", sendOrGiveResult);
-        model.addAttribute("specificJs", "/js/evolution.js");
+        model.addAttribute("specificJs", "/js/get-fields-values.js");
     }
 
 }

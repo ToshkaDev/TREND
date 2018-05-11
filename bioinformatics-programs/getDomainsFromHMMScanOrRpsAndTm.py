@@ -17,7 +17,7 @@ USAGE = "\n\nThe script extracts domain information from the results of hmmscan 
 	-A || --hmmscanDbPath  - path to hmmscan database
 	-B || --rpsblastDbPath - path to rpsblast database
 	-C || --rpsprocDbPath  - path to database for rpcbproc
-	-D || --rpsblastSpDb   - specific rpsblast database
+	-D || --dbname         - domain prediction database name
 	[-H || --hmmscanPath]  - hmmscan program full path
 	[-R || --rpsblastPath] - rpsblast program full path
 	[-P || --rpsbprocPath] - rpsbproc program full path
@@ -57,8 +57,8 @@ OUTPUT_RPSBPROC = "RPSBPROC_RESULT"
 OUTPUT_TMHMMSCAN = "TMHMMSCan_RESULT"
 HMMSCAN_DB_PATH = "/home/Soft/hmmer/pfam31_0/Pfam-A.hmm"
 RPSBLAST_DB_PATH = "/home/vadim/Softs/rpsblastdb/"
-RPSBPROC_DB_PATH = "/home/vadim/Softs/rpsbproc/data/"
-RPSBLAST_DB = "Cdd_NCBI"
+RPSBPROC_DB_PATH = "/home/vadim/Softs/rpsbproc/data/Cdd_NCBI"
+DB_NAME = ""
 CPU = 4
 
 
@@ -82,11 +82,11 @@ PROTEIN_TO_SITES = collections.defaultdict(list)
     
 def initialyze(argv):
 	global HMMSCAN_PROGRAM, RPSBLAST_PROGRAM, RPSBPROC_PROGRAM, TMHMMSCAN_PROGRAM, INPUT_FILE_FASTA, PROCESS_TYPE, OUTPUT_RPSBLAST_OR_HMMSCAN, \
-	OUTPUT_RPSBPROC, OUTPUT_TMHMMSCAN, HMMSCAN_DB_PATH, RPSBLAST_DB_PATH, RPSBPROC_DB_PATH, RPSBLAST_DB, CPU, EVAL_THRESHOLD, GET_TAB, GET_JSON, \
+	OUTPUT_RPSBPROC, OUTPUT_TMHMMSCAN, HMMSCAN_DB_PATH, RPSBLAST_DB_PATH, RPSBPROC_DB_PATH, DB_NAME, CPU, EVAL_THRESHOLD, GET_TAB, GET_JSON, \
 	PROTEIN_TO_DOMAININFO_FILE, DOMAIN_ARCHITECT_TO_COUNT_FILE, PROTEIN_TO_DOMAININFO_JSONFILE, PROTEIN_SITES_INCLUDE
 	try:
 		opts, args = getopt.getopt(argv[1:],"hi:p:r:f:x:A:B:C:D:H:R:P:T:e:t:j:u:m:o:n:b:",["ifile=", "iprocess=", "ofourth=", "ofifth=", "osixth=", "hmmscanDbPath=", \
-		"rpsblastDbPath=", "rpsprocDbPath=", "rpsblastSpDb=", "hmmscanPath=", "rpsblastPath", "rpsbprocPath", "tmhmm2Path", "evalue=", "tabformat=", "jsonformat=", "cpu=", "sites=", "ofile=", "osecond=", "othird="])
+		"rpsblastDbPath=", "rpsprocDbPath=", "dbname=", "hmmscanPath=", "rpsblastPath", "rpsbprocPath", "tmhmm2Path", "evalue=", "tabformat=", "jsonformat=", "cpu=", "sites=", "ofile=", "osecond=", "othird="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
@@ -119,8 +119,8 @@ def initialyze(argv):
 				RPSBLAST_DB_PATH = str(arg).strip()
 			elif opt in ("-C", "--rpsprocDbPath"):
 				RPSBPROC_DB_PATH = str(arg).strip()
-			elif opt in ("-D", "--rpsblastSpDb"):
-				RPSBLAST_DB = str(arg).strip()
+			elif opt in ("-D", "--dbname"):
+				DB_NAME = str(arg).strip()
 			elif opt in ("-H", "--hmmscanPath"):
 				HMMSCAN_PROGRAM = str(arg).strip()
 			elif opt in ("-R", "--rpsblastPath"):
@@ -171,27 +171,22 @@ class Protein(object):
 	def setRpsRegion(self, regionData, regionType):
 		if regionType == DOMAIN:
 			region = RpsDomainRegion()	
-			region.name = regionData[9]
-			region.start = regionData[4]
-			region.end = regionData[5]
+			region.domainName = regionData[9]
+			region.aliStart = int(regionData[4])
+			region.aliEnd = int(regionData[5])
 			region.source = regionData[8]
-			region.eValue = regionData[6]
-			region.bitscore = regionData[7]
+			region.eValue = float(regionData[6])
+			region.bitscore = float(regionData[7])
 			region.superfamily_pssmId = regionData[11]
-			region.regionType = regionType
 			domainEnds = regionData[10]
 			if domainEnds == "-":
-				region.startStyle = "complete"
-				region.endStyle = "complete"
+				region.alignmentToModelType = "[]"
 			elif domainEnds == "N":
-				region.startStyle = "jagged"
-				region.endStyle = "complete"
+				region.alignmentToModelType = ".]"
 			elif domainEnds == "C":
-				region.startStyle = "complete"
-				region.endStyle = "jagged"
+				region.alignmentToModelType = "[."
 			elif domainEnds == "NC":
-				region.startStyle = "jagged"
-				region.endStyle = "jagged"
+				region.alignmentToModelType = ".."
 			self.domains.append(region)
 		elif regionType == PROTEIN_SITE:
 			region = RpsSiteRegion()
@@ -220,18 +215,7 @@ class Protein(object):
 			region.source = "pfamA"
 			region.description = description
 			region.domainName = domain
-			if alignmentToModelType == "[]":
-				region.startStyle = "complete"
-				region.endStyle = "complete"
-			elif alignmentToModelType == ".]":
-				region.startStyle = "jagged"
-				region.endStyle = "complete"
-			elif alignmentToModelType == "[.":
-				region.startStyle = "complete"
-				region.endStyle = "jagged"
-			elif alignmentToModelType == "..":
-				region.startStyle = "jagged"
-				region.endStyle = "jagged"
+			region.alignmentToModelType = alignmentToModelType
 		self.domains.append(region)
 	def setTmInfo(self, first60=None, possibSigPep=None, tm=None, tmTopology=None):
 		self.tmInfo["first60"] = first60
@@ -252,15 +236,13 @@ class HmmscanDomainRegion(object):
 		self.envStart = None
 		self.envEnd = None
 		self.colour = None
-		self.startStyle = None
-		self.endStyle = None
+		self.alignmentToModelType = None
 		self.display = None
 		self.description = None
 		self.modelLength = None
 		self.source = None
 		self.eValue = None
 		self.probability = None
-		self.regionType = None
 
 class RpsSiteRegion(object):
 	def __init__(self):
@@ -268,18 +250,15 @@ class RpsSiteRegion(object):
 		self.complete_size = None
 		self.mapped_size = None
 		self.source_domain_pssmId = None
-		self.regionType = None
 		self.sitePositions = []
 		
 class RpsDomainRegion(object):
 	def __init__(self):
-		self.regionType = None
-		self.name = None
-		self.start = None
-		self.end = None
+		self.domainName = None
+		self.aliStart = None
+		self.aliEnd = None
 		self.colour = None
-		self.startStyle = None
-		self.endStyle = None
+		self.alignmentToModelType = None
 		self.display = None
 		self.description = None
 		self.source = None
@@ -477,12 +456,14 @@ def getDomainArchitecture(proteint, protRefToDomainInfo):
 	return domainArchitecture
 
 def hmmscan():
+	print "DB_NAME " + DB_NAME
+	print "HMMSCAN_DB_PATH+DB_NAME " + HMMSCAN_DB_PATH+DB_NAME
 	#if hmmscan is in the linux path, this will be resloved
 	hmmscan = "hmmscan"
 	#If hmmscan is not in the linux path then give it the program full path as a parameter. The same for 'rpsblast', 'rpsbproc' and 'tmhmm' programs
 	if HMMSCAN_PROGRAM != None:
 		hmmscan = HMMSCAN_PROGRAM
-	runSubProcess(" ".join([hmmscan, "--noali", "--cpu", str(CPU), HMMSCAN_DB_PATH, INPUT_FILE_FASTA, ">", OUTPUT_RPSBLAST_OR_HMMSCAN]))
+	runSubProcess(" ".join([hmmscan, "--noali", "--cpu", str(CPU), HMMSCAN_DB_PATH+DB_NAME, INPUT_FILE_FASTA, ">", OUTPUT_RPSBLAST_OR_HMMSCAN]))
 	
 def rpsBlast():
 	rpsblast = "rpsblast"
@@ -492,7 +473,7 @@ def rpsBlast():
 	if RPSBPROC_PROGRAM != None:
 		rpsbproc = RPSBPROC_PROGRAM
 		
-	runSubProcess(" ".join([rpsblast, "--thread", CPU, "-evalue", "0.01", "-seg", "no", "-outfmt", "5", "-db", RPSBLAST_DB_PATH+RPSBLAST_DB, "-query", INPUT_FILE_FASTA, "-out", OUTPUT_RPSBLAST_OR_HMMSCAN]))
+	runSubProcess(" ".join([rpsblast, "-num_threads", CPU, "-evalue", "0.01", "-seg", "no", "-outfmt", "5", "-db", RPSBLAST_DB_PATH+DB_NAME, "-query", INPUT_FILE_FASTA, "-out", OUTPUT_RPSBLAST_OR_HMMSCAN]))
 	runSubProcess(" ".join([rpsbproc, "-d", RPSBPROC_DB_PATH, "-i", OUTPUT_RPSBLAST_OR_HMMSCAN, "-o", OUTPUT_RPSBPROC]))
 	
 def tmhmm2scan():
