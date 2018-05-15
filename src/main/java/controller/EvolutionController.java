@@ -103,10 +103,11 @@ public class EvolutionController extends BioUniverseController {
 
 	     if (jobId != null ) {
             bioJob = evolutionService.getBioJobIfFinished(Integer.valueOf(jobId.split("-")[0]));
-            if (bioJob != null)
+            if (bioJob != null) {
                 listOfResultFileNames = bioJob.getBioJobResultList().stream().map(bjResult -> urlPath + bjResult.getResultFileName()).collect(Collectors.toList());
                 result.put("result", listOfResultFileNames);
                 result.put("status", statusReady);
+            }
         }
         return result;
     }

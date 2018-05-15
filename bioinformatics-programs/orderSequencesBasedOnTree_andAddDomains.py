@@ -72,56 +72,57 @@ def initialyze(argv):
 
 def prepareProteinToDomainsDict():
 	for proteinName, proteinData in PROTEIN_DOMAINS.items():
-		tms = list()
-		domains = list()
-		domainsFinal = list()
-		domainToCoords = dict()
-		aliEnds = set()
-		aliStarts = set()
-		startsToDomainList = collections.defaultdict(list)
-		
-		domToMergeGrpNames = collections.defaultdict(set)
-		domToMergeGrpStarts = collections.defaultdict(set)
-		domToMergeGrpEnds = collections.defaultdict(set)
-		domainsOK = dict()
-		
-		if "tmRegions" in proteinData["tmInfo"]:
-			for region in proteinData["tmInfo"]["tmRegions"]:
-				tms.append([int(region["tmSart"])-1, int(region["tmEnd"])-1, "[]", None, 35, "gray", "gray", ""])
-				aliStarts.add(int(region["tmSart"])-1)
-				aliEnds.add(int(region["tmEnd"])-1)
-				startsToDomainList[int(region["tmSart"])-1].append(int(region["tmEnd"])-1)
-			domains.extend(tms)
-		for region in proteinData["domains"]:
-			aliStart = region["aliStart"]-1
-			aliEnd = region["aliEnd"]-1
-			#taking care of domains with the same names but different coordinates
-			domainName = str(region["domainName"])+"&"+str(aliStart)+str(aliEnd)
-			aliStarts.add(aliStart)
-			aliEnds.add(aliEnd)
-			domainSpan = aliEnd - aliStart
-			createMergeGrps(aliStart, aliEnd, domainName, domainSpan, domainToCoords, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domainsOK)							
-			if domainName not in domToMergeGrpNames:
-				domainsOK[domainName] = ""
-			domainToCoords[domainName] = [aliStart, aliEnd, domainSpan]
+		if proteinData["domains"] or "tmRegions" in proteinData["tmInfo"]:
+			tms = list()
+			domains = list()
+			domainsFinal = list()
+			domainToCoords = dict()
+			aliEnds = set()
+			aliStarts = set()
+			startsToDomainList = collections.defaultdict(list)
+			
+			domToMergeGrpNames = collections.defaultdict(set)
+			domToMergeGrpStarts = collections.defaultdict(set)
+			domToMergeGrpEnds = collections.defaultdict(set)
+			domainsOK = dict()
+			
+			if "tmRegions" in proteinData["tmInfo"]:
+				for region in proteinData["tmInfo"]["tmRegions"]:
+					tms.append([int(region["tmSart"])-1, int(region["tmEnd"])-1, "[]", None, 35, "gray", "gray", ""])
+					aliStarts.add(int(region["tmSart"])-1)
+					aliEnds.add(int(region["tmEnd"])-1)
+					startsToDomainList[int(region["tmSart"])-1].append(int(region["tmEnd"])-1)
+				domains.extend(tms)
+			for region in proteinData["domains"]:
+				aliStart = region["aliStart"]-1
+				aliEnd = region["aliEnd"]-1
+				#taking care of domains with the same names but different coordinates
+				domainName = str(region["domainName"])+"&"+str(aliStart)+str(aliEnd)
+				aliStarts.add(aliStart)
+				aliEnds.add(aliEnd)
+				domainSpan = aliEnd - aliStart
+				createMergeGrps(aliStart, aliEnd, domainName, domainSpan, domainToCoords, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domainsOK)							
+				if domainName not in domToMergeGrpNames:
+					domainsOK[domainName] = ""
+				domainToCoords[domainName] = [aliStart, aliEnd, domainSpan]
 
-		processSeparateDomains(domainsOK, domainToCoords, domains, startsToDomainList)
-		processDomainsForMerge(domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domains, startsToDomainList)
-		domainsFinal.extend(domains)
-		addThinLines(proteinName, domainsFinal, startsToDomainList)
-		
-		#If len of a protein is bigger than the last coordinate do the following:
-		endOfLastDomain = max(aliEnds)
-		startOfFirstDomain = min(aliStarts)
-		if len(PROTEIN_NAME_TO_SEQ[proteinName]) > endOfLastDomain:
-			thisThinLine = makeThinLine(endOfLastDomain+1, len(PROTEIN_NAME_TO_SEQ[proteinName])-1)
-			domainsFinal.append(thisThinLine)
-		#If start of the first domain is bigger then 0:
-		if startOfFirstDomain > 0:
-			thisThinLine = makeThinLine(0, startOfFirstDomain-1)
-			domainsFinal.append(thisThinLine)
-		
-		PROTEIN_TO_DOMAINS[proteinName].extend(domainsFinal)
+			processSeparateDomains(domainsOK, domainToCoords, domains, startsToDomainList)
+			processDomainsForMerge(domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domains, startsToDomainList)
+			domainsFinal.extend(domains)
+			addThinLines(proteinName, domainsFinal, startsToDomainList)
+			
+			#If len of a protein is bigger than the last coordinate do the following:
+			endOfLastDomain = max(aliEnds)
+			startOfFirstDomain = min(aliStarts)
+			if len(PROTEIN_NAME_TO_SEQ[proteinName]) > endOfLastDomain:
+				thisThinLine = makeThinLine(endOfLastDomain+1, len(PROTEIN_NAME_TO_SEQ[proteinName])-1)
+				domainsFinal.append(thisThinLine)
+			#If start of the first domain is bigger then 0:
+			if startOfFirstDomain > 0:
+				thisThinLine = makeThinLine(0, startOfFirstDomain-1)
+				domainsFinal.append(thisThinLine)
+			
+			PROTEIN_TO_DOMAINS[proteinName].extend(domainsFinal)
 
 
 def createMergeGrps(aliStart, aliEnd, domainName, domainSpan, domainToCoords, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domainsOK):

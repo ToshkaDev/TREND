@@ -175,6 +175,7 @@ class Protein(object):
 			region.aliStart = int(regionData[4])
 			region.aliEnd = int(regionData[5])
 			region.source = regionData[8]
+			region.dbName = "CDD"
 			region.eValue = float(regionData[6])
 			region.bitscore = float(regionData[7])
 			region.superfamily_pssmId = regionData[11]
@@ -212,7 +213,7 @@ class Protein(object):
 			region.modelLength = modelLen
 			region.envStart = int(regionData[12])
 			region.envEnd = int(regionData[13])
-			region.source = "pfamA"
+			region.dbName = "pfamA"
 			region.description = description
 			region.domainName = domain
 			region.alignmentToModelType = alignmentToModelType
@@ -240,7 +241,7 @@ class HmmscanDomainRegion(object):
 		self.display = None
 		self.description = None
 		self.modelLength = None
-		self.source = None
+		self.dbName = None
 		self.eValue = None
 		self.probability = None
 
@@ -262,6 +263,7 @@ class RpsDomainRegion(object):
 		self.display = None
 		self.description = None
 		self.source = None
+		self.dbName = None
 		self.eValue = None
 		self.bitscore = None
 		self.superfamily_pssmId = None

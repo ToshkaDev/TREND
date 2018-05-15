@@ -1,6 +1,4 @@
 $(document).ready(function (){
-
-
     var jobId = $('#jobId').text();
     getIfReady(jobId);
 
@@ -46,7 +44,7 @@ function prepareTreeContainer() {
         .attr("id", "treeContainer");
 }
 function processRetrievedDataAsync(data) {
-    if (data.status[0] != 'notReady') {
+    if (data.status[0] === 'ready') {
         clearInterval(fileGetter);
 
         if (data.result.length === 1) {
