@@ -39,6 +39,8 @@ PROTEIN_TO_DOMAINS = collections.defaultdict(list) #{protName1: [[], [], ...], p
 ALLOWED_OVERLAP = 0.2
 # seq.start, seq.end, shape, width, height, fgcolor, bgcolor
 THIN_LINE = [0, 9, "[]", 0.2, 0.7, "black", "gray", ""]
+INVISIBLE_LINE = [0, 9, "[]", 0.1, 0.7, "white", "white", ""]
+
 # typical domain visualization construct: [10, 100, "[]", None, 10, "black", "#E8E8E8", "arial|2|black|Domain"]
 
 
@@ -183,8 +185,11 @@ def processDomainsForMerge(domToMergeGrpNames, domToMergeGrpStarts, domToMergeGr
 		
 def addThinLines(proteinName, domainsFinal, startsToDomainList):
 	domsStartsSorted = sorted(startsToDomainList.keys())
+	print str(startsToDomainList)
+	print str(domsStartsSorted)
 	#Used for taking care of situations when transmembrane domain is in the protein domain
 	tempDom1End = None
+	lastSmallDomainInBiggerDomain = False
 	for ind in xrange(len(domsStartsSorted)-1):
 		if len(startsToDomainList[domsStartsSorted[ind]]) == 1:
 			#If not TM donain inside the protien domain was encountered
@@ -197,21 +202,39 @@ def addThinLines(proteinName, domainsFinal, startsToDomainList):
 			else:
 				dom1Start = domsStartsSorted[ind]
 				dom1End = tempDom1End
+				dom1EndTrue = startsToDomainList[dom1Start][0]
 				dom2Start = domsStartsSorted[ind+1]
 				dom2End = startsToDomainList[dom2Start][0]
+				#Check if the second domain start is inside the big previouse domain
+				#and make invisible line
+				if dom2Start < dom1End:
+					thisThinLine = makeThinLine(dom1EndTrue+1, dom2Start-1, False)
+					domainsFinal.append(thisThinLine)
 			#If the second domain is TM domain and it's inside the first protein domain
 			if dom2End < dom1End:
+				#this is an end of the larger domain inside which a second domain is placed
 				tempDom1End = dom1End
+				lastSmallDomainInBiggerDomain = True
 			else:
 				tempDom1End = None
+
 			if dom2Start > dom1End:
+				if lastSmallDomainInBiggerDomain:
+					lastSmallDomainInBiggerDomain = False
+					thisThinLine = makeThinLine(dom1EndTrue+1, dom1End, False)
+					domainsFinal.append(thisThinLine)
 				thisThinLine = makeThinLine(dom1End+1, dom2Start-1)
 				domainsFinal.append(thisThinLine)
 			
-def makeThinLine(startPosition, endPosition):
-	thisThinLine = THIN_LINE[::]
-	thisThinLine[0] = startPosition
-	thisThinLine[1] = endPosition
+def makeThinLine(startPosition, endPosition, notInsideDomain=True):
+	if notInsideDomain:
+		thisThinLine = THIN_LINE[::]
+		thisThinLine[0] = startPosition
+		thisThinLine[1] = endPosition
+	else:
+		thisThinLine = INVISIBLE_LINE[::]
+		thisThinLine[0] = startPosition
+		thisThinLine[1] = endPosition
 	return thisThinLine
 
 def processFileWithDomains():
