@@ -3,11 +3,6 @@ import sys, getopt, json, collections
 from Bio import Phylo, SeqIO
 from ete2 import Tree, SeqMotifFace, TreeStyle, add_face_to_node
 
-
-'''!!! Need to take care of situation when domain is not detected and we need to render the tree in svg format. 
-Take a look at writeSeqsAndTree() and layout(node)
-'''
-
 USAGE = "\nThis script enumerates protein sequence names on the provided phylogenetic tree and in the file with aligned proteins\n" + \
 "and creates phylogenetic tree in svg format with protein domains after branches.\n" + \
 "It additionally saves phylogenetic tree with changed protein names in newick format\n\n" + "python" + sys.argv[0] + '''
@@ -36,6 +31,10 @@ PROTEIN_NAME_TO_SEQ = dict()
 PROTEIN_DOMAINS = dict()
 PROTEIN_TO_DOMAINS = collections.defaultdict(list) #{protName1: [[], [], ...], protName2: [[], [], ...]}
 
+
+#Maximum number of domains in then merged domain syt to be displayed
+MAX_DOMAIN_COUNT = 6
+#Allowed overlap between adjacent domains. If the overlap precentage is bigger than this value the domains will be merged together 
 ALLOWED_OVERLAP = 0.2
 # seq.start, seq.end, shape, width, height, fgcolor, bgcolor
 THIN_LINE = [0, 9, "[]", 0.2, 0.7, "black", "gray", ""]
@@ -95,7 +94,22 @@ def prepareProteinToDomainsDict():
 					aliEnds.add(int(region["tmEnd"])-1)
 					startsToDomainList[int(region["tmSart"])-1].append(int(region["tmEnd"])-1)
 				domains.extend(tms)
+				
+			#Doing the following inorder to process domains in asscending order of their starts 	
+			dmainStartsProcessed = []
+			dmainStartToDomainInfo = {}
 			for region in proteinData["domains"]:
+				if region["aliStart"]-1 not in dmainStartsProcessed:
+					dmainStartToDomainInfo[region["aliStart"]-1] = region
+				#taking care of possible domains with the same start but different names
+				else:
+					region["aliStart"] = region["aliStart"]+1 
+					dmainStartToDomainInfo[region["aliStart"]-1] = region					
+				dmainStartsProcessed.append(region["aliStart"]-1)	
+
+			#Here I'm sorting the starts in processinf them in the sorted order
+			for key in sorted(dmainStartToDomainInfo):
+				region = dmainStartToDomainInfo[key]
 				aliStart = region["aliStart"]-1
 				aliEnd = region["aliEnd"]-1
 				#taking care of domains with the same names but different coordinates
@@ -160,20 +174,21 @@ def mergeIfOneIsInMergeGrp(domainName1, domainName2, aliStart, aliEnd, domToMerg
 	
 def processSeparateDomains(domainsOK, domainToCoords, domains, startsToDomainList):
 	for domainName in domainsOK:
-		domains.append([domainToCoords[domainName][0], domainToCoords[domainName][1], "o", None, 35,  "steelblue", "white", "arial|8|black|" + domainName.split("&")[0]])
+		domains.append([domainToCoords[domainName][0], domainToCoords[domainName][1], "o", None, 35,  "steelblue", "white", "arial|8|#008B8B|" + domainName.split("&")[0]])
 		startsToDomainList[domainToCoords[domainName][0]].append(domainToCoords[domainName][1])
         	
 def processDomainsForMerge(domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domains, startsToDomainList):
-	processedDomains = set()
+	processedDomains = set()	
 	for domain, mergeGroup in domToMergeGrpNames.items():
 		if domain in processedDomains:
 			continue
 		aliStart = min(domToMergeGrpStarts[domain])
 		aliEnd = max(domToMergeGrpEnds[domain])
 		processedDomains.update(mergeGroup)
-		domainName = "arial|8|black|"
+		domainName = "arial|8|#008B8B|"
 		mergeDomainInd = 1
-		for mergeDomain in mergeGroup:
+		# Sorting to show the domains in consistent ordere across proteins with the same merged domains
+		for mergeDomain in sorted(mergeGroup)[:MAX_DOMAIN_COUNT]:
 			mergeDomain = mergeDomain.split("&")[0]
 			if mergeDomainInd%2 == 0:
 				domainName = domainName + mergeDomain + "\n "
@@ -185,8 +200,6 @@ def processDomainsForMerge(domToMergeGrpNames, domToMergeGrpStarts, domToMergeGr
 		
 def addThinLines(proteinName, domainsFinal, startsToDomainList):
 	domsStartsSorted = sorted(startsToDomainList.keys())
-	print str(startsToDomainList)
-	print str(domsStartsSorted)
 	#Used for taking care of situations when transmembrane domain is in the protein domain
 	tempDom1End = None
 	lastSmallDomainInBiggerDomain = False
@@ -256,7 +269,7 @@ def layout(node):
 		if node.name in PROTEIN_TO_DOMAINS:
 			seq = PROTEIN_NAME_TO_SEQ[node.name]
 			protDomains = PROTEIN_TO_DOMAINS[node.name]
-			seqFace = SeqMotifFace(seq, protDomains, scale_factor=1)
+			seqFace = SeqMotifFace(seq, protDomains, scale_factor=1.3)
 			add_face_to_node(seqFace, node, 0, position="aligned")
        
 def writeSeqsAndTree():
@@ -285,7 +298,7 @@ def writeSeqsAndTree():
 	tree.write(outfile=OUTPUT_TREE_NEWICK_FILENAME)
 	treeStyle = TreeStyle()
 	treeStyle.layout_fn = layout
-	tree.render(OUTPUT_TREE_SVG_FILENAME, w=1200, dpi=300, tree_style=treeStyle)
+	tree.render(OUTPUT_TREE_SVG_FILENAME, w=2200, dpi=400, tree_style=treeStyle)
 	
 		
 def main(argv):
