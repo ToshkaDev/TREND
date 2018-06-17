@@ -359,13 +359,14 @@ def processRpsbproc():
 			elif recordList[0] == "DOMAINS":
 				domainListBegan = True
 			elif recordList[0] != "ENDDOMAINS" and domainListBegan:
-				if GET_TAB:
-					domainName = recordList[9]
-					start = recordList[4]
-					end = recordList[5]
-					PROTREF_TO_DOMAIN_INFO[query].append([domainName, start, end])
-				if GET_JSON:
-					proteinObject.setRpsRegion(recordList, DOMAIN)
+				if float(recordList[6]) < EVAL_THRESHOLD:
+					if GET_TAB:
+						domainName = recordList[9]
+						start = recordList[4]
+						end = recordList[5]
+						PROTREF_TO_DOMAIN_INFO[query].append([domainName, start, end])
+					if GET_JSON:
+						proteinObject.setRpsRegion(recordList, DOMAIN)
 			elif recordList[0] == "ENDDOMAINS":
 				domainListBegan = False
 			elif PROTEIN_SITES_INCLUDE and recordList[0] == "SITES":
