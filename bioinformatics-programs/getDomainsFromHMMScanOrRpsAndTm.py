@@ -175,7 +175,7 @@ class Protein(object):
 			region.aliStart = int(regionData[4])
 			region.aliEnd = int(regionData[5])
 			region.source = regionData[8]
-			region.predicter = "Rpslast"
+			region.predictor = "RpsBlast"
 			#Need to change
 			region.dbName = None
 			region.eValue = float(regionData[6])
@@ -215,7 +215,7 @@ class Protein(object):
 			region.modelLength = modelLen
 			region.envStart = int(regionData[12])
 			region.envEnd = int(regionData[13])
-			region.predicter = "Hmmer"
+			region.predictor = "Hmmer"
 			region.dbName = "pfamA"
 			region.description = description
 			region.domainName = domain
@@ -244,7 +244,7 @@ class HmmscanDomainRegion(object):
 		self.display = None
 		self.description = None
 		self.modelLength = None
-		self.predicter = None
+		self.predictor = None
 		self.dbName = None
 		self.eValue = None
 		self.probability = None
@@ -267,7 +267,7 @@ class RpsDomainRegion(object):
 		self.display = None
 		self.description = None
 		self.source = None
-		self.predicter = None
+		self.predictor = None
 		self.dbName = None
 		self.eValue = None
 		self.bitscore = None

@@ -116,7 +116,12 @@ public class EvolutionController extends BioUniverseController {
     public void getFileFromDbP(@PathVariable String filename, HttpServletResponse response) throws IOException {
         BioJobResult bioJobResult = ((BioUniverseService) evolutionService).getBioJobResultDao().findByResultFileName(filename);
 
-        response.setContentType("image/svg+xml");
+        if (filename.split("\\.")[1].equals("txt")) {
+            response.setContentType("text/plain");
+        } else {
+            response.setContentType("image/svg+xml");
+        }
+
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + bioJobResult.getResultFileName());
 
         OutputStream outputStream = response.getOutputStream();

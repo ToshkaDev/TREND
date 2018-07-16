@@ -38,7 +38,10 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
 	    String db = dbName.split(" ")[0] + " ";
         switch (dbName.split(" ")[1]) {
             case "cdd":
-                db = db + super.getProperties().getRpsblastCdd();
+                db = db + super.getProperties().getRpsblastCddSuper();
+                break;
+            case "cdd_ncbi":
+                db = db + super.getProperties().getRpsblastCddNcbi();
                 break;
             case "pfam":
                 db = db + super.getProperties().getRpsblastPfam();
@@ -82,11 +85,19 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + preparedFile));
         protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + preparedFile);
         protoTreeInternal.setFields();
+        String predictionFile = null;
 
         String hmmscanOrRpsbOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
         String rpsbProcOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+
+        if (protoTreeInternal.getDomainPredictionProgram().equals("hmmscan")) {
+            predictionFile = hmmscanOrRpsbOutFile;
+        } else if (protoTreeInternal.getDomainPredictionProgram().equals("rpsblast")) {
+            predictionFile = rpsbProcOutFile;
+        }
         String tmhmmscanOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
         String proteinFeaturesOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+
         String eValueThreashold = "0.01";
         String numberOfThreads = "4";
         argsForProteinFeatures.addAll(Arrays.asList(
@@ -128,7 +139,8 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         String outSvgFile = super.getPrefix() + UUID.randomUUID().toString() + ".svg";
         String outOrderedAlgnFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
 
-        protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, outOrderedAlgnFile));
+        System.out.println("proteinFeaturesOutFile " + proteinFeaturesOutFile);
+        protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, outOrderedAlgnFile, proteinFeaturesOutFile));
 
         argsForTreeWithDomains.addAll(Arrays.asList(
                 protoTreeInternal.getFirstFileName(),

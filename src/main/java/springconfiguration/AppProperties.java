@@ -32,7 +32,8 @@ public class AppProperties {
     private String rpsblastDbPath = "/home/vadim/Softs/rpsblastdb/";
     private String rpsprocDbPath = "/home/vadim/Softs/rpsbproc/data/";
     private String pfam = "Pfam31/Pfam-A.hmm";
-    private String rpsblastCdd = "Cdd_NCBI";
+    private String rpsblastCddSuper = "Cdd";
+    private String rpsblastCddNcbi = "Cdd_NCBI";
     private String rpsblastCog = "Cog";
     private String rpsblastKog = "Kog";
     private String rpsblastPfam = "Pfam";
@@ -179,12 +180,12 @@ public class AppProperties {
         this.pfam = pfam;
     }
 
-    public String getRpsblastCdd() {
-        return rpsblastCdd;
+    public String getRpsblastCddNcbi() {
+        return rpsblastCddNcbi;
     }
 
-    public void setRpsblastCdd(String rpsblastCdd) {
-        this.rpsblastCdd = rpsblastCdd;
+    public void setRpsblastCddNcbi(String rpsblastCddNcbi) {
+        this.rpsblastCddNcbi = rpsblastCddNcbi;
     }
 
     public String getRpsblastCog() {
@@ -281,5 +282,13 @@ public class AppProperties {
 
     public void setMegacc(String megacc) {
         this.megacc = megacc;
+    }
+
+    public String getRpsblastCddSuper() {
+        return rpsblastCddSuper;
+    }
+
+    public void setRpsblastCddSuper(String rpsblastCddSuper) {
+        this.rpsblastCddSuper = rpsblastCddSuper;
     }
 }
