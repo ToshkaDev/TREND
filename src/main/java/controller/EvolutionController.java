@@ -115,7 +115,6 @@ public class EvolutionController extends BioUniverseController {
     @GetMapping("/univ_files/{filename:.+}")
     public void getFileFromDbP(@PathVariable String filename, HttpServletResponse response) throws IOException {
         BioJobResult bioJobResult = ((BioUniverseService) evolutionService).getBioJobResultDao().findByResultFileName(filename);
-
         if (filename.split("\\.")[1].equals("txt")) {
             response.setContentType("text/plain");
         } else {
