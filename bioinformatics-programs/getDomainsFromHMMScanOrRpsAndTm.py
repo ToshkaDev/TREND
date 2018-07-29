@@ -210,7 +210,8 @@ class Protein(object):
 			region.modelEnd = modelEnd
 			region.aliStart = int(regionData[9])
 			region.aliEnd = int(regionData[10])
-			region.eValue = float(regionData[5])
+			region.ceValue = float(regionData[4])
+			region.ieValue = float(regionData[5])
 			region.probability = float(regionData[2])
 			region.modelLength = modelLen
 			region.envStart = int(regionData[12])
@@ -246,7 +247,8 @@ class HmmscanDomainRegion(object):
 		self.modelLength = None
 		self.predictor = None
 		self.dbName = None
-		self.eValue = None
+		self.ceValue = None
+		self.ieValue = None
 		self.probability = None
 
 class RpsSiteRegion(object):
@@ -304,7 +306,6 @@ def processHmmscan():
 					proteinlen = proteinAndLengthList[2].strip().rstrip("]")
 					PROT_NAME_TO_LENGTH[currentQuery] = proteinlen
 					if GET_JSON:
-						print "proteinlen "  + proteinlen
 						proteinObject = Protein(proteinlen.split("=")[1])
 						PROTREF_TO_DOMAINS[currentQuery] = proteinObject
 				elif recSplitted[0] == "Description":
@@ -417,11 +418,9 @@ def processTmscan():
 def main(argv):
 	initialyze(argv)
 	if PROCESS_TYPE == HMMSCAN:
-		print "Here1"
 		hmmscan()
 		processHmmscan()
 	elif PROCESS_TYPE == RPSBLAST:
-		print "Here2"
 		rpsBlast()
 		processRpsbproc()
 	tmhmm2scan()
