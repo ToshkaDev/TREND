@@ -132,8 +132,14 @@ div.raw-files-containers {
 }
 
 div.div-container {
+    border: 1px solid #3F7C7A;
     background-color: white;
     width: 45%;
+}
+
+.info-table {
+    margin-bottom: 7px;
+    margin-right: 1px;
 }
 /*End of Results container and raw files container*/
 

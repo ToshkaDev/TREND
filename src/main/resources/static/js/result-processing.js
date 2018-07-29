@@ -1,6 +1,9 @@
 $(document).ready(function (){
     var jobId = $('#jobId').text();
     renderedClass = null;
+    infoPostfix = "_table";
+    xOffset = 400;
+    yOffset = 200;
     getIfReady(jobId);
 
 });
@@ -43,6 +46,7 @@ function prepareTreeContainer() {
         .append("g")
         .attr("id", "treeContainer");
 }
+
 function processRetrievedDataAsync(data) {
     if (data.status[0] === 'ready') {
         clearInterval(fileGetter);
@@ -63,11 +67,9 @@ function processRetrievedDataAsync(data) {
         }
         $('.result-container').show();
 	}
-
 }
 
 function addEventListeners(data) {
-    console.log("renderedClass addEventListeners " + renderedClass)
 	var re = /^\d{1,}_/;
 	var currentClassName;
 	var proteinIdToRendered = {};
@@ -97,15 +99,16 @@ function addEventListeners(data) {
 }
 
 function checkTableAndDisplay(event, currentClassName, data, proteinIdToRendered, trueClassNameToChanged) {
-    console.log("currentClassName  checkTableAndDisplay " + currentClassName)
-    console.log("renderedClass checkTableAndDisplay " + renderedClass)
     event.stopPropagation();
+    if (renderedClass) {
+        $("." + renderedClass + infoPostfix).hide();
+    }
     if (!proteinIdToRendered[currentClassName]) {
         createTable(event, data, currentClassName, trueClassNameToChanged);
         proteinIdToRendered[currentClassName] = true;
         renderedClass = currentClassName;
     } else {
-        $("."+currentClassName).show();
+        updatePositionAndShow(event, currentClassName + infoPostfix);
         renderedClass = currentClassName;
     }
 }
@@ -113,8 +116,10 @@ function checkTableAndDisplay(event, currentClassName, data, proteinIdToRendered
 function createTable(event, data, currentClassName, trueClassNameToChanged) {
     var organizedData = organizeData(data, trueClassNameToChanged[currentClassName]);
     var divToAddTo = createDivToAddTo(event, currentClassName);
-    makeTable(divToAddTo, organizedData.domainOrganizedData);
-
+    addButtons(divToAddTo);
+    makeTable(divToAddTo, organizedData.domainOrganizedData, "domain-table");
+    makeTable(divToAddTo, organizedData.tmOrganizedData, "tm-table");
+    makeTable(divToAddTo, organizedData.additionalOrganizedData, "additional-table");
 }
 
 function organizeData(data, currentClassName) {
@@ -159,29 +164,61 @@ function organizeData(data, currentClassName) {
         tmRaw = [];
         tmRaw.push(tmCounter++);
         tmRaw.push(tm.tmEnd);
-        tmRaw.push(tm.tmStart);
+        tmRaw.push(tm.tmSart);
         tmOrganizedData.push(tmRaw);
     }
     var additionalRaw = [dataAsJson.tmInfo.possibSigPep, dataAsJson.tmInfo.tmTopology];
     additionalOrganizedData.push(additionalRaw);
 
-    return {'domainOrganizedData': domainOrganizedData, 'tmOrganizedData': tmOrganizedData, 'tmOrganizedData': tmOrganizedData};
+    return {'domainOrganizedData': domainOrganizedData, 'tmOrganizedData': tmOrganizedData, 'additionalOrganizedData': additionalOrganizedData};
 }
 
 function createDivToAddTo(event, currentClassName) {
-    var xCoor = event.clientX - 400 + "px";
-    var yCoor = event.clientY - 200 + "px";
-    console.log("event.clientY " + event.clientY)
+    var xCoor = event.clientX - xOffset + "px";
+    var yCoor = event.clientY - yOffset + "px";
     var divElement = document.createElement("div");
-    divElement.innerHTML = "<h4>" + currentClassName + "</h4>"
-    divElement.className = currentClassName+"_table div-container";
+    divElement.innerHTML = "<h4>" + currentClassName.replace(/_/g, " ") + "</h4>"
+    var readyClassName = currentClassName + infoPostfix;
+    divElement.className = readyClassName + " div-container";
     $("#svgContainer").after(divElement);
-    $("."+currentClassName+"_table").css({"position": "absolute", "left": xCoor, "top": yCoor});
-    return currentClassName+"_table";
+    $("." + readyClassName).css({"position": "absolute", "left": xCoor, "top": yCoor});
+    return readyClassName;
 }
 
-function makeTable(container, data) {
-    var table = $("<table/>").addClass('table table-condensed');
+function addButtons(container) {
+    var buttonTexts = ["Domains", "TMs", "Additional"];
+    buttonTexts.forEach(buttonText => {
+        var button = $("<button/>").addClass("btn btn-primary btn-md proto-tree-button info-table ");
+        button.attr("id", buttonText);
+        addButtonEventListener(button)
+        button.html(buttonText);
+        $("."+container).append(button);
+    });
+}
+
+function addButtonEventListener(buttonElement) {
+    buttonElement.click(function(event) {
+        event.stopPropagation();
+        if ($(this).attr("id") === "Domains") {
+            $("." + "domain-table").show();
+            $("." + "tm-table").hide();
+            $("." + "additional-table").hide();
+        } else if ($(this).attr("id") === "TMs") {
+            console.log("here")
+            $("." + "tm-table").show();
+            $("." + "domain-table").hide();
+
+            $("." + "additional-table").hide();
+        } else if ($(this).attr("id") === "Additional") {
+            $("." + "domain-table").hide();
+            $("." + "tm-table").hide();
+            $("." + "additional-table").show();
+        }
+    });
+}
+
+function makeTable(container, data, tableClass) {
+    var table = $("<table/>").addClass('table table-condensed ' + tableClass);
     $.each(data, function(rowIndex, r) {
         var row = $("<tr/>");
         $.each(r, function(colIndex, c) {
@@ -189,12 +226,22 @@ function makeTable(container, data) {
         });
         table.append(row);
     });
-    console.log("table " + table)
-    return $("."+container).append(table);
+    $("."+container).append(table);
+
+    if (tableClass !== "domain-table") {
+        $("."+tableClass).hide();
+    }
+}
+
+function updatePositionAndShow(event, readyClassName) {
+    var xCoor = event.clientX - xOffset + "px";
+    var yCoor = event.clientY - yOffset + "px";
+    $("." + readyClassName).css({"left": xCoor, "top": yCoor});
+    $("." + readyClassName).show();
 }
 
 $(document).on("click", function () {
-    $("."+renderedClass).hide();
+    $("." + renderedClass + infoPostfix).hide();
 });
 
 function error(jqXHR, textStatus, errorThrown) {
