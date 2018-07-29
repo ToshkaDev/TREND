@@ -10,7 +10,7 @@ function getIfReady(jobId) {
     console.log('jobId ' + jobId + Cookies.get('protoTree'));
     fileGetter = setInterval(function() {
         tryToGetFileName(jobId + "-" + Cookies.get('protoTree'))
-    }, 5000);
+    }, 200);
 }
 
 function tryToGetFileName(jobId) {
@@ -27,7 +27,7 @@ function tryToGetFileName(jobId) {
 
 function prepareTreeContainer() {
     var minSvgWidth = 650;
-    var widthShrinkageFactor = 0.8;
+    var widthShrinkageFactor = 0.89;
     var heightShrinkageFactor = 0.8;
     var width = window.innerWidth*widthShrinkageFactor;
     var height = window.innerHeight*heightShrinkageFactor;
@@ -56,12 +56,10 @@ function processRetrievedDataAsync(data) {
             d3.xml(data.result[1]).then(function(xml) {
                 console.log(xml.documentElement)
                 document.getElementById("treeContainer").appendChild(xml.documentElement);
+                $.get(data.result[3], function(data, status){
+                    addEventListeners(data);
+                });
             });
-
-            $.get(data.result[3], function(data, status){
-                addEventListeners(data);
-            });
-
         }
         $('.result-container').show();
 	}
@@ -69,45 +67,41 @@ function processRetrievedDataAsync(data) {
 }
 
 function addEventListeners(data) {
+    console.log("renderedClass addEventListeners " + renderedClass)
 	var re = /^\d{1,}_/;
 	var currentClassName;
-	var proteinIdToRendered = {}
-	var sel = d3.select("#treeContainer");
-	var ssel = sel.select("svg")
-	console.log(d3.select("#treeContainer"))
-	console.log(d3.select("#treeContainer>svg"))
-	console.log(ssel)
-	console.log(d3.select('#treeContainer').selectAll('svg>g'))
-	console.log("here00")
-	d3.select('#treeContainer').selectAll('*')
+	var proteinIdToRendered = {};
+	var trueClassNameToChanged = {};
+	d3.select('#treeContainer>svg').selectAll('*')
 	  .attr("dummy", function(){
-	  console.log("here0")
 			if (d3.select(this).text().length > 0 && re.test(d3.select(this).text())) {
-				console.log("here1")
-				currentClassName = d3.select(this).text()
+			    classNameForJson = d3.select(this).text().replace(re, '');
+				currentClassName = classNameForJson.replace('.', '');
+				trueClassNameToChanged[currentClassName] = classNameForJson;
+
 				d3.select(this).attr("class", currentClassName+"_text");
 				d3.select(this).selectAll('*').attr("class", currentClassName);
 
 			} else if (currentClassName) {
-				console.log("here2")
-				console.log("currentClassName " + currentClassName)
 				d3.select(this).attr("class", currentClassName);
 				d3.select(this).selectAll('*').attr("class", currentClassName);
 
-				d3.select(this).on("click", function(event){
-						checkTableAndDisplay(event, currentClassName, data, proteinIdToRendered);
+				d3.select(this).on("click", function(){
+						checkTableAndDisplay(d3.event, d3.select(this).attr("class"), data, proteinIdToRendered, trueClassNameToChanged);
 					});
-				d3.select(this).selectAll('*').on("click", function(event){
-						checkTableAndDisplay(event, currentClassName, data, proteinIdToRendered);
+				d3.select(this).selectAll('*').on("click", function(){
+						checkTableAndDisplay(d3.event, d3.select(this).attr("class"), data, proteinIdToRendered, trueClassNameToChanged);
 					});
 			}
 	  });
 }
 
-function checkTableAndDisplay(event, currentClassName, data, proteinIdToRendered) {
+function checkTableAndDisplay(event, currentClassName, data, proteinIdToRendered, trueClassNameToChanged) {
+    console.log("currentClassName  checkTableAndDisplay " + currentClassName)
+    console.log("renderedClass checkTableAndDisplay " + renderedClass)
     event.stopPropagation();
     if (!proteinIdToRendered[currentClassName]) {
-        createTable(data, currentClassName);
+        createTable(event, data, currentClassName, trueClassNameToChanged);
         proteinIdToRendered[currentClassName] = true;
         renderedClass = currentClassName;
     } else {
@@ -116,52 +110,52 @@ function checkTableAndDisplay(event, currentClassName, data, proteinIdToRendered
     }
 }
 
-function createTable(data, currentClassName) {
-    var organizedData = organizeData(data, currentClassName);
-    var divToAddTo = createDivToAddTo(currentClassName);
-    makeTable($(divToAddTo), organizedData);
+function createTable(event, data, currentClassName, trueClassNameToChanged) {
+    var organizedData = organizeData(data, trueClassNameToChanged[currentClassName]);
+    var divToAddTo = createDivToAddTo(event, currentClassName);
+    makeTable(divToAddTo, organizedData.domainOrganizedData);
 
 }
 
 function organizeData(data, currentClassName) {
-    var domainOrganizedData = [];
-    var tmOrganizedData = [];
-    var additionalOrganizedData = []
-    var score;
+    var domainOrganizedData = [], tmOrganizedData = [], additionalOrganizedData = [], score;
     var dataAsJson = JSON.parse(data)[currentClassName];
     var hrefRootPath;
-    if (dataAsJson.predictor == "RpsBlast") {
+    var domainHeaders;
+    if (dataAsJson.domains && dataAsJson.domains[0].predictor == "RpsBlast") {
         score = "Bitscore";
         hrefRootPath = "https://www.ncbi.nlm.nih.gov/cdd?term=";
-    } else if (dataAsJson.predictor == "hmmscan"){
+        domainHeaders = ["No.", "Domain", "Start", "End", "Bitscore", "Evalue", "Alignment"];
+    } else if (dataAsJson.domains && dataAsJson.domains[0].predictor == "Hmmer"){
         score = "Probability";
+        domainHeaders = ["No.", "Domain", "Start", "End", "Probability", "C-Evalue", "I-Evalue", "Alignment"];
         hrefRootPath = "https://pfam.xfam.org/search/keyword?query=";
     }
-    var domainHeaders = ["No.", "Domain", "Start", "End", score, "eValue", "Alignment"];
     var tmHeaders = ["No.", "Start", "End"];
     var additionalHeaders = ["Signal Peptide?", "Topology"];
     domainOrganizedData.push(domainHeaders);
     tmOrganizedData.push(tmHeaders);
     additionalOrganizedData.push(additionalHeaders);
 
-    var domainCounter = 1;
-    var tmCounter = 1;
-    var domainRaw;
-    var tmRaw;
-    var domainName;
-    for (var domain in dataAsJson.domains) {
+    var domainCounter = 1, tmCounter = 1, domainRaw, tmRaw, domainName;
+    for (var domain of dataAsJson.domains) {
         domainRaw = [];
-        domainName = "<a href=" + hrefRootPath+domain.domainName + ">domain.domainName" + "</a>";
-        domdainRaw.push(domainCounter++);
-        domdainRaw.push(domainName);
-        domdainRaw.push(domain.aliStart);
-        domdainRaw.push(domain.aliEnd);
-        domdainRaw.push(domain.bitscore);
-        domdainRaw.push(domain.eValue);
-        domdainRaw.push(domain.alignmentToModelType);
+        domainName = "<span><a href='" + hrefRootPath+domain.domainName + "'>" + domain.domainName + "</a></span>";
+        domainRaw.push(domainCounter++);
+        domainRaw.push(domainName);
+        domainRaw.push(domain.aliStart);
+        domainRaw.push(domain.aliEnd);
+        domainRaw.push(domain[score.toLowerCase()]);
+        if (score == "Bitscore") {
+            domainRaw.push(domain.eValue);
+        } else if (score == "Probability") {
+            domainRaw.push(domain.ceValue);
+            domainRaw.push(domain.ieValue);
+        }
+        domainRaw.push(domain.alignmentToModelType);
         domainOrganizedData.push(domainRaw);
     }
-    for (var tm in dataAsJson.tmInfo.tmRegions) {
+    for (var tm of dataAsJson.tmInfo['tmRegions']) {
         tmRaw = [];
         tmRaw.push(tmCounter++);
         tmRaw.push(tm.tmEnd);
@@ -171,19 +165,18 @@ function organizeData(data, currentClassName) {
     var additionalRaw = [dataAsJson.tmInfo.possibSigPep, dataAsJson.tmInfo.tmTopology];
     additionalOrganizedData.push(additionalRaw);
 
-    return organizedData;
+    return {'domainOrganizedData': domainOrganizedData, 'tmOrganizedData': tmOrganizedData, 'tmOrganizedData': tmOrganizedData};
 }
 
-//TODO
-function createDivToAddTo(currentClassName) {
-    var selectedLeaf = document.getElementsByClassName(currentClassName+"_text")[0].getBoundingClientRect();
-    var xAbsolute = selectedLeaf["x"] + window.scrollX;
-    var yAbsolute = selectedLeaf["y"] + window.scrollY;
-    var divElement = document.createElement("div").addClass(currentClassName+"_table");
-    $(".table-container").after(divElement);
-    d3.select("."+currentClassName+"_table")
-    .style("top", yAbsolute+"px")
-    .style("left", xAbsolute+"px");
+function createDivToAddTo(event, currentClassName) {
+    var xCoor = event.clientX - 400 + "px";
+    var yCoor = event.clientY - 200 + "px";
+    console.log("event.clientY " + event.clientY)
+    var divElement = document.createElement("div");
+    divElement.innerHTML = "<h4>" + currentClassName + "</h4>"
+    divElement.className = currentClassName+"_table div-container";
+    $("#svgContainer").after(divElement);
+    $("."+currentClassName+"_table").css({"position": "absolute", "left": xCoor, "top": yCoor});
     return currentClassName+"_table";
 }
 
@@ -192,11 +185,12 @@ function makeTable(container, data) {
     $.each(data, function(rowIndex, r) {
         var row = $("<tr/>");
         $.each(r, function(colIndex, c) {
-            row.append($("<t"+(rowIndex == 0 ?  "h" : "d")+"/>").text(c));
+            row.append($("<t"+(rowIndex == 0 ?  "h" : "d")+"/>").html(c));
         });
         table.append(row);
     });
-    return container.append(table);
+    console.log("table " + table)
+    return $("."+container).append(table);
 }
 
 $(document).on("click", function () {

@@ -105,7 +105,7 @@ div.query-area {
 }
 
 div.result-area {
-    padding-left: 10%;
+    padding-left: 5%;
 }
 
 .my-textarea {
@@ -131,6 +131,10 @@ div.raw-files-containers {
     padding-bottom: 3em;
 }
 
+div.div-container {
+    background-color: white;
+    width: 45%;
+}
 /*End of Results container and raw files container*/
 
 /*Footer*/

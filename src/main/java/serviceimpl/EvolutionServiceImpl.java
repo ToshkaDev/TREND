@@ -85,16 +85,10 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + preparedFile));
         protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + preparedFile);
         protoTreeInternal.setFields();
-        String predictionFile = null;
 
         String hmmscanOrRpsbOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
         String rpsbProcOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
 
-        if (protoTreeInternal.getDomainPredictionProgram().equals("hmmscan")) {
-            predictionFile = hmmscanOrRpsbOutFile;
-        } else if (protoTreeInternal.getDomainPredictionProgram().equals("rpsblast")) {
-            predictionFile = rpsbProcOutFile;
-        }
         String tmhmmscanOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
         String proteinFeaturesOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
 
