@@ -131,15 +131,37 @@ div.raw-files-containers {
     padding-bottom: 3em;
 }
 
-div.div-container {
-    border: 1px solid #3F7C7A;
+div.protein-info-container {
+    border: 1.3px solid #3F7C7A;
+    border-radius: 5px;
     background-color: white;
     width: 45%;
+    padding-left: 7px;
+    padding-right: 7px;
 }
 
-.info-table {
+.protein-info-buttons, .protein-info-buttons:focus {
     margin-bottom: 7px;
     margin-right: 1px;
+    color: white !important;
+    background-color: #7FB9AB;
+    border: 1px solid #7FB9AB;
+}
+
+.protein-info-buttons:hover, .protein-info-buttons:active, .protein-info-buttons-selected {
+    margin-bottom: 7px;
+    margin-right: 1px;
+    color: white !important;
+    background-color: #3F7C7A;
+    border: 1px solid #3F7C7A;
+}
+
+.proto-tree-link, proto-tree-link {
+    color: #7FB9AB;
+}
+
+.proto-tree-link:hover, .proto-tree-link:active {
+    color: #3F7C7A;
 }
 /*End of Results container and raw files container*/
 

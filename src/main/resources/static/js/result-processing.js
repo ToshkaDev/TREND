@@ -4,6 +4,7 @@ $(document).ready(function (){
     infoPostfix = "_table";
     xOffset = 400;
     yOffset = 200;
+    entityToButton = {"domainOrganizedData": "Domains", 'tmOrganizedData': "TMs", "additionalOrganizedData": "Additional"};
     getIfReady(jobId);
 
 });
@@ -37,7 +38,7 @@ function prepareTreeContainer() {
     var tree = d3.select("div#svgContainer")
         .style("width", width)
         .style("height", height)
-        .style("border", "1px solid #9494b8")
+        .style("border", "1.4px solid #9494b8")
         .append("svg")
         .attr("width", width)
         .attr("height", height)
@@ -116,7 +117,7 @@ function checkTableAndDisplay(event, currentClassName, data, proteinIdToRendered
 function createTable(event, data, currentClassName, trueClassNameToChanged) {
     var organizedData = organizeData(data, trueClassNameToChanged[currentClassName]);
     var divToAddTo = createDivToAddTo(event, currentClassName);
-    addButtons(divToAddTo);
+    addButtons(divToAddTo, organizedData);
     makeTable(divToAddTo, organizedData.domainOrganizedData, "domain-table");
     makeTable(divToAddTo, organizedData.tmOrganizedData, "tm-table");
     makeTable(divToAddTo, organizedData.additionalOrganizedData, "additional-table");
@@ -125,70 +126,94 @@ function createTable(event, data, currentClassName, trueClassNameToChanged) {
 function organizeData(data, currentClassName) {
     var domainOrganizedData = [], tmOrganizedData = [], additionalOrganizedData = [], score;
     var dataAsJson = JSON.parse(data)[currentClassName];
-    var hrefRootPath;
-    var domainHeaders;
-    if (dataAsJson.domains && dataAsJson.domains[0].predictor == "RpsBlast") {
-        score = "Bitscore";
-        hrefRootPath = "https://www.ncbi.nlm.nih.gov/cdd?term=";
-        domainHeaders = ["No.", "Domain", "Start", "End", "Bitscore", "Evalue", "Alignment"];
-    } else if (dataAsJson.domains && dataAsJson.domains[0].predictor == "Hmmer"){
-        score = "Probability";
-        domainHeaders = ["No.", "Domain", "Start", "End", "Probability", "C-Evalue", "I-Evalue", "Alignment"];
-        hrefRootPath = "https://pfam.xfam.org/search/keyword?query=";
-    }
-    var tmHeaders = ["No.", "Start", "End"];
-    var additionalHeaders = ["Signal Peptide?", "Topology"];
-    domainOrganizedData.push(domainHeaders);
-    tmOrganizedData.push(tmHeaders);
-    additionalOrganizedData.push(additionalHeaders);
 
-    var domainCounter = 1, tmCounter = 1, domainRaw, tmRaw, domainName;
-    for (var domain of dataAsJson.domains) {
-        domainRaw = [];
-        domainName = "<span><a href='" + hrefRootPath+domain.domainName + "'>" + domain.domainName + "</a></span>";
-        domainRaw.push(domainCounter++);
-        domainRaw.push(domainName);
-        domainRaw.push(domain.aliStart);
-        domainRaw.push(domain.aliEnd);
-        domainRaw.push(domain[score.toLowerCase()]);
-        if (score == "Bitscore") {
-            domainRaw.push(domain.eValue);
-        } else if (score == "Probability") {
-            domainRaw.push(domain.ceValue);
-            domainRaw.push(domain.ieValue);
+    if (dataAsJson) {
+        var hrefRootPath;
+        var domainHeaders;
+        if (dataAsJson.domains && dataAsJson.domains[0].predictor == "RpsBlast") {
+            score = "Bitscore";
+            hrefRootPath = "https://www.ncbi.nlm.nih.gov/cdd?term=";
+            domainHeaders = ["No.", "Domain", "Start", "End", "Bitscore", "Evalue", "Alignment"];
+        } else if (dataAsJson.domains && dataAsJson.domains[0].predictor == "Hmmer"){
+            score = "Probability";
+            domainHeaders = ["No.", "Domain", "Start", "End", "Probability", "C-Evalue", "I-Evalue", "Alignment"];
+            hrefRootPath = "https://pfam.xfam.org/search/keyword?query=";
         }
-        domainRaw.push(domain.alignmentToModelType);
-        domainOrganizedData.push(domainRaw);
-    }
-    for (var tm of dataAsJson.tmInfo['tmRegions']) {
-        tmRaw = [];
-        tmRaw.push(tmCounter++);
-        tmRaw.push(tm.tmEnd);
-        tmRaw.push(tm.tmSart);
-        tmOrganizedData.push(tmRaw);
-    }
-    var additionalRaw = [dataAsJson.tmInfo.possibSigPep, dataAsJson.tmInfo.tmTopology];
-    additionalOrganizedData.push(additionalRaw);
 
+        var domainCounter = 1, tmCounter = 1, domainRaw, tmRaw, domainName;
+        if (dataAsJson.domains) {
+            domainOrganizedData.push(domainHeaders);
+            for (var domain of dataAsJson.domains) {
+                domainRaw = [];
+                domainName = "<span><a href='" + hrefRootPath+domain.domainName + "'>" + domain.domainName + "</a></span>";
+                domainRaw.push(domainCounter++ + ".");
+                domainRaw.push(domainName);
+                domainRaw.push(domain.aliStart);
+                domainRaw.push(domain.aliEnd);
+                domainRaw.push(domain[score.toLowerCase()]);
+                if (score == "Bitscore") {
+                    domainRaw.push(domain.eValue);
+                } else if (score == "Probability") {
+                    domainRaw.push(domain.ceValue);
+                    domainRaw.push(domain.ieValue);
+                }
+                domainRaw.push(domain.alignmentToModelType);
+                domainOrganizedData.push(domainRaw);
+            }
+        }
+
+        if (dataAsJson.tmInfo['tmRegions']) {
+            var tmHeaders = ["No.", "Start", "End"];
+            var additionalHeaders = ["Signal Peptide?", "Topology"];
+            tmOrganizedData.push(tmHeaders);
+            additionalOrganizedData.push(additionalHeaders);
+            for (var tm of dataAsJson.tmInfo['tmRegions']) {
+                tmRaw = [];
+                tmRaw.push(tmCounter++ + ".");
+                tmRaw.push(tm.tmEnd);
+                tmRaw.push(tm.tmSart);
+                tmOrganizedData.push(tmRaw);
+            }
+            var additionalRaw = [dataAsJson.tmInfo.possibSigPep, dataAsJson.tmInfo.tmTopology];
+            additionalOrganizedData.push(additionalRaw);
+        }
+    }
     return {'domainOrganizedData': domainOrganizedData, 'tmOrganizedData': tmOrganizedData, 'additionalOrganizedData': additionalOrganizedData};
 }
 
 function createDivToAddTo(event, currentClassName) {
     var xCoor = event.clientX - xOffset + "px";
     var yCoor = event.clientY - yOffset + "px";
-    var divElement = document.createElement("div");
-    divElement.innerHTML = "<h4>" + currentClassName.replace(/_/g, " ") + "</h4>"
     var readyClassName = currentClassName + infoPostfix;
-    divElement.className = readyClassName + " div-container";
+    var divElement = $("<div/>");
+    var removeElement = $("<div><a href='#' class='proto-tree-link'><span class='glyphicon glyphicon-remove pull-right'></span></a></div>");
+    divElement.addClass(readyClassName + " protein-info-container");
+    divElement.append(removeElement);
+    divElement.append($("<h4>" + currentClassName.replace(/_/g, " ") + "</h4><hr/>"));
+
+    divElement.click(function(event){
+        event.stopPropagation();
+    });
+
+    removeElement.click(function(event){
+        $("." + renderedClass + infoPostfix).hide();
+    });
+
     $("#svgContainer").after(divElement);
-    $("." + readyClassName).css({"position": "absolute", "left": xCoor, "top": yCoor});
+    divElement.css({"position": "absolute", "left": xCoor, "top": yCoor});
     return readyClassName;
 }
 
-function addButtons(container) {
-    var buttonTexts = ["Domains", "TMs", "Additional"];
+function addButtons(container, organizedData) {
+    var buttonTexts = [];
+    for (var entity in organizedData) {
+        organizedData[entity].length > 0 && entityToButton[entity] ? buttonTexts.push(entityToButton[entity]) : null;
+    }
+    var button;
     buttonTexts.forEach(buttonText => {
-        var button = $("<button/>").addClass("btn btn-primary btn-md proto-tree-button info-table ");
+        buttonText == "Domains"
+            ? button = $("<button/>").addClass("btn btn-md protein-info-buttons-selected ")
+            : button = $("<button/>").addClass("btn btn-md protein-info-buttons ");
         button.attr("id", buttonText);
         addButtonEventListener(button)
         button.html(buttonText);
@@ -199,12 +224,13 @@ function addButtons(container) {
 function addButtonEventListener(buttonElement) {
     buttonElement.click(function(event) {
         event.stopPropagation();
+        $(".protein-info-buttons-selected").removeClass("protein-info-buttons-selected").addClass("protein-info-buttons");
+        $(this).removeClass("protein-info-buttons").addClass("protein-info-buttons-selected");
         if ($(this).attr("id") === "Domains") {
             $("." + "domain-table").show();
             $("." + "tm-table").hide();
             $("." + "additional-table").hide();
         } else if ($(this).attr("id") === "TMs") {
-            console.log("here")
             $("." + "tm-table").show();
             $("." + "domain-table").hide();
 
@@ -218,18 +244,20 @@ function addButtonEventListener(buttonElement) {
 }
 
 function makeTable(container, data, tableClass) {
-    var table = $("<table/>").addClass('table table-condensed ' + tableClass);
-    $.each(data, function(rowIndex, r) {
-        var row = $("<tr/>");
-        $.each(r, function(colIndex, c) {
-            row.append($("<t"+(rowIndex == 0 ?  "h" : "d")+"/>").html(c));
+    if (data && data.length > 0) {
+        var table = $("<table/>").addClass('table table-condensed ' + tableClass);
+        $.each(data, function(rowIndex, r) {
+            var row = $("<tr/>");
+            $.each(r, function(colIndex, c) {
+                row.append($("<t"+(rowIndex == 0 ?  "h" : "d")+"/>").html(c));
+            });
+            table.append(row);
         });
-        table.append(row);
-    });
-    $("."+container).append(table);
+        $("."+container).append(table);
 
-    if (tableClass !== "domain-table") {
-        $("."+tableClass).hide();
+        if (tableClass !== "domain-table") {
+            $("."+tableClass).hide();
+        }
     }
 }
 
