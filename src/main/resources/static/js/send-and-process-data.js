@@ -18,6 +18,10 @@ $(document).ready(function (){
         $('.extra-result-container').show();
         $('#options').hide();
     });
+
+    $('#addSecondArea').click(function() {
+        $('.second-area').toggle();
+    });
 });
 
 function setCookie() {

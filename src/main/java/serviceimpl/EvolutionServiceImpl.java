@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import service.EvolutionService;
 import service.StorageService;
 import exceptions.IncorrectRequestException;
@@ -81,21 +82,28 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         List<String> argsForAlignmentAndTree = new LinkedList<>();
         List<String> argsForTreeWithDomains = new LinkedList<>();
 
-        String preparedFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
-        argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + preparedFile));
-        protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + preparedFile);
+        String firstPreparedFile = getRandomFileName();
+        argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + firstPreparedFile));
+        String secondPreparedFile = getRandomFileName();
+        argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + secondPreparedFile));
+        protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + firstPreparedFile);
+        protoTreeInternal.setSecondFileName(ParamPrefixes.INPUT.getPrefix() + secondPreparedFile);
         protoTreeInternal.setFields();
 
-        String hmmscanOrRpsbOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
-        String rpsbProcOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+        String inputFileNameForAlignAndTree = protoTreeInternal.getSecondFileName() != null
+                ? protoTreeInternal.getSecondFileName()
+                : protoTreeInternal.getFirstFileName();
 
-        String tmhmmscanOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
-        String proteinFeaturesOutFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+        String hmmscanOrRpsbOutFile = getRandomFileName();
+        String rpsbProcOutFile = getRandomFileName();
+
+        String tmhmmscanOutFile = getRandomFileName();
+        String proteinFeaturesOutFile = getRandomFileName();
 
         String eValueThreashold = "0.01";
         String numberOfThreads = "4";
         argsForProteinFeatures.addAll(Arrays.asList(
-                protoTreeInternal.getFirstFileName(),
+                inputFileNameForAlignAndTree,
                 protoTreeInternal.getDomainPredictionProgram(),
                 getDomainPredictionDb(protoTreeInternal.getDomainPredictionDb()),
                 ParamPrefixes.OUTPUT_FOURTH.getPrefix() + hmmscanOrRpsbOutFile,
@@ -131,13 +139,12 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
 
         String outNewickFile = super.getPrefix() + UUID.randomUUID().toString() + ".newick";
         String outSvgFile = super.getPrefix() + UUID.randomUUID().toString() + ".svg";
-        String outOrderedAlgnFile = super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
+        String outOrderedAlgnFile = getRandomFileName();
 
-        System.out.println("proteinFeaturesOutFile " + proteinFeaturesOutFile);
         protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, outOrderedAlgnFile, proteinFeaturesOutFile));
 
         argsForTreeWithDomains.addAll(Arrays.asList(
-                protoTreeInternal.getFirstFileName(),
+                inputFileNameForAlignAndTree,
                 ParamPrefixes.INPUT_SECOND.getPrefix() + outAlgnFile,
                 ParamPrefixes.INPUT_THIRD.getPrefix() + outNewickTree + ".nwk",
                 ParamPrefixes.INPUT_FOURTH.getPrefix() + proteinFeaturesOutFile,
@@ -246,17 +253,27 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
 	}
 
     private ProtoTreeInternal storeFileAndGetInternalRepresentationP(final ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
-        String firstFileName = null;
+        String firstFileName = storeAndGetFileName(protoTreeRequest.getFirstFile(), protoTreeRequest.getFirstFileArea());
+        String secondFileName = storeAndGetFileName(protoTreeRequest.getSecondFile(), protoTreeRequest.getSecondFileArea());
 
-        if (protoTreeRequest.getFirstFile() != null) {
-            if (!isNullOrEmpty(protoTreeRequest.getFirstFileArea())) {
-                throw new IncorrectRequestException("firstFileTextArea and firstFileName are both not empty");
+        return fromProtoTreeRequestToProtoTreeInternal(protoTreeRequest, firstFileName, secondFileName);
+    }
+
+    private String storeAndGetFileName(final MultipartFile multipartFile, final String fileArea) throws IncorrectRequestException {
+        String fileName = null;
+        if (multipartFile != null) {
+            if (!isNullOrEmpty(fileArea)) {
+                throw new IncorrectRequestException("fileTextArea and fileName are both not empty");
             } else {
-                firstFileName = super.getStorageService().store(protoTreeRequest.getFirstFile());
+                fileName = super.getStorageService().store(multipartFile);
             }
-        } else if (!isNullOrEmpty(protoTreeRequest.getFirstFileArea())) {
-            firstFileName = super.getStorageService().createAndStore(protoTreeRequest.getFirstFileArea());
+        } else if (!isNullOrEmpty(fileArea)) {
+            fileName = super.getStorageService().createAndStore(fileArea);
         }
-        return fromProtoTreeRequestToProtoTreeInternal(protoTreeRequest, firstFileName);
+        return fileName;
+    }
+
+    private String getRandomFileName() {
+        return super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix();
     }
 }

@@ -10,7 +10,7 @@
             </div>
             <br />
             <div class="row">
-                <label id="choose-file" class="btn btn-primary btn-md">
+                <label class="btn btn-primary btn-md choose-file">
                     Choose file with protein sequences <input id="first-file" type="file" style="display: none" multiple/>
                 </label>
                 <span class='label label-info' id="first-file-info"></span>
@@ -19,6 +19,27 @@
                 </button>
             </div> <br /> <br />
         </div>
+
+        <button id="addSecondArea" class="btn btn-primary btn-md proto-tree-button" type="button">
+            <span>Add Second Area</span>
+        </button>
+
+        <div class="col-md-8 my-textarea second-area">
+            <div class="row">
+                <textarea id="second-file-area" class="form-control" rows="12"> </textarea>
+            </div>
+            <br />
+            <div class="row">
+                <label class="btn btn-primary btn-md choose-file">
+                    Choose file with protein sequences <input id="second-file" type="file" style="display: none" multiple/>
+                </label>
+                <span class='label label-info' id="second-file-info"></span>
+                <button id="GoAsync" class="btn btn-primary btn-md pull-right proto-tree-button" type="button">
+                    <span>SUBMIT</span>
+                </button>
+            </div> <br /> <br />
+        </div>
+
     </div>
 
     <div th:fragment="result">

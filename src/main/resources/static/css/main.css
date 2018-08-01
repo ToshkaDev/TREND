@@ -77,11 +77,15 @@ label.error {
     color: #3399ff;
 }
 
-#choose-file {
+.choose-file {
     background-color: #7575a3;
 }
 #first-file-info {
     background-color: #8585ad;
+}
+
+.second-area {
+    display: none;
 }
  /*End of Activity associated elements: buttons and so on*/
 

@@ -1,8 +1,6 @@
 package converters;
 
-import enums.Delimeters;
 import enums.ParamPrefixes;
-import exceptions.IncorrectRequestException;
 import model.internal.ProtoTreeInternal;
 import model.request.ProtoTreeRequest;
 import service.StorageService;
@@ -13,9 +11,10 @@ public class ConverterMain {
 	}
 
 	public static ProtoTreeInternal fromProtoTreeRequestToProtoTreeInternal(ProtoTreeRequest protoTreeRequest,
-                                                                            String firstFileName) {
+                                                                            String firstFileName, String secondFileName) {
 		ProtoTreeInternal protoTreeInternal = new ProtoTreeInternal();
         protoTreeInternal.setFirstFileName(checkForNullAndGet(ParamPrefixes.INPUT.getPrefix(), firstFileName));
+		protoTreeInternal.setSecondFileName(checkForNullAndGet(ParamPrefixes.INPUT_SECOND.getPrefix(), secondFileName));
 		protoTreeInternal.setCommandToBeProcessedBy(protoTreeRequest.getCommandToBeProcessedBy());
 
         protoTreeInternal.setTreeBuildMethod(checkForNullAndGet(ParamPrefixes.TREE_BUILD_METHOD.getPrefix(), protoTreeRequest.getTreeBuildMethod()));
