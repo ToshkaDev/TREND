@@ -76,8 +76,7 @@ public class EvolutionController extends BioUniverseController {
     @PostMapping(value="/process-request", produces="text/plain")
     @ResponseBody
     public String processTreeRequest(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException, ExecutionException, InterruptedException {
-        ProtoTreeInternal protoTreeInternal = null;
-
+	    ProtoTreeInternal protoTreeInternal = null;
         //Split it to several functions because 'PROTO_TREE' method is asynchronous
         //and files in 'listOfFiles' field of evolutionRequest are got cleared at the end of request processing.
         if (protoTreeRequest.getCommandToBeProcessedBy().equals(BioPrograms.PROTO_TREE.getProgramName())) {

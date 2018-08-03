@@ -71,17 +71,14 @@ div.panel-body {
 	padding: 2px;
 }
 
+div.panel-default {
+    margin-right: 9em;
+}
+
 
 label.error {
     font-size:small;
     color: #3399ff;
-}
-
-.choose-file {
-    background-color: #7575a3;
-}
-#first-file-info {
-    background-color: #8585ad;
 }
 
 .second-area {
@@ -105,7 +102,7 @@ div.secondary-buttons, div.options {
 }
 
 div.query-area {
-    padding-left: 15%;
+    padding-left: 10%;
 }
 
 div.result-area {
@@ -113,7 +110,7 @@ div.result-area {
 }
 
 .my-textarea {
-	margin-right: 7em;
+	max-width: 50%;
 }
 
 .glyphicon.glyphicon-option-horizontal {

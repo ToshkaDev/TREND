@@ -21,6 +21,12 @@ $(document).ready(function (){
 
     $('#addSecondArea').click(function() {
         $('.second-area').toggle();
+        if ($('.second-area').css("display") !== "none") {
+            $('#addSecondArea').html("Close Second Area")
+        }
+        else {
+            $('#addSecondArea').html("Add Second Area")
+        }
     });
 });
 

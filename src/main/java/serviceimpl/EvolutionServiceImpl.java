@@ -76,23 +76,33 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
 
     public ProtoTreeInternal storeFilesAndPrepareCommandArgumentsP(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
         ProtoTreeInternal protoTreeInternal = storeFileAndGetInternalRepresentationP(protoTreeRequest);
+        List<String> listOfPrograms = new LinkedList<>();
+        List<List<String>> listOfArgumentLists = new LinkedList<>();
 
         List<String> argsForPrepareNames = new LinkedList<>();
+        List<String> argsForPrepareNamesSecond = new LinkedList<>();
         List<String> argsForProteinFeatures = new LinkedList<>();
         List<String> argsForAlignmentAndTree = new LinkedList<>();
         List<String> argsForTreeWithDomains = new LinkedList<>();
 
         String firstPreparedFile = getRandomFileName();
         argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + firstPreparedFile));
-        String secondPreparedFile = getRandomFileName();
-        argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + secondPreparedFile));
         protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + firstPreparedFile);
-        protoTreeInternal.setSecondFileName(ParamPrefixes.INPUT.getPrefix() + secondPreparedFile);
-        protoTreeInternal.setFields();
+        String inputFileNameForProtFeatures = protoTreeInternal.getFirstFileName();
+        listOfPrograms.add(super.getProperties().getPrepareNames());
+        listOfArgumentLists.add(argsForPrepareNames);
 
-        String inputFileNameForAlignAndTree = protoTreeInternal.getSecondFileName() != null
-                ? protoTreeInternal.getSecondFileName()
-                : protoTreeInternal.getFirstFileName();
+        if (protoTreeInternal.getSecondFileName() != null) {
+            String secondPreparedFile = getRandomFileName();
+            argsForPrepareNamesSecond.addAll(Arrays.asList(protoTreeInternal.getSecondFileName(), ParamPrefixes.OUTPUT.getPrefix() + secondPreparedFile));
+            protoTreeInternal.setSecondFileName(ParamPrefixes.INPUT.getPrefix() + secondPreparedFile);
+            inputFileNameForProtFeatures = protoTreeInternal.getSecondFileName();
+            listOfPrograms.add(super.getProperties().getPrepareNames());
+            listOfArgumentLists.add(argsForPrepareNamesSecond);
+        }
+
+
+        protoTreeInternal.setFields();
 
         String hmmscanOrRpsbOutFile = getRandomFileName();
         String rpsbProcOutFile = getRandomFileName();
@@ -103,7 +113,7 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         String eValueThreashold = "0.01";
         String numberOfThreads = "4";
         argsForProteinFeatures.addAll(Arrays.asList(
-                inputFileNameForAlignAndTree,
+                inputFileNameForProtFeatures,
                 protoTreeInternal.getDomainPredictionProgram(),
                 getDomainPredictionDb(protoTreeInternal.getDomainPredictionDb()),
                 ParamPrefixes.OUTPUT_FOURTH.getPrefix() + hmmscanOrRpsbOutFile,
@@ -144,7 +154,7 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, outOrderedAlgnFile, proteinFeaturesOutFile));
 
         argsForTreeWithDomains.addAll(Arrays.asList(
-                inputFileNameForAlignAndTree,
+                inputFileNameForProtFeatures,
                 ParamPrefixes.INPUT_SECOND.getPrefix() + outAlgnFile,
                 ParamPrefixes.INPUT_THIRD.getPrefix() + outNewickTree + ".nwk",
                 ParamPrefixes.INPUT_FOURTH.getPrefix() + proteinFeaturesOutFile,
@@ -153,21 +163,34 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
                 ParamPrefixes.OUTPUT_THIRD.getPrefix() + outNewickFile
         ));
 
-        String[] arrayOfInterpreters = {super.getPython(), super.getPython(), super.getPython(), super.getPython()};
-
-        String[] arrayOfPrograms = {
-                super.getProperties().getPrepareNames(),
+        listOfPrograms.addAll(Arrays.asList(
                 super.getProperties().getCalculateProteinFeatures(),
                 super.getProperties().getAlignAndBuildTree(),
                 super.getProgram(protoTreeInternal.getCommandToBeProcessedBy())
-        };
+        ));
 
-        List<List<String>> listOfArgumentLists = new LinkedList<>(Arrays.asList(
-                argsForPrepareNames, argsForProteinFeatures, argsForAlignmentAndTree, argsForTreeWithDomains));
+        String[] arrayOfInterpreters = prepareInterpreters(listOfPrograms.size());
+        String[] arrayOfPrograms = listOfPrograms.toArray(new String[listOfPrograms.size()]);
+
+        listOfArgumentLists.addAll(Arrays.asList(
+                argsForProteinFeatures,
+                argsForAlignmentAndTree,
+                argsForTreeWithDomains
+        ));
+
         prepareCommandArgumentsCommonP(protoTreeInternal, arrayOfInterpreters, arrayOfPrograms, listOfArgumentLists);
 
         return protoTreeInternal;
     }
+
+    private String[] prepareInterpreters(Integer intepreterNum) {
+        String[] arrayOfInterpreters = new String[intepreterNum];
+        for (int i=0; i < intepreterNum; i++) {
+            arrayOfInterpreters[i] = super.getPython();
+        }
+	    return arrayOfInterpreters;
+    }
+
 
     public void prepareCommandArgumentsCommonP(ProtoTreeInternal protoTreeInternal, String[] arrayOfInterpreters,
                                               String[] arrayOfPrograms, List<List<String>> listOfArgumentLists) {

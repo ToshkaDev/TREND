@@ -29,8 +29,8 @@
         <div class="form-group">
             <div th:fragment="addContent(fragmentsMain, searchArea, filter, result)">
                 <div class="col-md-12 query-area">
-                    <div th:replace="${searchArea} ? ~{${fragmentsMain} :: ${searchArea}} : ~{}"></div>
                     <div th:replace="${filter} ? ~{${fragmentsMain} :: ${filter}} : ~{}"></div>
+                    <div th:replace="${searchArea} ? ~{${fragmentsMain} :: ${searchArea}} : ~{}"></div>
                 </div>
                 <div class="col-md-12 result-area">
                     <div th:replace="${result} ? ~{${fragmentsMain} :: ${result}} : ~{}"></div>

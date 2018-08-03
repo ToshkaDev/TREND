@@ -6,9 +6,9 @@ function getOptions() {
     if (typeof $('#third-file')[0] != 'undefined') {
         var thirdFile = $('#third-file')[0].files[0];
     }
-	var firstFileArea = $('#first-file-area').val();
-	var secondFileArea = $('#second-file-area').val();
-	var thirdFileArea = $('#third-file-area').val();
+	var firstFileArea = $('#first-file-area').val() ? $('#first-file-area').val().trim() : '';
+	var secondFileArea = $('#second-file-area').val() ? $('#second-file-area').val().trim() : '';
+	var thirdFileArea = $('#third-file-area').val() ? $('#third-file-area').val().trim() : '';
     var alignmentAlg = $('#alignment-alg').val();
     var treeBuildMethod = $('#tree-method').val();
 
@@ -47,9 +47,9 @@ function getOptions() {
     var options = new FormData();
 
     for (var optionName in optionToOptionNameMain) {
-        console.log("optionName " + optionName)
-        console.log("optionToOptionNameMain[optionName] " + optionToOptionNameMain[optionName])
         if (optionIsDefined(optionToOptionNameMain[optionName])) {
+            console.log("optionName " + optionName)
+            console.log("optionToOptionNameMain[optionName] " + optionToOptionNameMain[optionName])
             options.append(optionName, optionToOptionNameMain[optionName]);
             if (optionName === "domainPredictionProgram") {
                 setDomainPredictionDb(options, optionToOptionNameMain[optionName]);
@@ -57,6 +57,8 @@ function getOptions() {
         }
 
     }
+
+    options.forEach(item => console.log("item " + item))
 	return options;
 }
 
