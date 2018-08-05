@@ -20,6 +20,8 @@ public class ProtoTreeRequest {
     private String alignmentAlg;
     private String domainPredictionProgram;
     private String domainPredictionDb;
+    private String eValue;
+    private String probability;
 
     private String commandToBeProcessedBy;
 
@@ -163,6 +165,21 @@ public class ProtoTreeRequest {
         this.commandToBeProcessedBy = commandToBeProcessedBy;
     }
 
+    public String geteValue() {
+        return eValue;
+    }
+
+    public void seteValue(String eValue) {
+        this.eValue = eValue;
+    }
+
+    public String getProbability() {
+        return probability;
+    }
+
+    public void setProbability(String probability) {
+        this.probability = probability;
+    }
 }
 
 

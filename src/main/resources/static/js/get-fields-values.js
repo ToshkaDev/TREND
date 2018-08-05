@@ -9,22 +9,22 @@ function getOptions() {
 	var firstFileArea = $('#first-file-area').val() ? $('#first-file-area').val().trim() : '';
 	var secondFileArea = $('#second-file-area').val() ? $('#second-file-area').val().trim() : '';
 	var thirdFileArea = $('#third-file-area').val() ? $('#third-file-area').val().trim() : '';
+
     var alignmentAlg = $('#alignment-alg').val();
     var treeBuildMethod = $('#tree-method').val();
-
     var aaSubstRate = $('#subst-rate').val();
     var initialTreeForMl = $('#initial-tree-ml').val();
     var gapsAndMissingData = $('#gaps-missing').val();
     var siteCovCutOff = $('#site-cov-cutoff').val();
     var numberOrReplicates = $('#number-of-replicates').val();
-    var domainPredictionProgram = $('input[name="dom-prediction-program"]:checked').val();
-
     var phylogenyTest = getOption("phylo-test");
     var aaSubstModel = getOption("subst-model");
 
+    var domainPredictionProgram = $('input[name="dom-prediction-program"]:checked').val();
+
     Cookies.set('HEYE', 'This');
     console.log("cookie.get('HEYE') " + Cookies.get('HEYE'))
-    var optionToOptionNameMain = {
+    var optionToOptionName = {
         "firstFile": firstFile,
         "secondFile": secondFile,
         "thirdFile": thirdFile,
@@ -43,22 +43,8 @@ function getOptions() {
         "domainPredictionProgram": domainPredictionProgram,
         "commandToBeProcessedBy": $('#subnavigation-tab').text()
     }
-
     var options = new FormData();
-
-    for (var optionName in optionToOptionNameMain) {
-        if (optionIsDefined(optionToOptionNameMain[optionName])) {
-            console.log("optionName " + optionName)
-            console.log("optionToOptionNameMain[optionName] " + optionToOptionNameMain[optionName])
-            options.append(optionName, optionToOptionNameMain[optionName]);
-            if (optionName === "domainPredictionProgram") {
-                setDomainPredictionDb(options, optionToOptionNameMain[optionName]);
-            }
-        }
-
-    }
-
-    options.forEach(item => console.log("item " + item))
+    setOptions(options, optionToOptionName);
 	return options;
 }
 
@@ -78,18 +64,30 @@ function getOption(option) {
     return optionValue;
 }
 
-function setDomainPredictionDb(options, domainPredictionProgram) {
-    console.log('domainPredictionProgram ' + domainPredictionProgram);
-    console.log("$('.hmmer-db').val() " + $('.hmmer-db').val())
-    var domainPredictionDb;
-    var dbNameFieldValue;
-    if (domainPredictionProgram == "hmmscan") {
-        dbNameFieldValue = $('.hmmer-db').val();
-        optionIsDefined(dbNameFieldValue) ?  options.append("domainPredictionDb", dbNameFieldValue) : null;
-    } else if (domainPredictionProgram == "rpsblast") {
-        dbNameFieldValue = $('.rpsblast-db').val();
-        optionIsDefined(dbNameFieldValue) ? options.append("domainPredictionDb", dbNameFieldValue) : null;
+function setOptions(options, optionToOptionName) {
+    for (var optionName in optionToOptionName) {
+        if (optionIsDefined(optionToOptionName[optionName])) {
+            options.append(optionName, optionToOptionName[optionName]);
+            if (optionName === "domainPredictionProgram") {
+                setDomainPredictionOptions(options, optionToOptionName[optionName]);
+            }
+        }
     }
+}
+
+function setDomainPredictionOptions(options, domainPredictionProgram) {
+    var optionToOptionName = {};
+    if (domainPredictionProgram == "hmmscan") {
+        optionToOptionName["domainPredictionDb"] = $('.hmmer-db').val();
+        optionToOptionName["eValue"] = $('#evalue-threshold-hmmer').val();
+        optionToOptionName["probability"] = $('#probability').val();
+    } else if (domainPredictionProgram == "rpsblast") {
+        optionToOptionName["domainPredictionDb"] = $('.rpsblast-db').val();
+        optionToOptionName["eValue"] = $('#evalue-threshold-rpsblast').val();
+        // will not be used
+        optionToOptionName["probability"] = '50';
+    }
+    setOptions(options, optionToOptionName);
 }
 
 function optionIsDefined(option) {

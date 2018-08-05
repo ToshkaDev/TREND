@@ -28,13 +28,14 @@ public class ProtoTreeInternal {
     private String domainPredictionDb;
 	//e-value for Hmmscan and RpsBlast
 	private String eValue;
+    private String probability;
 
     private String  commandToBeProcessedBy;
     private List<List<String>> commandsAndArguments;
     private List<String> outputFilesNames = new LinkedList<>();
 
     private List<String> fieldsForAlignmentAndTreeBuild = new LinkedList<>();
-    private List<String> allFields = new LinkedList<>();
+    private List<String> fieldsForFeaturesPrediction = new LinkedList<>();
 
     public int getJobId() {
         return jobId;
@@ -197,15 +198,21 @@ public class ProtoTreeInternal {
         this.eValue = eValue;
     }
 
+    public String getProbability() {
+        return probability;
+    }
+
+    public void setProbability(String probability) {
+        this.probability = probability;
+    }
 
     public void setFields() {
-        fieldsForAlignmentAndTreeBuild.add(getFirstFileName());
-        fieldsForAlignmentAndTreeBuild.add(getAlignmentAlg());
-
         String reorderOrNot = getReorderOrNot();
         if (reorderOrNot != null) {
             fieldsForAlignmentAndTreeBuild.add(reorderOrNot);
         }
+        fieldsForAlignmentAndTreeBuild.add(getFirstFileName());
+        fieldsForAlignmentAndTreeBuild.add(getAlignmentAlg());
         fieldsForAlignmentAndTreeBuild.add(getTreeBuildMethod());
         fieldsForAlignmentAndTreeBuild.add(getAaSubstModel());
         fieldsForAlignmentAndTreeBuild.add(getAaSubstRate());
@@ -215,23 +222,17 @@ public class ProtoTreeInternal {
         fieldsForAlignmentAndTreeBuild.add(getPhylogenyTest());
         fieldsForAlignmentAndTreeBuild.add(getNumberOrReplicates());
 
-        allFields.addAll(fieldsForAlignmentAndTreeBuild);
-
-        allFields.add(getFirstFileName());
-        if (getSecondFileName() != null) {
-            allFields.add(getSecondFileName());
-        }
-        if (getThirdFileName() != null) {
-            allFields.add(getThirdFileName());
-        }
-    }
-
-    public List<String> getAllFields() {
-        return allFields;
+        fieldsForFeaturesPrediction.add(geteValue());
+        fieldsForFeaturesPrediction.add(getProbability());
+        fieldsForFeaturesPrediction.add(getDomainPredictionProgram());
     }
 
     public List<String> getFieldsForAlignmentAndTreeBuild() {
         return fieldsForAlignmentAndTreeBuild;
+    }
+
+    public List<String> getFieldsForFeaturesPrediction() {
+        return fieldsForFeaturesPrediction;
     }
 
 }

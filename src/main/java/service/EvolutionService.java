@@ -7,8 +7,8 @@ import model.request.ProtoTreeRequest;
 
 
 public interface EvolutionService {
-	void runMainProgramP(ProtoTreeInternal protoTreeInternal) throws IncorrectRequestException;
-	ProtoTreeInternal storeFilesAndPrepareCommandArgumentsP(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException;
+	void runMainProgram(ProtoTreeInternal protoTreeInternal) throws IncorrectRequestException;
+	ProtoTreeInternal storeFilesAndPrepareCommandArguments(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException;
 	BioJob getBioJobIfFinished(int jobId);
 
 }

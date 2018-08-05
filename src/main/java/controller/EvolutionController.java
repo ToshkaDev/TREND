@@ -80,11 +80,11 @@ public class EvolutionController extends BioUniverseController {
         //Split it to several functions because 'PROTO_TREE' method is asynchronous
         //and files in 'listOfFiles' field of evolutionRequest are got cleared at the end of request processing.
         if (protoTreeRequest.getCommandToBeProcessedBy().equals(BioPrograms.PROTO_TREE.getProgramName())) {
-            protoTreeInternal = evolutionService.storeFilesAndPrepareCommandArgumentsP(protoTreeRequest);
+            protoTreeInternal = evolutionService.storeFilesAndPrepareCommandArguments(protoTreeRequest);
         }
 
         Integer jobId = protoTreeInternal.getJobId();
-        evolutionService.runMainProgramP(protoTreeInternal);
+        evolutionService.runMainProgram(protoTreeInternal);
 
         return String.valueOf(jobId);
     }

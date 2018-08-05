@@ -23,6 +23,7 @@ USAGE = "\n\nThe script extracts domain information from the results of hmmscan 
 	[-P || --rpsbprocPath] - rpsbproc program full path
 	[-T || --tmhmm2Path]   - tmhmm2 program full path
  	[-e || --evalue]       - e-value threshold of a recognized domain
+ 	[-y || --probability]  - probability for hmmscan
 	[-t || --tabformat]    - output file format as tab delimited file (yes||y or no||n, default no)
 	[-j || --jsonformat]   - output file format as json (yes||y or no||n, default yes)
 	[-u || --cpu]          - number of threads for hmmscan or rpsblast; default=4
@@ -64,6 +65,7 @@ CPU = 4
 
 PROTEIN_SITES_INCLUDE = False
 EVAL_THRESHOLD = 0.01
+HMMSCAN_PROBABILITY = 50
 
 # Global parameters
 BORDER_STYLES = ["jagged", "curved"]
@@ -82,10 +84,10 @@ PROTEIN_TO_SITES = collections.defaultdict(list)
     
 def initialyze(argv):
 	global HMMSCAN_PROGRAM, RPSBLAST_PROGRAM, RPSBPROC_PROGRAM, TMHMMSCAN_PROGRAM, INPUT_FILE_FASTA, PROCESS_TYPE, OUTPUT_RPSBLAST_OR_HMMSCAN, \
-	OUTPUT_RPSBPROC, OUTPUT_TMHMMSCAN, HMMSCAN_DB_PATH, RPSBLAST_DB_PATH, RPSBPROC_DB_PATH, DB_NAME, CPU, EVAL_THRESHOLD, GET_TAB, GET_JSON, \
-	PROTEIN_TO_DOMAININFO_FILE, DOMAIN_ARCHITECT_TO_COUNT_FILE, PROTEIN_TO_DOMAININFO_JSONFILE, PROTEIN_SITES_INCLUDE
+	OUTPUT_RPSBPROC, OUTPUT_TMHMMSCAN, HMMSCAN_DB_PATH, RPSBLAST_DB_PATH, RPSBPROC_DB_PATH, DB_NAME, CPU, EVAL_THRESHOLD, HMMSCAN_PROBABILITY, \
+	GET_TAB, GET_JSON, PROTEIN_TO_DOMAININFO_FILE, DOMAIN_ARCHITECT_TO_COUNT_FILE, PROTEIN_TO_DOMAININFO_JSONFILE, PROTEIN_SITES_INCLUDE
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:p:r:f:x:A:B:C:D:H:R:P:T:e:t:j:u:m:o:n:b:",["ifile=", "iprocess=", "ofourth=", "ofifth=", "osixth=", "hmmscanDbPath=", \
+		opts, args = getopt.getopt(argv[1:],"hi:p:r:f:x:A:B:C:D:H:R:P:T:e:y:t:j:u:m:o:n:b:",["ifile=", "iprocess=", "ofourth=", "ofifth=", "osixth=", "hmmscanDbPath=", \
 		"rpsblastDbPath=", "rpsprocDbPath=", "dbname=", "hmmscanPath=", "rpsblastPath", "rpsbprocPath", "tmhmm2Path", "evalue=", "tabformat=", "jsonformat=", "cpu=", "sites=", "ofile=", "osecond=", "othird="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
@@ -131,6 +133,8 @@ def initialyze(argv):
 				TMHMMSCAN_PROGRAM = str(arg).strip()	
 			elif opt in ("-e", "--evalue"):
 				EVAL_THRESHOLD = float(arg)
+			elif opt in ("-y", "--probability"):
+				HMMSCAN_PROBABILITY = float(arg)
 			elif opt in ("-t", "--tabformat"):
 				if str(arg) in ["no", "n"]:
 					GET_TAB = False
@@ -331,7 +335,7 @@ def processHmmscan():
 				elif len(record) > 0 and "#" not in record:
 					if hitFound and domainListBegan and record != 'Alignments for each domain:' and record != "Internal pipeline statistics summary:":
 						recordListWithoutSpaces = [elem for elem in record.split(" ") if len(elem) > 0]
-						if float(recordListWithoutSpaces[4]) < EVAL_THRESHOLD:
+						if float(recordListWithoutSpaces[5]) < EVAL_THRESHOLD and float(recordListWithoutSpaces[2]) >= HMMSCAN_PROBABILITY:
 							envStart = int(recordListWithoutSpaces[12])
 							envEnd = int(recordListWithoutSpaces[13])
 							if GET_JSON:

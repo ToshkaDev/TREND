@@ -29,7 +29,8 @@ public class ConverterMain {
 
 		protoTreeInternal.setDomainPredictionProgram(checkForNullAndGet(ParamPrefixes.DOMAINS_PREDICTION_PROGRAM.getPrefix(), protoTreeRequest.getDomainPredictionProgram()));
 		protoTreeInternal.setDomainPredictionDb(checkForNullAndGet(ParamPrefixes.DOMAINS_PREDICTION_DB.getPrefix(), protoTreeRequest.getDomainPredictionDb()));
-
+		protoTreeInternal.seteValue(checkEvalueAndGet(ParamPrefixes.EVAL_THRESH.getPrefix(), protoTreeRequest.geteValue()));
+		protoTreeInternal.setProbability(checkProbabilityAndGet(ParamPrefixes.PROBABILITY.getPrefix(), protoTreeRequest.getProbability()));
 
         return protoTreeInternal;
 	}
@@ -41,4 +42,25 @@ public class ConverterMain {
 		return null;
 	}
 
+	// Should be less or equal to 1 and bigger or equal to 0
+	private static String checkEvalueAndGet(String paramPrefix, String evalue) {
+		if (evalue != null) {
+			Double doubleEvalue = Double.valueOf(evalue);
+			if (doubleEvalue <= 1 && doubleEvalue >= 0) {
+				return paramPrefix + evalue;
+			}
+		}
+		return null;
+	}
+
+	// Should be bigger or equal to 0
+	private static String checkProbabilityAndGet(String paramPrefix, String probability) {
+		if (probability != null) {
+			Double doubleProbability = Double.valueOf(probability);
+			if (doubleProbability >= 0) {
+				return paramPrefix + probability;
+			}
+		}
+		return null;
+	}
 }

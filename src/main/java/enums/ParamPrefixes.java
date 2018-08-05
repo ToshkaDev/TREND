@@ -39,6 +39,7 @@ public enum  ParamPrefixes {
     RPSBPROC_DB_PATH("-C "),
 
     HMMSCAN_PATH("-H "),
+    PROBABILITY("-y "),
     RPSBLAST_PATH("-R "),
     RPSBPROC_PATH("-P "),
     TMHMM_PATH("-T ");
