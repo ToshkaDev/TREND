@@ -14,14 +14,16 @@ USAGE = "\n\nThe script extracts domain information from the results of hmmscan 
 	-r || --ofourth        - output file for hmmscan or rpsblast (and input for rpcbproc)
 	-f || --ofifth         - output file for rpcbproc
 	-x || --osixth         - output file for tmhmmscan
-	-A || --hmmscanDbPath  - path to hmmscan database
-	-B || --rpsblastDbPath - path to rpsblast database
-	-C || --rpsprocDbPath  - path to database for rpcbproc
-	-D || --dbname         - domain prediction database name
+	-a || --oseventh       - output file for segmasker
+	[-A || --hmmscanDbPath]  - path to hmmscan database
+	[-B || --rpsblastDbPath] - path to rpsblast database
+	[-C || --rpsprocDbPath]  - path to database for rpcbproc
+	[-D || --dbname]         - domain prediction database name
 	[-H || --hmmscanPath]  - hmmscan program full path
 	[-R || --rpsblastPath] - rpsblast program full path
 	[-P || --rpsbprocPath] - rpsbproc program full path
 	[-T || --tmhmm2Path]   - tmhmm2 program full path
+	[-S || --segmaskerPath]- segmasker program full path
  	[-e || --evalue]       - e-value threshold of a recognized domain
  	[-y || --probability]  - probability for hmmscan
 	[-t || --tabformat]    - output file format as tab delimited file (yes||y or no||n, default no)
@@ -39,6 +41,7 @@ HMMSCAN_PROGRAM = None
 RPSBLAST_PROGRAM = None
 RPSBPROC_PROGRAM = None
 TMHMMSCAN_PROGRAM = None
+SEGMASKER_PROGRAM = None
 
 
 # Global parameters specified via program arguments
@@ -84,11 +87,11 @@ PROTEIN_TO_SITES = collections.defaultdict(list)
     
 def initialyze(argv):
 	global HMMSCAN_PROGRAM, RPSBLAST_PROGRAM, RPSBPROC_PROGRAM, TMHMMSCAN_PROGRAM, INPUT_FILE_FASTA, PROCESS_TYPE, OUTPUT_RPSBLAST_OR_HMMSCAN, \
-	OUTPUT_RPSBPROC, OUTPUT_TMHMMSCAN, HMMSCAN_DB_PATH, RPSBLAST_DB_PATH, RPSBPROC_DB_PATH, DB_NAME, CPU, EVAL_THRESHOLD, HMMSCAN_PROBABILITY, \
+	OUTPUT_RPSBPROC, OUTPUT_TMHMMSCAN, OUTPUT_SEGMASKER, HMMSCAN_DB_PATH, RPSBLAST_DB_PATH, RPSBPROC_DB_PATH, DB_NAME, CPU, EVAL_THRESHOLD, HMMSCAN_PROBABILITY, \
 	GET_TAB, GET_JSON, PROTEIN_TO_DOMAININFO_FILE, DOMAIN_ARCHITECT_TO_COUNT_FILE, PROTEIN_TO_DOMAININFO_JSONFILE, PROTEIN_SITES_INCLUDE
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:p:r:f:x:A:B:C:D:H:R:P:T:e:y:t:j:u:m:o:n:b:",["ifile=", "iprocess=", "ofourth=", "ofifth=", "osixth=", "hmmscanDbPath=", \
-		"rpsblastDbPath=", "rpsprocDbPath=", "dbname=", "hmmscanPath=", "rpsblastPath", "rpsbprocPath", "tmhmm2Path", "evalue=", "tabformat=", "jsonformat=", "cpu=", "sites=", "ofile=", "osecond=", "othird="])
+		opts, args = getopt.getopt(argv[1:],"hi:p:r:f:x:a:A:B:C:D:H:R:P:T:S:e:y:t:j:u:m:o:n:b:",["ifile=", "iprocess=", "ofourth=", "ofifth=", "osixth=", "oseventh", "hmmscanDbPath=", \
+		"rpsblastDbPath=", "rpsprocDbPath=", "dbname=", "hmmscanPath=", "rpsblastPath", "rpsbprocPath", "tmhmm2Path", "segmaskerPath", "evalue=", "tabformat=", "jsonformat=", "cpu=", "sites=", "ofile=", "osecond=", "othird="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
@@ -115,6 +118,8 @@ def initialyze(argv):
 				OUTPUT_RPSBPROC = str(arg).strip()
 			elif opt in ("-x", "--osixth"):
 				OUTPUT_TMHMMSCAN = str(arg).strip()
+			elif opt in ("-a", "--oseventh"):
+				OUTPUT_SEGMASKER = str(arg).strip()
 			elif opt in ("-A", "--hmmscanDbPath"):
 				HMMSCAN_DB_PATH = str(arg).strip()
 			elif opt in ("-B", "--rpsblastDbPath"):
@@ -130,7 +135,9 @@ def initialyze(argv):
 			elif opt in ("-P", "--rpsbprocPath"):
 				RPSBPROC_PROGRAM = str(arg).strip()
 			elif opt in ("-T", "--tmhmm2Path"):
-				TMHMMSCAN_PROGRAM = str(arg).strip()	
+				TMHMMSCAN_PROGRAM = str(arg).strip()
+			elif opt in ("-S", "--segmaskerPath"):
+				SEGMASKER_PROGRAM = str(arg).strip()	
 			elif opt in ("-e", "--evalue"):
 				EVAL_THRESHOLD = float(arg)
 			elif opt in ("-y", "--probability"):
@@ -170,6 +177,7 @@ class Protein(object):
 	def __init__(self, length = None):
 		self.domains = []
 		self.tmInfo = dict()
+		self.lowComplexity = []
 		self.sites = []
 		self.length = length
 	def setRpsRegion(self, regionData, regionType):
@@ -234,6 +242,8 @@ class Protein(object):
 		self.tmInfo["tmRegions"] = []
 	def setTmRegions(self, tmSart, tmEnd):
 		self.tmInfo["tmRegions"].append(TmRegion(tmSart, tmEnd))
+	def setLowComplexityRegions(self, lowCompStart, lowCompEnd):
+		self.lowComplexity.append(LowComplexityRegion(lowCompStart, lowCompEnd))
 		
 class HmmscanDomainRegion(object):
 	def __init__(self):
@@ -283,7 +293,12 @@ class TmRegion(object):
 	def __init__(self, tmSart, tmEnd):
 		self.tmSart = tmSart
 		self.tmEnd = tmEnd
-				
+		
+class LowComplexityRegion(object):
+	def __init__(self, lowCompSart, lowCompEnd):
+		self.start = lowCompSart
+		self.end = lowCompEnd	
+		
 def processHmmscan():
 	domainListBegan = False
 	hitFound = False
@@ -293,7 +308,6 @@ def processHmmscan():
 	regex = re.compile(r"\s")
 	try:	
 		with open(OUTPUT_RPSBLAST_OR_HMMSCAN, "r") as hmmscanFile:
-			print "OUTPUT_RPSBLAST_OR_HMMSCAN " + OUTPUT_RPSBLAST_OR_HMMSCAN
 			for record in hmmscanFile:
 				record = record.strip()
 				recSplitted = record.split(":")
@@ -418,7 +432,17 @@ def processTmscan():
 				PROTREF_TO_DOMAINS[query].setTmInfo(first60, possibSigPep, tm, tmTopology)
 				for coordPair in topologyCoords:
 					PROTREF_TO_DOMAINS[query].setTmRegions(coordPair.split("-")[0], coordPair.split("-")[1])
-
+def processSegmasker():
+	with open(OUTPUT_SEGMASKER, "r") as segmaskerFile:
+		currentProtein = None
+		for record in segmaskerFile:
+			recordSplitted = record.strip().split(">")
+			if len(recordSplitted) > 1:
+				currentProtein = recordSplitted[1]
+			elif len(recordSplitted) == 1:
+				coords = record.strip().split(" - ")
+				PROTREF_TO_DOMAINS[currentProtein].setLowComplexityRegions(int(coords[0]) + 1, int(coords[1]) + 1)
+		
 def main(argv):
 	initialyze(argv)
 	if PROCESS_TYPE == HMMSCAN:
@@ -429,6 +453,8 @@ def main(argv):
 		processRpsbproc()
 	tmhmm2scan()
 	processTmscan()
+	segMasker()
+	processSegmasker()
 	if GET_TAB:
 		with open(PROTEIN_TO_DOMAININFO_FILE, "w") as proteinToDomainFile:
 			for proteint in PROT_NAME_TO_LENGTH:
@@ -467,8 +493,6 @@ def getDomainArchitecture(proteint, protRefToDomainInfo):
 	return domainArchitecture
 
 def hmmscan():
-	print "DB_NAME " + DB_NAME
-	print "HMMSCAN_DB_PATH+DB_NAME " + HMMSCAN_DB_PATH+DB_NAME
 	#if hmmscan is in the linux path, this will be resloved
 	hmmscan = "hmmscan"
 	#If hmmscan is not in the linux path then give it the program full path as a parameter. The same for 'rpsblast', 'rpsbproc' and 'tmhmm' programs
@@ -492,6 +516,12 @@ def tmhmm2scan():
 	if TMHMMSCAN_PROGRAM != None:
 		tmhmm = TMHMMSCAN_PROGRAM
 	runSubProcess(" ".join([tmhmm, "--short", INPUT_FILE_FASTA, ">", OUTPUT_TMHMMSCAN]))
+	
+def segMasker():
+	segmasker = "segmasker"
+	if SEGMASKER_PROGRAM != None:
+		segmasker = SEGMASKER_PROGRAM
+	runSubProcess(" ".join([segmasker, "-infmt", "fasta", "-outfmt", "interval", "-in", INPUT_FILE_FASTA, "-out", OUTPUT_SEGMASKER]))
 
 def runSubProcess(command):
 	try:

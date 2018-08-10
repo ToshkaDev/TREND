@@ -8,7 +8,6 @@ public enum  ParamPrefixes {
     OUTPUT("-o "),
     EVAL_THRESH("-e "),
 
-    REORDER("-r "),
     ALGORITHM("-a "),
     THREAD_ALGN("-t "),
 
@@ -34,6 +33,7 @@ public enum  ParamPrefixes {
     OUTPUT_FOURTH("-r "),
     OUTPUT_FIFTH("-f "),
     OUTPUT_SIXTH("-x "),
+    OUTPUT_SEVENTH("-a "),
     HMMSCAN_DB_PATH("-A "),
     RPSBLAST_DB_PATH("-B "),
     RPSBPROC_DB_PATH("-C "),
@@ -42,7 +42,8 @@ public enum  ParamPrefixes {
     PROBABILITY("-y "),
     RPSBLAST_PATH("-R "),
     RPSBPROC_PATH("-P "),
-    TMHMM_PATH("-T ");
+    TMHMM_PATH("-T "),
+    SEGMASKER_PATH("-S ");
 
     private String paramPrefix;
 

@@ -108,6 +108,7 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
 
         String tmhmmscanOutFile = getRandomFileName();
         String proteinFeaturesOutFile = getRandomFileName();
+        String segmakserOutFile = getRandomFileName();
 
         String numberOfThreadsForProtFeatures = "4";
         String numberOfThreadsForTree = "4";
@@ -119,6 +120,7 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
                 ParamPrefixes.OUTPUT_FOURTH.getPrefix() + hmmscanOrRpsbOutFile,
                 ParamPrefixes.OUTPUT_FIFTH.getPrefix() + rpsbProcOutFile,
                 ParamPrefixes.OUTPUT_SIXTH.getPrefix() + tmhmmscanOutFile,
+                ParamPrefixes.OUTPUT_SEVENTH.getPrefix() + segmakserOutFile,
                 ParamPrefixes.HMMSCAN_DB_PATH.getPrefix() + super.getProperties().getHmmscanDbPath(),
                 ParamPrefixes.RPSBLAST_DB_PATH.getPrefix() + super.getProperties().getRpsblastDbPath(),
                 ParamPrefixes.RPSBPROC_DB_PATH.getPrefix() + super.getProperties().getRpsprocDbPath(),
@@ -126,6 +128,7 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
                 ParamPrefixes.RPSBLAST_PATH.getPrefix() + super.getProperties().getRpsblastPath(),
                 ParamPrefixes.RPSBPROC_PATH.getPrefix() + super.getProperties().getRpsbprocPath(),
                 ParamPrefixes.TMHMM_PATH.getPrefix() + super.getProperties().getTmhmm2Path(),
+                ParamPrefixes.SEGMASKER_PATH.getPrefix() + super.getProperties().getSegmaskerPath(),
                 ParamPrefixes.THREAD.getPrefix() + numberOfThreadsForProtFeatures,
                 ParamPrefixes.OUTPUT_THIRD.getPrefix() + proteinFeaturesOutFile
         ));

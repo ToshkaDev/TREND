@@ -44,6 +44,7 @@ public class AppProperties {
     private String rpsblastPath = "/home/vadim/Softs/ncbi-blast-2.6.0+/bin/rpsblast";
     private String rpsbprocPath = "/home/vadim/bin/rpsbproc";
     private String tmhmm2Path = "/home/vadim/Softs/tmhmm-2.0c/bin/tmhmm";
+    private String segmaskerPath = "/home/vadim/Softs/ncbi-blast-2.6.0+/bin/segmasker";
     private String mafft = "/usr/bin/mafft";
     private String megacc = "/usr/bin/megacc";
 
@@ -266,6 +267,14 @@ public class AppProperties {
 
     public void setTmhmm2Path(String tmhmm2Path) {
         this.tmhmm2Path = tmhmm2Path;
+    }
+
+    public String getSegmaskerPath() {
+        return segmaskerPath;
+    }
+
+    public void setSegmaskerPath(String segmaskerPath) {
+        this.segmaskerPath = segmaskerPath;
     }
 
     public String getMafft() {
