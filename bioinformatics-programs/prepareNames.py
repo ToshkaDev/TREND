@@ -38,7 +38,7 @@ def prepareNames():
 	with open(OUTPUT_FILE, "w") as outputFile:
 		with open(INPUT_FILE, "r") as inputFile:
 			for line in inputFile:
-				line = line.replace('(','').replace(')','').replace(':','').replace(',','').replace("'", "").replace("/","").replace(" ","_").replace("]","").replace("[","")
+				line = line.replace('(','').replace(')','').replace(':','').replace(',','').replace("'", "").replace("/","").replace(" ","_").replace("]","").replace("[","").replace("|","_")
 				outputFile.write(line)
 
 

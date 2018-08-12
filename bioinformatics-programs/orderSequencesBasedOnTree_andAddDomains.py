@@ -32,9 +32,9 @@ PROTEIN_DOMAINS = dict()
 PROTEIN_TO_DOMAINS = collections.defaultdict(list) #{protName1: [[], [], ...], protName2: [[], [], ...]}
 
 
-#Maximum number of domains in then merged domain syt to be displayed
+# Maximum number of domains in then merged domain syt to be displayed
 MAX_DOMAIN_COUNT = 6
-#Allowed overlap between adjacent domains. If the overlap precentage is bigger than this value the domains will be merged together 
+# Allowed overlap between adjacent domains. If the overlap precentage is bigger than this value the domains will be merged together 
 ALLOWED_OVERLAP = 0.2
 # seq.start, seq.end, shape, width, height, fgcolor, bgcolor
 THIN_LINE = [0, 9, "[]", 0.2, 0.7, "black", "gray", ""]
@@ -94,41 +94,38 @@ def prepareProteinToDomainsDict():
 			
 			if "tmRegions" in proteinData["tmInfo"]:
 				for region in proteinData["tmInfo"]["tmRegions"]:
-					tms.append([int(region["tmSart"])-1, int(region["tmEnd"])-1, "[]", None, 35, TM_COLOR, TM_COLOR, ""])
-					aliStarts.add(int(region["tmSart"])-1)
-					aliEnds.add(int(region["tmEnd"])-1)
-					startsToDomainList[int(region["tmSart"])-1].append(int(region["tmEnd"])-1)
+					correctedCoords = addToCoordinateLists(aliStarts, aliEnds, int(region["tmSart"])-1, int(region["tmEnd"])-1)
+					tms.append([correctedCoords[0], correctedCoords[1], "[]", None, 35, TM_COLOR, TM_COLOR, ""])
+					startsToDomainList[correctedCoords[0]].append(correctedCoords[1])
 				domains.extend(tms)
 				
 			for region in proteinData["lowComplexity"]:
-				lowComplexityRegions.append([int(region["start"])-1, int(region["end"])-1, "[]", None, 35, LCR_COLOR, LCR_COLOR, ""])
-				aliStarts.add(int(region["start"])-1)
-				aliEnds.add(int(region["end"])-1)
-				startsToDomainList[int(region["start"])-1].append(int(region["end"])-1)
+				correctedCoords = addToCoordinateLists(aliStarts, aliEnds, int(region["start"])-1, int(region["end"])-1)
+				lowComplexityRegions.append([correctedCoords[0], correctedCoords[1], "[]", None, 35, LCR_COLOR, LCR_COLOR, ""])
+				startsToDomainList[correctedCoords[0]].append(correctedCoords[1])
 			domains.extend(lowComplexityRegions)
 				
-			#Doing the following inorder to process domains in asscending order of their starts 	
+			# Doing the following inorder to process domains in asscending order of their starts 	
 			dmainStartsProcessed = []
 			dmainStartToDomainInfo = {}
 			for region in proteinData["domains"]:
 				if region["aliStart"]-1 not in dmainStartsProcessed:
 					dmainStartToDomainInfo[region["aliStart"]-1] = region
-				#taking care of possible domains with the same start but different names
+				# taking care of possible domains with the same start but different names
 				else:
 					region["aliStart"] = region["aliStart"]+1 
 					dmainStartToDomainInfo[region["aliStart"]-1] = region					
 				dmainStartsProcessed.append(region["aliStart"]-1)	
 
-			#Here I'm sorting the starts in processinf them in the sorted order
+			# Here I'm sorting the starts in processinf them in the sorted order
 			for key in sorted(dmainStartToDomainInfo):
 				region = dmainStartToDomainInfo[key]
-				aliStart = region["aliStart"]-1
-				aliEnd = region["aliEnd"]-1
-				#taking care of domains with the same names but different coordinates
+				correctedCoords = addToCoordinateLists(aliStarts, aliEnds, region["aliStart"]-1, region["aliEnd"]-1)
+				aliStart = correctedCoords[0]
+				aliEnd = correctedCoords[1]
+				# taking care of domains with the same names but different coordinates
 				domainName = str(region["domainName"])+"&"+str(aliStart)+str(aliEnd)
-				aliStarts.add(aliStart)
-				aliEnds.add(aliEnd)
-				domainSpan = aliEnd - aliStart
+				domainSpan = correctedCoords[2]
 				createMergeGrps(aliStart, aliEnd, domainName, domainSpan, domainToCoords, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domainsOK)							
 				if domainName not in domToMergeGrpNames:
 					domainsOK[domainName] = ""
@@ -139,20 +136,34 @@ def prepareProteinToDomainsDict():
 			domainsFinal.extend(domains)
 			addThinLines(proteinName, domainsFinal, startsToDomainList)
 			
-			#If len of a protein is bigger than the last coordinate do the following:
+			# If len of a protein is bigger than the last coordinate do the following:
 			endOfLastDomain = max(aliEnds)
 			startOfFirstDomain = min(aliStarts)
 			if len(PROTEIN_NAME_TO_SEQ[proteinName]) > endOfLastDomain:
 				thisThinLine = makeThinLine(endOfLastDomain+1, len(PROTEIN_NAME_TO_SEQ[proteinName])-1)
 				domainsFinal.append(thisThinLine)
-			#If start of the first domain is bigger then 0:
+			# If start of the first domain is bigger then 0:
 			if startOfFirstDomain > 0:
 				thisThinLine = makeThinLine(0, startOfFirstDomain-1)
 				domainsFinal.append(thisThinLine)
 			
 			PROTEIN_TO_DOMAINS[proteinName].extend(domainsFinal)
 
-
+def addToCoordinateLists(starts, ends, regionStart, regionEnd):
+	start = regionStart
+	end = regionEnd
+	if regionStart not in starts:
+		starts.add(start)
+	else:
+		start = regionStart + 1
+		starts.add(start)
+	if regionEnd not in ends:
+		ends.add(end)
+	else:
+		end = regionEnd + 1
+		ends.add(end)
+	return (start, end, end - start)
+	
 def createMergeGrps(aliStart, aliEnd, domainName, domainSpan, domainToCoords, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domainsOK):
 	for processedDomain, domainCoords in domainToCoords.items():
 		if aliStart < domainCoords[1]:
@@ -212,36 +223,40 @@ def processDomainsForMerge(domToMergeGrpNames, domToMergeGrpStarts, domToMergeGr
 		
 def addThinLines(proteinName, domainsFinal, startsToDomainList):
 	domsStartsSorted = sorted(startsToDomainList.keys())
-	#Used for taking care of situations when transmembrane domain is in the protein domain
+	# Used for taking care of situations when transmembrane domain is in the protein domain
 	tempDom1End = None
 	lastSmallDomainInBiggerDomain = False
 	for ind in xrange(len(domsStartsSorted)-1):
 		if len(startsToDomainList[domsStartsSorted[ind]]) == 1:
-			#If not TM domain inside the protien domain was encountered
+			# If not TM domain inside the protien domain was encountered
 			if tempDom1End == None:
 				dom1Start = domsStartsSorted[ind]
 				dom1End = startsToDomainList[dom1Start][0]
 				dom2Start = domsStartsSorted[ind+1]
 				dom2End = startsToDomainList[dom2Start][0]
-			#If previous TM domain was inside the protein domain
+			# If previous TM domain was inside the protein domain
 			else:
 				dom1Start = domsStartsSorted[ind]
 				dom1End = tempDom1End
 				dom1EndTrue = startsToDomainList[dom1Start][0]
 				dom2Start = domsStartsSorted[ind+1]
 				dom2End = startsToDomainList[dom2Start][0]
-				#Check if the second domain start is inside the big previouse domain
-				#and make invisible line
+				# Check if the second domain start is inside the big previouse domain
+				# and make invisible line between dom1 and dom2
 				if dom2Start < dom1End:
 					thisThinLine = makeThinLine(dom1EndTrue+1, dom2Start-1, False)
 					domainsFinal.append(thisThinLine)
-			#If the second domain is TM domain and it's inside the first protein domain
+			# If the second domain is TM/lowComplexity domain and it's inside the first protein domain
 			if dom2End < dom1End:
-				#this is the end of a larger domain inside which a second domain is placed
+				# this is the end of a larger domain inside which a second domain is placed
 				tempDom1End = dom1End
 				lastSmallDomainInBiggerDomain = True
+					
 			else:
 				tempDom1End = None
+				# we don't assign 'lastSmallDomainInBiggerDomain = True' because 
+				# at next satge based on the dom2 and lastSmallDomainInBiggerDomain 
+				# the thin line will be drown using the immdiate below clause
 			if dom2Start > dom1End:
 				if lastSmallDomainInBiggerDomain:
 					lastSmallDomainInBiggerDomain = False
@@ -249,11 +264,12 @@ def addThinLines(proteinName, domainsFinal, startsToDomainList):
 					domainsFinal.append(thisThinLine)
 				thisThinLine = makeThinLine(dom1End+1, dom2Start-1)
 				domainsFinal.append(thisThinLine)
+			# case: dom1 is a large domain and dom2 is domain inside dom1 and 
+			# dom2 is the last domain
 			elif tempDom1End and ind == (len(domsStartsSorted)-2):
 				thisThinLine = makeThinLine(dom2End+1, tempDom1End, False)
 				domainsFinal.append(thisThinLine)
 				
-			
 def makeThinLine(startPosition, endPosition, notInsideDomain=True):
 	if notInsideDomain:
 		thisThinLine = THIN_LINE[::]
@@ -278,7 +294,6 @@ def processFileWithSeqs():
 		for sequence in SeqIO.parse(alignedSeqs, "fasta"):
 			ALIGNED_PROTEIN_NAME_TO_SEQ[sequence.description.strip()] = str(sequence.seq)
 
-	
 def layout(node):
     if node.is_leaf():
 		if node.name in PROTEIN_TO_DOMAINS:
@@ -290,7 +305,7 @@ def layout(node):
 def writeSeqsAndTree():
 	tree = Tree(TREE_FILE)
 	terminals = tree.get_leaves()
-	# change protein names in datas sctrucuters and write protein sequences with changed names to file 
+	# Change protein names in datas sctrucuters and write protein sequences with changed names to file 
 	with open(OUTPUT_ALIGNED_FILENAME, "w") as outputFile:
 		for i in range(len(terminals)):
 			proteinName = terminals[i].name.strip("'")
@@ -314,7 +329,6 @@ def writeSeqsAndTree():
 	treeStyle.layout_fn = layout
 	tree.render(OUTPUT_TREE_SVG_FILENAME, w=2200, dpi=400, tree_style=treeStyle)
 	
-		
 def main(argv):
 	initialyze(argv)
 	processFileWithDomains()
