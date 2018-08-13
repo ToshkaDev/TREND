@@ -4,7 +4,9 @@ $(document).ready(function (){
     infoPostfix = "_table";
     xOffset = 400;
     yOffset = 200;
-    entityToButton = {"domainOrganizedData": "Domains", 'tmOrganizedData': "TMs", "additionalOrganizedData": "Additional"};
+    buttonIds = ["Domains", "TMs", "LCRs", "Additional"];
+    buttonIdToTableClass = {"Domains": "domain-table", "TMs": "tm-table", "LCRs": "lcr-table", "Additional": "additional-table"};
+    entityToButton = {"domainOrganizedData": buttonIds[0], 'tmOrganizedData': buttonIds[1], "lcrOrganized": buttonIds[2], "additionalOrganizedData": buttonIds[3]};
     getIfReady(jobId);
 
 });
@@ -120,28 +122,30 @@ function createTable(event, data, currentClassName, trueClassNameToChanged) {
     addButtons(divToAddTo, organizedData);
     makeTable(divToAddTo, organizedData.domainOrganizedData, "domain-table");
     makeTable(divToAddTo, organizedData.tmOrganizedData, "tm-table");
+    makeTable(divToAddTo, organizedData.lcrOrganized, "lcr-table");
     makeTable(divToAddTo, organizedData.additionalOrganizedData, "additional-table");
 }
 
 function organizeData(data, currentClassName) {
-    var domainOrganizedData = [], tmOrganizedData = [], additionalOrganizedData = [], score;
+    var domainOrganizedData = [], tmOrganizedData = [], additionalOrganizedData = [], lcrOrganized = [], score;
     var dataAsJson = JSON.parse(data)[currentClassName];
 
     if (dataAsJson) {
         var hrefRootPath;
         var domainHeaders;
-        if (dataAsJson.domains && dataAsJson.domains[0].predictor == "RpsBlast") {
-            score = "Bitscore";
-            hrefRootPath = "https://www.ncbi.nlm.nih.gov/cdd?term=";
-            domainHeaders = ["No.", "Domain", "Start", "End", "Bitscore", "Evalue", "Alignment"];
-        } else if (dataAsJson.domains && dataAsJson.domains[0].predictor == "Hmmer"){
-            score = "Probability";
-            domainHeaders = ["No.", "Domain", "Start", "End", "Probability", "C-Evalue", "I-Evalue", "Alignment"];
-            hrefRootPath = "https://pfam.xfam.org/search/keyword?query=";
-        }
+        var domainCounter = 1, tmCounter = 1, lcrCounter = 1, domainRaw, tmRaw, domainName;
 
-        var domainCounter = 1, tmCounter = 1, domainRaw, tmRaw, domainName;
-        if (dataAsJson.domains) {
+        if (dataAsJson.domains && dataAsJson.domains.length > 0) {
+            if ( dataAsJson.domains[0].predictor == "RpsBlast") {
+                score = "Bitscore";
+                hrefRootPath = "https://www.ncbi.nlm.nih.gov/cdd?term=";
+                domainHeaders = ["No.", "Domain", "Start", "End", "Bitscore", "Evalue", "Alignment"];
+            } else if (dataAsJson.domains[0].predictor == "Hmmer"){
+                score = "Probability";
+                domainHeaders = ["No.", "Domain", "Start", "End", "Probability", "C-Evalue", "I-Evalue", "Alignment"];
+                hrefRootPath = "https://pfam.xfam.org/search/keyword?query=";
+            }
+
             domainOrganizedData.push(domainHeaders);
             for (var domain of dataAsJson.domains) {
                 domainRaw = [];
@@ -162,7 +166,7 @@ function organizeData(data, currentClassName) {
             }
         }
 
-        if (dataAsJson.tmInfo['tmRegions']) {
+        if (dataAsJson.tmInfo['tmRegions'] && dataAsJson.tmInfo['tmRegions'].length > 0) {
             var tmHeaders = ["No.", "Start", "End"];
             var additionalHeaders = ["Signal Peptide?", "Topology"];
             tmOrganizedData.push(tmHeaders);
@@ -170,15 +174,33 @@ function organizeData(data, currentClassName) {
             for (var tm of dataAsJson.tmInfo['tmRegions']) {
                 tmRaw = [];
                 tmRaw.push(tmCounter++ + ".");
-                tmRaw.push(tm.tmEnd);
                 tmRaw.push(tm.tmSart);
+                tmRaw.push(tm.tmEnd);
                 tmOrganizedData.push(tmRaw);
             }
             var additionalRaw = [dataAsJson.tmInfo.possibSigPep, dataAsJson.tmInfo.tmTopology];
             additionalOrganizedData.push(additionalRaw);
         }
+
+        if (dataAsJson.lowComplexity && dataAsJson.lowComplexity.length > 0) {
+            var lcrHeaders = ["No.", "Start", "End"];
+            lcrOrganized.push(tmHeaders);
+            for (var lcr of dataAsJson.lowComplexity) {
+                lcrRaw = [];
+                lcrRaw.push(lcrCounter++ + ".");
+                lcrRaw.push(lcr.start);
+                lcrRaw.push(lcr.end);
+                lcrOrganized.push(lcrRaw);
+            }
+        }
     }
-    return {'domainOrganizedData': domainOrganizedData, 'tmOrganizedData': tmOrganizedData, 'additionalOrganizedData': additionalOrganizedData};
+
+    return {
+        'domainOrganizedData': domainOrganizedData,
+        'tmOrganizedData': tmOrganizedData,
+        'lcrOrganized': lcrOrganized,
+        'additionalOrganizedData': additionalOrganizedData
+    };
 }
 
 function createDivToAddTo(event, currentClassName) {
@@ -210,15 +232,20 @@ function addButtons(container, organizedData) {
         organizedData[entity].length > 0 && entityToButton[entity] ? buttonTexts.push(entityToButton[entity]) : null;
     }
     var button;
-    buttonTexts.forEach(buttonText => {
-        buttonText == "Domains"
-            ? button = $("<button/>").addClass("btn btn-md protein-info-buttons-selected ")
-            : button = $("<button/>").addClass("btn btn-md protein-info-buttons ");
+    buttonTexts.forEach((buttonText, idx) => {
+        if (idx === 0) {
+            button = $("<button/>").addClass("btn btn-md protein-info-buttons-selected ");
+        } else {
+            button = $("<button/>").addClass("btn btn-md protein-info-buttons ");
+        }
+
         button.attr("id", buttonText);
-        addButtonEventListener(button)
+        addButtonEventListener(button);
         button.html(buttonText);
         $("."+container).append(button);
     });
+
+    return buttonTexts[0];
 }
 
 function addButtonEventListener(buttonElement) {
@@ -228,15 +255,22 @@ function addButtonEventListener(buttonElement) {
         $(this).removeClass("protein-info-buttons").addClass("protein-info-buttons-selected");
         if ($(this).attr("id") === "Domains") {
             $("." + "domain-table").show();
+            $("." + "lcr-table").hide();
             $("." + "tm-table").hide();
             $("." + "additional-table").hide();
         } else if ($(this).attr("id") === "TMs") {
-            $("." + "tm-table").show();
             $("." + "domain-table").hide();
-
+            $("." + "lcr-table").hide();
+            $("." + "tm-table").show();
+            $("." + "additional-table").hide();
+        } else if ($(this).attr("id") === "LCRs") {
+            $("." + "domain-table").hide();
+            $("." + "lcr-table").show();
+            $("." + "tm-table").hide();
             $("." + "additional-table").hide();
         } else if ($(this).attr("id") === "Additional") {
             $("." + "domain-table").hide();
+            $("." + "lcr-table").hide();
             $("." + "tm-table").hide();
             $("." + "additional-table").show();
         }
@@ -254,11 +288,8 @@ function makeTable(container, data, tableClass) {
             table.append(row);
         });
         $("."+container).append(table);
-
-        if (tableClass !== "domain-table") {
-            $("."+tableClass).hide();
-        }
     }
+
 }
 
 function updatePositionAndShow(event, readyClassName) {
@@ -266,6 +297,20 @@ function updatePositionAndShow(event, readyClassName) {
     var yCoor = event.clientY - yOffset + "px";
     $("." + readyClassName).css({"left": xCoor, "top": yCoor});
     $("." + readyClassName).show();
+    var buttons = $("."+readyClassName).children(".btn");
+
+    var buttonId, counter = 0;
+    for (button of buttons) {
+        buttonId = $(button).attr("id");
+        if (counter === 0) {
+            $(button).removeClass("protein-info-buttons").addClass("protein-info-buttons-selected");
+            $("."+buttonIdToTableClass[buttonId]).show();
+        } else {
+            $(button).removeClass("protein-info-buttons-selected").addClass("protein-info-buttons");
+            $("."+buttonIdToTableClass[buttonId]).hide();
+        }
+        counter = counter + 1;
+     }
 }
 
 $(document).on("click", function () {
