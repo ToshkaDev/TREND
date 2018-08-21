@@ -29,6 +29,7 @@ public class ProtoTreeInternal {
 	//e-value for Hmmscan and RpsBlast
 	private String eValue;
     private String probability;
+    private String lcrPrediction;
 
     private String  commandToBeProcessedBy;
     private List<List<String>> commandsAndArguments;
@@ -206,8 +207,17 @@ public class ProtoTreeInternal {
         this.probability = probability;
     }
 
+    public String getLcrPrediction() {
+        return lcrPrediction;
+    }
+
+    public void setLcrPrediction(String lcrPrediction) {
+        this.lcrPrediction = lcrPrediction;
+    }
+
     public void setFields() {
         String reorderOrNot = getReorderOrNot();
+        String lcrPrediction = getLcrPrediction();
         if (reorderOrNot != null) {
             fieldsForAlignmentAndTreeBuild.add(reorderOrNot);
         }
@@ -224,6 +234,9 @@ public class ProtoTreeInternal {
 
         fieldsForFeaturesPrediction.add(geteValue());
         fieldsForFeaturesPrediction.add(getProbability());
+        if (lcrPrediction != null) {
+            fieldsForFeaturesPrediction.add(getLcrPrediction());
+        }
         fieldsForFeaturesPrediction.add(getDomainPredictionProgram());
     }
 

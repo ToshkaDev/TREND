@@ -307,10 +307,10 @@ def writeSeqsAndTree():
 	terminals = tree.get_leaves()
 	# Change protein names in datas sctrucuters and write protein sequences with changed names to file 
 	with open(OUTPUT_ALIGNED_FILENAME, "w") as outputFile:
-		for i in range(len(terminals)):
+		for i in xrange(len(terminals)):
 			proteinName = terminals[i].name.strip("'")
 			if proteinName in ALIGNED_PROTEIN_NAME_TO_SEQ:
-				terminals[i].name = str(i) + "_" + proteinName
+				terminals[i].name = str(i+1) + "_" + proteinName
 				if proteinName in PROTEIN_DOMAINS:
 					PROTEIN_DOMAINS[terminals[i].name] = PROTEIN_DOMAINS[proteinName]
 					del PROTEIN_DOMAINS[proteinName]

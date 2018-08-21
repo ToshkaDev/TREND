@@ -22,6 +22,9 @@ function getOptions() {
 
     var domainPredictionProgram = $('input[name="dom-prediction-program"]:checked').val();
 
+    var lcrPrediction = $("#lc-value").attr("checked");
+
+    console.log("lcrPrediction " + lcrPrediction)
     Cookies.set('HEYE', 'This');
     console.log("cookie.get('HEYE') " + Cookies.get('HEYE'))
     var optionToOptionName = {
@@ -41,6 +44,7 @@ function getOptions() {
         "siteCovCutOff": siteCovCutOff,
         "numberOrReplicates": numberOrReplicates,
         "domainPredictionProgram": domainPredictionProgram,
+        "lcrPrediction": lcrPrediction,
         "commandToBeProcessedBy": $('#subnavigation-tab').text()
     }
     var options = new FormData();

@@ -43,7 +43,8 @@ public enum  ParamPrefixes {
     RPSBLAST_PATH("-R "),
     RPSBPROC_PATH("-P "),
     TMHMM_PATH("-T "),
-    SEGMASKER_PATH("-S ");
+    SEGMASKER_PATH("-S "),
+    RUN_SEGMASKER("-E ");
 
     private String paramPrefix;
 

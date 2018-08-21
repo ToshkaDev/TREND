@@ -31,7 +31,7 @@ public class ConverterMain {
 		protoTreeInternal.setDomainPredictionDb(checkForNullAndGet(ParamPrefixes.DOMAINS_PREDICTION_DB.getPrefix(), protoTreeRequest.getDomainPredictionDb()));
 		protoTreeInternal.seteValue(checkEvalueAndGet(ParamPrefixes.EVAL_THRESH.getPrefix(), protoTreeRequest.geteValue()));
 		protoTreeInternal.setProbability(checkProbabilityAndGet(ParamPrefixes.PROBABILITY.getPrefix(), protoTreeRequest.getProbability()));
-
+		protoTreeInternal.setLcrPrediction(checkLcrPredictionAndGet(ParamPrefixes.RUN_SEGMASKER.getPrefix(), protoTreeRequest.getLcrPrediction()));
         return protoTreeInternal;
 	}
 
@@ -60,6 +60,13 @@ public class ConverterMain {
 			if (doubleProbability >= 0) {
 				return paramPrefix + probability;
 			}
+		}
+		return null;
+	}
+
+	private static String checkLcrPredictionAndGet(String paramPrefix, String lcrPrediction) {
+		if (lcrPrediction != null && lcrPrediction.equals("checked")) {
+			return paramPrefix + "true";
 		}
 		return null;
 	}

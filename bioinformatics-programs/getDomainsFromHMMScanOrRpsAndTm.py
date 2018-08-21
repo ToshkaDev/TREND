@@ -24,6 +24,7 @@ USAGE = "\n\nThe script extracts domain information from the results of hmmscan 
 	[-P || --rpsbprocPath] - rpsbproc program full path
 	[-T || --tmhmm2Path]   - tmhmm2 program full path
 	[-S || --segmaskerPath]- segmasker program full path
+	[-E || --runSegmasker] - run or not segmasker
  	[-e || --evalue]       - e-value threshold of a recognized domain
  	[-y || --probability]  - probability for hmmscan
 	[-t || --tabformat]    - output file format as tab delimited file (yes||y or no||n, default no)
@@ -52,6 +53,7 @@ PROTEIN_TO_SITES_FILE = "proteinToSites.txt"
 GET_JSON = True
 GET_TAB = False
 JOIN_STRING = True
+RUN_SEGMASKER = False
 
 
 INPUT_FILE_FASTA = None
@@ -88,10 +90,10 @@ PROTEIN_TO_SITES = collections.defaultdict(list)
 def initialyze(argv):
 	global HMMSCAN_PROGRAM, RPSBLAST_PROGRAM, RPSBPROC_PROGRAM, TMHMMSCAN_PROGRAM, INPUT_FILE_FASTA, PROCESS_TYPE, OUTPUT_RPSBLAST_OR_HMMSCAN, \
 	OUTPUT_RPSBPROC, OUTPUT_TMHMMSCAN, OUTPUT_SEGMASKER, HMMSCAN_DB_PATH, RPSBLAST_DB_PATH, RPSBPROC_DB_PATH, DB_NAME, CPU, EVAL_THRESHOLD, HMMSCAN_PROBABILITY, \
-	GET_TAB, GET_JSON, PROTEIN_TO_DOMAININFO_FILE, DOMAIN_ARCHITECT_TO_COUNT_FILE, PROTEIN_TO_DOMAININFO_JSONFILE, PROTEIN_SITES_INCLUDE
+	GET_TAB, GET_JSON, RUN_SEGMASKER, PROTEIN_TO_DOMAININFO_FILE, DOMAIN_ARCHITECT_TO_COUNT_FILE, PROTEIN_TO_DOMAININFO_JSONFILE, PROTEIN_SITES_INCLUDE
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:p:r:f:x:a:A:B:C:D:H:R:P:T:S:e:y:t:j:u:m:o:n:b:",["ifile=", "iprocess=", "ofourth=", "ofifth=", "osixth=", "oseventh", "hmmscanDbPath=", \
-		"rpsblastDbPath=", "rpsprocDbPath=", "dbname=", "hmmscanPath=", "rpsblastPath", "rpsbprocPath", "tmhmm2Path", "segmaskerPath", "evalue=", "tabformat=", "jsonformat=", "cpu=", "sites=", "ofile=", "osecond=", "othird="])
+		opts, args = getopt.getopt(argv[1:],"hi:p:r:f:x:a:A:B:C:D:H:R:P:T:S:E:e:y:t:j:u:m:o:n:b:",["ifile=", "iprocess=", "ofourth=", "ofifth=", "osixth=", "oseventh", "hmmscanDbPath=", \
+		"rpsblastDbPath=", "rpsprocDbPath=", "dbname=", "hmmscanPath=", "rpsblastPath", "rpsbprocPath", "tmhmm2Path", "segmaskerPath", "runSegmasker", "evalue=", "tabformat=", "jsonformat=", "cpu=", "sites=", "ofile=", "osecond=", "othird="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
@@ -138,6 +140,9 @@ def initialyze(argv):
 				TMHMMSCAN_PROGRAM = str(arg).strip()
 			elif opt in ("-S", "--segmaskerPath"):
 				SEGMASKER_PROGRAM = str(arg).strip()	
+			elif opt in ("-E", "--runSegmasker"):
+				if str(arg).strip() == "true":
+					RUN_SEGMASKER = True	
 			elif opt in ("-e", "--evalue"):
 				EVAL_THRESHOLD = float(arg)
 			elif opt in ("-y", "--probability"):
@@ -453,8 +458,9 @@ def main(argv):
 		processRpsbproc()
 	tmhmm2scan()
 	processTmscan()
-	segMasker()
-	processSegmasker()
+	if RUN_SEGMASKER:
+		segMasker()
+		processSegmasker()
 	if GET_TAB:
 		with open(PROTEIN_TO_DOMAININFO_FILE, "w") as proteinToDomainFile:
 			for proteint in PROT_NAME_TO_LENGTH:

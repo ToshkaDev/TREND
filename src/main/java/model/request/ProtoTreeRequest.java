@@ -22,6 +22,7 @@ public class ProtoTreeRequest {
     private String domainPredictionDb;
     private String eValue;
     private String probability;
+    private String lcrPrediction;
 
     private String commandToBeProcessedBy;
 
@@ -179,6 +180,14 @@ public class ProtoTreeRequest {
 
     public void setProbability(String probability) {
         this.probability = probability;
+    }
+
+    public String getLcrPrediction() {
+        return lcrPrediction;
+    }
+
+    public void setLcrPrediction(String lcrPrediction) {
+        this.lcrPrediction = lcrPrediction;
     }
 }
 

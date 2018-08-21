@@ -138,4 +138,10 @@ function takeCareOfFields() {
             $('.result-container').hide();
         }
     });
+
+    lcrStates = {"checked": true, "undefined": false};
+    $('#lc-value').click(function() {
+        var lcValue = $('#lc-value').attr("checked");
+        $('#lc-value').attr('checked', !lcrStates[lcValue]);
+    })
 }
