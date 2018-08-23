@@ -5,10 +5,12 @@ import model.internal.ProtoTreeInternal;
 import exceptions.IncorrectRequestException;
 import model.request.ProtoTreeRequest;
 
+import java.util.Map;
+
 
 public interface EvolutionService {
 	void runMainProgram(ProtoTreeInternal protoTreeInternal) throws IncorrectRequestException;
 	ProtoTreeInternal storeFilesAndPrepareCommandArguments(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException;
-	BioJob getBioJobIfFinished(int jobId);
+	BioJob getBioJob(int jobId);
 
 }

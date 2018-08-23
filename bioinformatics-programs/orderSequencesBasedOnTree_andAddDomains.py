@@ -299,7 +299,7 @@ def layout(node):
 		if node.name in PROTEIN_TO_DOMAINS:
 			seq = PROTEIN_NAME_TO_SEQ[node.name]
 			protDomains = PROTEIN_TO_DOMAINS[node.name]
-			seqFace = SeqMotifFace(seq, protDomains, scale_factor=1.3)
+			seqFace = SeqMotifFace(seq, protDomains, scale_factor=1)
 			add_face_to_node(seqFace, node, 0, position="aligned")
        
 def writeSeqsAndTree():

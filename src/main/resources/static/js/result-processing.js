@@ -2,6 +2,7 @@ $(document).ready(function (){
     var jobId = $('#jobId').text();
     renderedClass = null;
     infoPostfix = "_table";
+    stageList = [];
     xOffset = 400;
     yOffset = 200;
     buttonIds = ["Domains", "TMs", "LCRs", "Additional"];
@@ -16,7 +17,7 @@ function getIfReady(jobId) {
     console.log('jobId ' + jobId + Cookies.get('protoTree'));
     fileGetter = setInterval(function() {
         tryToGetFileName(jobId + "-" + Cookies.get('protoTree'))
-    }, 200);
+    }, 2000);
 }
 
 function tryToGetFileName(jobId) {
@@ -51,8 +52,15 @@ function prepareTreeContainer() {
 }
 
 function processRetrievedDataAsync(data) {
-    if (data.status[0] === 'ready') {
+    if (data.status[0] === 'noSuchBioJob') {
         clearInterval(fileGetter);
+        $('.wait-for-it').hide();
+        $('.no-such-biojob').show();
+    }
+
+    else  if (data.status[0] === 'ready') {
+        clearInterval(fileGetter);
+        displayStage(data.stage[0]);
 
         if (data.result.length === 1) {
             $('#results-load').attr('href', data.result[0]);
@@ -69,7 +77,20 @@ function processRetrievedDataAsync(data) {
             });
         }
         $('.result-container').show();
+	} else if (data.status[0] === 'notReady') {
+	    displayStage(data.stage[0]);
 	}
+
+}
+
+function displayStage(dataStage) {
+    var stages = JSON.parse(dataStage.replace(/'/g, '"'));
+    for (var stage of stages) {
+        if (!stageList.includes(stage)) {
+            $('#result-stage').append("<h4>" + stage + "</h4>");
+            stageList.push(stage);
+        }
+    }
 }
 
 function addEventListeners(data) {

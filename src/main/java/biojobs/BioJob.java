@@ -29,6 +29,9 @@ public class BioJob {
     @Column(name="FINISHED")
     private boolean finished;
 
+    @Column(name="STAGE")
+    private String stage;
+
     @NotNull
     @Column(name="PROGRAM_NAME")
     private String programName;
@@ -60,6 +63,14 @@ public class BioJob {
 
     public void setFinished(boolean finished) {
         this.finished = finished;
+    }
+
+    public String getStage() {
+        return stage;
+    }
+
+    public void setStage(String stage) {
+        this.stage = stage;
     }
 
     public String getProgramNameName() {

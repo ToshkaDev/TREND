@@ -140,6 +140,10 @@ div.result-container {
     padding: 7px;
 }
 
+div.no-such-biojob {
+    display: none;
+}
+
 div.raw-files-containers {
     padding-bottom: 3em;
 }

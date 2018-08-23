@@ -26,13 +26,17 @@ import exceptions.IncorrectRequestException;
 import springconfiguration.AppProperties;
 
 @Service
-@Transactional(propagation = Propagation.REQUIRED)
+
 public class EvolutionServiceImpl extends BioUniverseServiceImpl implements EvolutionService {
 	private final int defaultLastJobId = 1;
+	private Map<Integer, String> counterToStage = new HashMap<>();
 
 
 	public EvolutionServiceImpl(final StorageService storageService, final AppProperties properties, final BioJobDao bioJobDao, final BioJobResultDao bioJobResultDao) {
 		super(storageService, properties, bioJobResultDao, bioJobDao);
+        counterToStage.put(1, "['Predicting proteins features.']");
+        counterToStage.put(2, "['Predicting proteins features.', 'Aligning and building tree.']");
+        counterToStage.put(3, "['Predicting proteins features.', 'Aligning and building tree.', 'Ordering alignment and putting features and tree together.']");
 	}
 
 	private String getDomainPredictionDb(String dbName) {
@@ -68,11 +72,10 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         return db;
     }
 
-	@Override
-	public BioJob getBioJobIfFinished(int jobId) {
-		BioJob bioJob = super.getBioJobDao().findByJobId(jobId);
-		return bioJob.isFinished() ? bioJob : null;
-	}
+    @Override
+    public BioJob getBioJob(int jobId) {
+	    return super.getBioJobDao().findByJobId(jobId);
+    }
 
     public ProtoTreeInternal storeFilesAndPrepareCommandArguments(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
         ProtoTreeInternal protoTreeInternal = storeFileAndGetInternalRepresentation(protoTreeRequest);
@@ -210,12 +213,20 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
     @Override
     @Async
     public void runMainProgram(ProtoTreeInternal protoTreeInternal) throws IncorrectRequestException {
+	    int counter = 0;
         for (List<String> commandArgument : protoTreeInternal.getCommandsAndArguments()) {
+            if (counterToStage.containsKey(counter)) {
+                BioJob bioJob = super.getBioJobDao().findByJobId(protoTreeInternal.getJobId());
+                bioJob.setStage(counterToStage.get(counter));
+                super.getBioJobDao().save(bioJob);
+            }
+            counter++;
             super.launchProcess(commandArgument);
         }
         saveResultToDb(protoTreeInternal);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public int saveBioJobToDB(ProtoTreeInternal protoTreeInternal) {
         int jobId = getLastJobId();
 
@@ -235,6 +246,7 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         return jobId;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public void saveResultToDb(ProtoTreeInternal protoTreeInternal) {
 	    for (String filename : protoTreeInternal.getOutputFilesNames()) {
             saveResultFileToDB(filename);

@@ -47,6 +47,7 @@ public class EvolutionController extends BioUniverseController {
 
     private final List<String> statusReady = Arrays.asList("ready");
     private final List<String> statusNotReady = Arrays.asList("notReady");
+    private final List<String> noSuchBioJob = Arrays.asList("noSuchBioJob");
 
 
 	public EvolutionController(StorageService storageService, EvolutionService evolutionService) {
@@ -96,16 +97,22 @@ public class EvolutionController extends BioUniverseController {
         String urlPath = ServletUriComponentsBuilder.fromCurrentContextPath().path("/prototree/univ_files/").build().toString();
 
         Map<String, List<String>> result = new HashMap<>();
-        result.put("status", statusNotReady);
+        result.put("status", noSuchBioJob);
 
-        List<String> listOfResultFileNames = null;
+        List<String> listOfResultFileNames;
 
 	     if (jobId != null ) {
-            bioJob = evolutionService.getBioJobIfFinished(Integer.valueOf(jobId.split("-")[0]));
-            if (bioJob != null) {
-                listOfResultFileNames = bioJob.getBioJobResultList().stream().map(bjResult -> urlPath + bjResult.getResultFileName()).collect(Collectors.toList());
-                result.put("result", listOfResultFileNames);
-                result.put("status", statusReady);
+	        int id = Integer.valueOf(jobId.split("-")[0]);
+            bioJob = evolutionService.getBioJob(id);
+	        if (bioJob != null) {
+	            if (bioJob.isFinished()) {
+                    listOfResultFileNames = bioJob.getBioJobResultList().stream().map(bjResult -> urlPath + bjResult.getResultFileName()).collect(Collectors.toList());
+                    result.put("result", listOfResultFileNames);
+                    result.put("status", statusReady);
+                } else {
+                    result.put("status", statusNotReady);
+                }
+                result.put("stage", new LinkedList<>(Arrays.asList(bioJob.getStage())));
             }
         }
         return result;
