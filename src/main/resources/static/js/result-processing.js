@@ -3,6 +3,7 @@ $(document).ready(function (){
     renderedClass = null;
     infoPostfix = "_table";
     stageList = [];
+    stageToComplete = {};
     xOffset = 400;
     yOffset = 200;
     buttonIds = ["Domains", "TMs", "LCRs", "Additional"];
@@ -60,13 +61,19 @@ function processRetrievedDataAsync(data) {
 
     else  if (data.status[0] === 'ready') {
         clearInterval(fileGetter);
-        displayStage(data.stage[0]);
+        displayStage(data.stage[0], true);
 
         if (data.result.length === 1) {
             $('#results-load').attr('href', data.result[0]);
         }
         if (data.result.length > 1) {
+
+            // Add corresponding links to download buttons
             $('#results-load').attr('href', data.result[1]);
+            $('#tree-load').attr('href', data.result[0]);
+            $('#alignment-load').attr('href', data.result[2]);
+            $('#features-load').attr('href', data.result[3]);
+
             prepareTreeContainer();
             d3.xml(data.result[1]).then(function(xml) {
                 console.log(xml.documentElement)
@@ -83,12 +90,28 @@ function processRetrievedDataAsync(data) {
 
 }
 
-function displayStage(dataStage) {
+function displayStage(dataStage, statusReady=false) {
     var stages = JSON.parse(dataStage.replace(/'/g, '"'));
     for (var stage of stages) {
-        if (!stageList.includes(stage)) {
-            $('#result-stage').append("<h4>" + stage + "</h4>");
-            stageList.push(stage);
+        if (!statusReady) {
+            if (!stageList.includes(stage)) {
+                if (stageList.length > 0) {
+                    console.log("here 1. stage " + stage)
+                    $('.stage-element').last().append("<span class='glyphicon glyphicon-ok'></span>");
+                    //$('#result-stage').append("<span class='glyphicon glyphicon-ok'></span>");
+                    $('#result-stage').append("<div class='stage-element'><h4>" + stage + "</h4></div>");
+                } else {
+                    console.log("here 2. stage " + stage)
+                    //$('#result-stage').append("<h4 class='stage'>" + stage + "</h4>");
+                    $('#result-stage').append("<div class='stage-element'><h4>" + stage + "</h4></div>");
+                }
+                stageList.push(stage);
+            }
+        } else {
+            if (stageList.indexOf(stage) == stageList.length - 1) {
+                $('.stage-element').last().append("<span class='glyphicon glyphicon-ok'></span>");
+                //$('#result-stage').append("<span class='glyphicon glyphicon-ok'></span>");
+            }
         }
     }
 }

@@ -131,6 +131,11 @@ div.result-area {
     padding-top: 7px;
 }
 
+.stage-element {
+    display: flex;
+    justify-content: flex-start
+}
+
 /*End of filter options styles*/
 
 
