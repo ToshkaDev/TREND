@@ -46,6 +46,7 @@ public class BioJob {
     private LocalDateTime jobDate;
 
     @OneToMany(mappedBy="biojob", cascade={CascadeType.PERSIST, CascadeType.REMOVE})
+    @OrderColumn
     @org.hibernate.annotations.Cascade( {org.hibernate.annotations.CascadeType.SAVE_UPDATE})
     private List<BioJobResult> bioJobResultList = new LinkedList<>();
 

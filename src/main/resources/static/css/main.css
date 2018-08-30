@@ -44,7 +44,7 @@ nav div.bottom-nav-bar {
  }
 
  #logo {
-    margin-left: 90%;
+    margin-left: 30%;
  }
 
  .info-container {
@@ -72,7 +72,7 @@ div.panel-body {
 }
 
 div.panel-default {
-    margin-right: 9em;
+    margin-right: 10em;
     width: 20%;
 }
 
@@ -103,7 +103,7 @@ div.secondary-buttons, div.options {
 }
 
 div.query-area {
-    padding-left: 10%;
+    padding-left: 7%;
 }
 
 div.result-area {
@@ -222,7 +222,7 @@ div.protein-info-container {
 
 .footer-container {
     background-color: #7FB9AB;
-    height: 200px;
+    height: 210px;
 }
 
 .footer-text {

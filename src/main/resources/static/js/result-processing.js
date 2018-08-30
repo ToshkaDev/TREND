@@ -226,7 +226,7 @@ function organizeData(data, currentClassName) {
             var additionalRaw = [dataAsJson.tmInfo.possibSigPep, dataAsJson.tmInfo.tmTopology];
             additionalOrganizedData.push(additionalRaw);
         }
-
+        console.log(JSON.stringify(dataAsJson))
         if (dataAsJson.lowComplexity && dataAsJson.lowComplexity.length > 0) {
             var lcrHeaders = ["No.", "Start", "End"];
             lcrOrganized.push(tmHeaders);
@@ -289,8 +289,6 @@ function addButtons(container, organizedData) {
         button.html(buttonText);
         $("."+container).append(button);
     });
-
-    return buttonTexts[0];
 }
 
 function addButtonEventListener(buttonElement) {
@@ -334,7 +332,6 @@ function makeTable(container, data, tableClass) {
         });
         $("."+container).append(table);
     }
-
 }
 
 function updatePositionAndShow(event, readyClassName) {
