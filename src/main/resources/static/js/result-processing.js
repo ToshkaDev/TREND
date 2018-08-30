@@ -3,7 +3,6 @@ $(document).ready(function (){
     renderedClass = null;
     infoPostfix = "_table";
     stageList = [];
-    stageToComplete = {};
     xOffset = 400;
     yOffset = 200;
     buttonIds = ["Domains", "TMs", "LCRs", "Additional"];
@@ -87,33 +86,35 @@ function processRetrievedDataAsync(data) {
 	} else if (data.status[0] === 'notReady') {
 	    displayStage(data.stage[0]);
 	}
-
 }
 
 function displayStage(dataStage, statusReady=false) {
     var stages = JSON.parse(dataStage.replace(/'/g, '"'));
     for (var stage of stages) {
+        var stageReady = stage.split("-")[0]
         if (!statusReady) {
-            if (!stageList.includes(stage)) {
-                if (stageList.length > 0) {
-                    console.log("here 1. stage " + stage)
-                    $('.stage-element').last().append("<span class='glyphicon glyphicon-ok'></span>");
-                    //$('#result-stage').append("<span class='glyphicon glyphicon-ok'></span>");
-                    $('#result-stage').append("<div class='stage-element'><h4>" + stage + "</h4></div>");
-                } else {
-                    console.log("here 2. stage " + stage)
-                    //$('#result-stage').append("<h4 class='stage'>" + stage + "</h4>");
-                    $('#result-stage').append("<div class='stage-element'><h4>" + stage + "</h4></div>");
-                }
-                stageList.push(stage);
+            if (!stageList.includes(stageReady)) {
+                processStageMessage(stageReady);
             }
         } else {
-            if (stageList.indexOf(stage) == stageList.length - 1) {
+            if (!stageList.includes(stageReady)) {
+                processStageMessage(stageReady);
+            }
+            if (stage.split("-").length == 2) {
                 $('.stage-element').last().append("<span class='glyphicon glyphicon-ok'></span>");
-                //$('#result-stage').append("<span class='glyphicon glyphicon-ok'></span>");
             }
         }
     }
+}
+
+function processStageMessage(stage) {
+    if (stageList.length > 0) {
+        $('.stage-element').last().append("<span class='glyphicon glyphicon-ok'></span>");
+        $('#result-stage').append("<div class='stage-element'><h4>" + stage + "</h4></div>");
+    } else {
+        $('#result-stage').append("<div class='stage-element'><h4>" + stage + "</h4></div>");
+    }
+    stageList.push(stage);
 }
 
 function addEventListeners(data) {

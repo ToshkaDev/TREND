@@ -36,7 +36,7 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
 		super(storageService, properties, bioJobResultDao, bioJobDao);
         counterToStage.put(1, "['Predicting proteins features.']");
         counterToStage.put(2, "['Predicting proteins features.', 'Aligning and building tree.']");
-        counterToStage.put(3, "['Predicting proteins features.', 'Aligning and building tree.', 'Ordering alignment and putting features and tree together.']");
+        counterToStage.put(3, "['Predicting proteins features.', 'Aligning and building tree.', 'Ordering alignment and putting features and tree together.-last']");
 	}
 
 	private String getDomainPredictionDb(String dbName) {

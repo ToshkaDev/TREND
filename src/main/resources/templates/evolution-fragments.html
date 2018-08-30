@@ -39,18 +39,18 @@
     </div>
 
     <div th:fragment="result">
+        <div class="col-md-12 wait-for-it">
+            <div id="result-stage"></div>
+        </div>
+        <div class="col-md-12 no-such-biojob">
+            No such job found
+        </div>
         <div class="col-md-12 text-center result-container">
             <div class="btn-group" role="group" aria-label="...">
                 <a id="results-load" class="btn btn-info btn-lg proto-tree-button" href="#">
                     Download Tree (SVG) <span class="glyphicon glyphicon-download-alt "> </span>
                 </a>
             </div>
-        </div>
-        <div class="col-md-12 wait-for-it">
-            <div id="result-stage"></div>
-        </div>
-        <div class="col-md-12 no-such-biojob">
-            No such job found
         </div>
         <div class="col-md-12 my-result">
             <div style="display: none">
