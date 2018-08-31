@@ -12,7 +12,7 @@ body {
 .navbar-inverse {
 	font-size:130%;
 	color:white;
-	background-color:#3F7C7A;
+	background-color: #3F7C7A;
 }
 
 .navbar-inverse .navbar-nav > .active{
@@ -133,7 +133,14 @@ div.result-area {
 
 .stage-element {
     display: flex;
-    justify-content: flex-start
+    justify-content: flex-start;
+    font-size: 115%;
+    margin-left: 4%;
+}
+
+.complete {
+    color: #3F7C7A;
+    margin-left: 5px;
 }
 
 /*End of filter options styles*/

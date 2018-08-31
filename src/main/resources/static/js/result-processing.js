@@ -101,7 +101,7 @@ function displayStage(dataStage, statusReady=false) {
                 processStageMessage(stageReady);
             }
             if (stage.split("-").length == 2) {
-                $('.stage-element').last().append("<span class='glyphicon glyphicon-ok'></span>");
+                $('.stage-element').last().append("<span class='glyphicon glyphicon-ok complete'></span>");
             }
         }
     }
@@ -109,7 +109,7 @@ function displayStage(dataStage, statusReady=false) {
 
 function processStageMessage(stage) {
     if (stageList.length > 0) {
-        $('.stage-element').last().append("<span class='glyphicon glyphicon-ok'></span>");
+        $('.stage-element').last().append("<span class='glyphicon glyphicon-ok complete'></span>");
         $('#result-stage').append("<div class='stage-element'><h4>" + stage + "</h4></div>");
     } else {
         $('#result-stage').append("<div class='stage-element'><h4>" + stage + "</h4></div>");
@@ -119,6 +119,7 @@ function processStageMessage(stage) {
 
 function addEventListeners(data) {
 	var re = /^\d{1,}_/;
+	var notAllowedClassCharacters = /(\.|\~|!|$|@|\*|%|&|,|\?|#|`|:|;|>|<|\/|\\|{|}|[|])/g;
 	var currentClassName;
 	var proteinIdToRendered = {};
 	var trueClassNameToChanged = {};
@@ -126,7 +127,8 @@ function addEventListeners(data) {
 	  .attr("dummy", function(){
 			if (d3.select(this).text().length > 0 && re.test(d3.select(this).text())) {
 			    classNameForJson = d3.select(this).text().replace(re, '');
-				currentClassName = classNameForJson.replace('.', '');
+				currentClassName = classNameForJson.replace(notAllowedClassCharacters, '');
+				console.log("currentClassName " + currentClassName)
 				trueClassNameToChanged[currentClassName] = classNameForJson;
 
 				d3.select(this).attr("class", currentClassName+"_text");
@@ -165,10 +167,11 @@ function createTable(event, data, currentClassName, trueClassNameToChanged) {
     var organizedData = organizeData(data, trueClassNameToChanged[currentClassName]);
     var divToAddTo = createDivToAddTo(event, currentClassName);
     addButtons(divToAddTo, organizedData);
-    makeTable(divToAddTo, organizedData.domainOrganizedData, "domain-table");
-    makeTable(divToAddTo, organizedData.tmOrganizedData, "tm-table");
-    makeTable(divToAddTo, organizedData.lcrOrganized, "lcr-table");
-    makeTable(divToAddTo, organizedData.additionalOrganizedData, "additional-table");
+    var isFirstEncountered = false;
+    isFirstEncountered = makeTable(divToAddTo, organizedData.domainOrganizedData, "domain-table", isFirstEncountered);
+    isFirstEncountered = makeTable(divToAddTo, organizedData.tmOrganizedData, "tm-table", isFirstEncountered);
+    isFirstEncountered = makeTable(divToAddTo, organizedData.lcrOrganized, "lcr-table", isFirstEncountered);
+    isFirstEncountered = makeTable(divToAddTo, organizedData.additionalOrganizedData, "additional-table", isFirstEncountered);
 }
 
 function organizeData(data, currentClassName) {
@@ -226,10 +229,9 @@ function organizeData(data, currentClassName) {
             var additionalRaw = [dataAsJson.tmInfo.possibSigPep, dataAsJson.tmInfo.tmTopology];
             additionalOrganizedData.push(additionalRaw);
         }
-        console.log(JSON.stringify(dataAsJson))
         if (dataAsJson.lowComplexity && dataAsJson.lowComplexity.length > 0) {
             var lcrHeaders = ["No.", "Start", "End"];
-            lcrOrganized.push(tmHeaders);
+            lcrOrganized.push(lcrHeaders);
             for (var lcr of dataAsJson.lowComplexity) {
                 lcrRaw = [];
                 lcrRaw.push(lcrCounter++ + ".");
@@ -320,8 +322,9 @@ function addButtonEventListener(buttonElement) {
     });
 }
 
-function makeTable(container, data, tableClass) {
+function makeTable(container, data, tableClass, isFirstEncountered) {
     if (data && data.length > 0) {
+        console.log("DATA=== " + data)
         var table = $("<table/>").addClass('table table-condensed ' + tableClass);
         $.each(data, function(rowIndex, r) {
             var row = $("<tr/>");
@@ -331,7 +334,12 @@ function makeTable(container, data, tableClass) {
             table.append(row);
         });
         $("."+container).append(table);
+        if (!isFirstEncountered) {
+            return true;
+        }
+        $("."+tableClass).hide();
     }
+    return isFirstEncountered;
 }
 
 function updatePositionAndShow(event, readyClassName) {
