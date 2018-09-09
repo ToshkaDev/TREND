@@ -30,6 +30,7 @@ import springconfiguration.AppProperties;
 public class EvolutionServiceImpl extends BioUniverseServiceImpl implements EvolutionService {
 	private final int defaultLastJobId = 1;
 	private Map<Integer, String> counterToStage = new HashMap<>();
+    private Map<Integer, String> counterToStagePartial = new HashMap<>();
 
 
 	public EvolutionServiceImpl(final StorageService storageService, final AppProperties properties, final BioJobDao bioJobDao, final BioJobResultDao bioJobResultDao) {
@@ -37,6 +38,8 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         counterToStage.put(1, "['Predicting proteins features.']");
         counterToStage.put(2, "['Predicting proteins features.', 'Aligning and building tree.']");
         counterToStage.put(3, "['Predicting proteins features.', 'Aligning and building tree.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStagePartial.put(1, "['Predicting proteins features.']");
+        counterToStagePartial.put(2, "['Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
 	}
 
 	private String getDomainPredictionDb(String dbName) {
@@ -78,6 +81,17 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
     }
 
     public ProtoTreeInternal storeFilesAndPrepareCommandArguments(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
+        ProtoTreeInternal protoTreeInternal;
+	    if (protoTreeRequest.isFullPipeline().equals("true")) {
+            protoTreeInternal = fullPipelineProcessing(protoTreeRequest);
+
+        } else {
+            protoTreeInternal = partialPipelineProcessing(protoTreeRequest);
+        }
+        return protoTreeInternal;
+    }
+
+    private ProtoTreeInternal fullPipelineProcessing(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
         ProtoTreeInternal protoTreeInternal = storeFileAndGetInternalRepresentation(protoTreeRequest);
         List<String> listOfPrograms = new LinkedList<>();
         List<List<String>> listOfArgumentLists = new LinkedList<>();
@@ -185,6 +199,91 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         return protoTreeInternal;
     }
 
+    private ProtoTreeInternal partialPipelineProcessing(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
+        ProtoTreeInternal protoTreeInternal = storeFileAndGetInternalRepresentation(protoTreeRequest);
+        List<String> argsForPrepareNames = new LinkedList<>();
+        List<String> argsForProteinFeatures = new LinkedList<>();
+        List<String> argsForTreeWithDomains = new LinkedList<>();
+
+        String firstPreparedFile = getRandomFileName();
+        argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + firstPreparedFile));
+        protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + firstPreparedFile);
+        String inputFileNameForProtFeatures = protoTreeInternal.getFirstFileName();
+
+        protoTreeInternal.setFields();
+
+        String hmmscanOrRpsbOutFile = getRandomFileName();
+        String rpsbProcOutFile = getRandomFileName();
+
+        String tmhmmscanOutFile = getRandomFileName();
+        String proteinFeaturesOutFile = getRandomFileName();
+        String segmakserOutFile = getRandomFileName();
+
+        String numberOfThreadsForProtFeatures = "4";
+        String numberOfThreadsForTree = "4";
+        argsForProteinFeatures.addAll(protoTreeInternal.getFieldsForFeaturesPrediction());
+        argsForProteinFeatures.addAll(Arrays.asList(
+                inputFileNameForProtFeatures,
+                getDomainPredictionDb(protoTreeInternal.getDomainPredictionDb()),
+                ParamPrefixes.OUTPUT_FOURTH.getPrefix() + hmmscanOrRpsbOutFile,
+                ParamPrefixes.OUTPUT_FIFTH.getPrefix() + rpsbProcOutFile,
+                ParamPrefixes.OUTPUT_SIXTH.getPrefix() + tmhmmscanOutFile,
+                ParamPrefixes.OUTPUT_SEVENTH.getPrefix() + segmakserOutFile,
+                ParamPrefixes.HMMSCAN_DB_PATH.getPrefix() + super.getProperties().getHmmscanDbPath(),
+                ParamPrefixes.RPSBLAST_DB_PATH.getPrefix() + super.getProperties().getRpsblastDbPath(),
+                ParamPrefixes.RPSBPROC_DB_PATH.getPrefix() + super.getProperties().getRpsprocDbPath(),
+                ParamPrefixes.HMMSCAN_PATH.getPrefix() + super.getProperties().getHmmscanPath(),
+                ParamPrefixes.RPSBLAST_PATH.getPrefix() + super.getProperties().getRpsblastPath(),
+                ParamPrefixes.RPSBPROC_PATH.getPrefix() + super.getProperties().getRpsbprocPath(),
+                ParamPrefixes.TMHMM_PATH.getPrefix() + super.getProperties().getTmhmm2Path(),
+                ParamPrefixes.SEGMASKER_PATH.getPrefix() + super.getProperties().getSegmaskerPath(),
+                ParamPrefixes.THREAD.getPrefix() + numberOfThreadsForProtFeatures,
+                ParamPrefixes.OUTPUT_THIRD.getPrefix() + proteinFeaturesOutFile
+        ));
+
+        String outAlgnFile = protoTreeInternal.getAlignmentFile();
+        String outNewickTree = protoTreeInternal.getTreeFile();
+
+        String outNewickFile = super.getPrefix() + UUID.randomUUID().toString() + ".newick";
+        String outSvgFile = super.getPrefix() + UUID.randomUUID().toString() + ".svg";
+
+        if (outAlgnFile != null) {
+            String outOrderedAlgnFile = super.getPrefix() + UUID.randomUUID().toString() + ".fa";
+            protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, outOrderedAlgnFile, proteinFeaturesOutFile));
+            argsForTreeWithDomains.add(ParamPrefixes.INPUT_SECOND.getPrefix() + outAlgnFile);
+        } else {
+            protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, proteinFeaturesOutFile));
+        }
+
+        argsForTreeWithDomains.addAll(Arrays.asList(
+                inputFileNameForProtFeatures,
+                ParamPrefixes.INPUT_THIRD.getPrefix() + outNewickTree,
+                ParamPrefixes.INPUT_FOURTH.getPrefix() + proteinFeaturesOutFile,
+                ParamPrefixes.OUTPUT_SECOND.getPrefix() + outSvgFile,
+                ParamPrefixes.OUTPUT_THIRD.getPrefix() + outNewickFile
+        ));
+
+        List<String> listOfPrograms = new LinkedList<>();
+        List<List<String>> listOfArgumentLists = new LinkedList<>();
+
+        listOfPrograms.add(super.getProperties().getPrepareNames());
+        listOfPrograms.addAll(Arrays.asList(
+                super.getProperties().getCalculateProteinFeatures(),
+                super.getProgram(protoTreeInternal.getCommandToBeProcessedBy())
+        ));
+
+        String[] arrayOfInterpreters = prepareInterpreters(listOfPrograms.size());
+        String[] arrayOfPrograms = listOfPrograms.toArray(new String[listOfPrograms.size()]);
+
+        listOfArgumentLists.add(argsForPrepareNames);
+        listOfArgumentLists.addAll(Arrays.asList(
+                argsForProteinFeatures,
+                argsForTreeWithDomains
+        ));
+        prepareCommandArgumentsCommon(protoTreeInternal, arrayOfInterpreters, arrayOfPrograms, listOfArgumentLists);
+        return protoTreeInternal;
+    }
+
     private String[] prepareInterpreters(Integer intepreterNum) {
         String[] arrayOfInterpreters = new String[intepreterNum];
         for (int i=0; i < intepreterNum; i++) {
@@ -215,15 +314,22 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
     public void runMainProgram(ProtoTreeInternal protoTreeInternal) throws IncorrectRequestException {
 	    int counter = 0;
         for (List<String> commandArgument : protoTreeInternal.getCommandsAndArguments()) {
-            if (counterToStage.containsKey(counter)) {
-                BioJob bioJob = super.getBioJobDao().findByJobId(protoTreeInternal.getJobId());
-                bioJob.setStage(counterToStage.get(counter));
-                super.getBioJobDao().save(bioJob);
-            }
+            if (protoTreeInternal.isFullPipeline().equals("true"))
+                saveStage(protoTreeInternal, counter, counterToStage);
+            else if (protoTreeInternal.isFullPipeline().equals("false"))
+                saveStage(protoTreeInternal, counter, counterToStagePartial);
             counter++;
             super.launchProcess(commandArgument);
         }
         saveResultToDb(protoTreeInternal);
+    }
+
+    private void saveStage(ProtoTreeInternal protoTreeInternal, int counter, Map <Integer, String> counterToStageMap) {
+        if (counterToStageMap.containsKey(counter)) {
+            BioJob bioJob = super.getBioJobDao().findByJobId(protoTreeInternal.getJobId());
+            bioJob.setStage(counterToStageMap.get(counter));
+            super.getBioJobDao().save(bioJob);
+        }
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -290,7 +396,11 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         String firstFileName = storeAndGetFileName(protoTreeRequest.getFirstFile(), protoTreeRequest.getFirstFileArea());
         String secondFileName = storeAndGetFileName(protoTreeRequest.getSecondFile(), protoTreeRequest.getSecondFileArea());
 
-        return fromProtoTreeRequestToProtoTreeInternal(protoTreeRequest, firstFileName, secondFileName);
+        String alignedFileName = storeAndGetFileName(protoTreeRequest.getAlignmentFile(), null);
+        String treeFileName = storeAndGetFileName(protoTreeRequest.getTreeFile(), null);
+
+        return fromProtoTreeRequestToProtoTreeInternal(protoTreeRequest, firstFileName,
+                secondFileName, alignedFileName, treeFileName);
     }
 
     private String storeAndGetFileName(final MultipartFile multipartFile, final String fileArea) throws IncorrectRequestException {

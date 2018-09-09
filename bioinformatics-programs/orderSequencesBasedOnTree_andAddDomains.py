@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import sys, getopt, json, collections
+import sys, getopt, json, collections, re
 from Bio import Phylo, SeqIO
 from ete2 import Tree, SeqMotifFace, TreeStyle, add_face_to_node
 
@@ -7,7 +7,7 @@ USAGE = "\nThis script enumerates protein sequence names on the provided phyloge
 "and creates phylogenetic tree in svg format with protein domains after branches.\n" + \
 "It additionally saves phylogenetic tree with changed protein names in newick format\n\n" + "python" + sys.argv[0] + '''
 -i || --isequence     -input filew with sequences
--s || --ialigned      -input file with aligned sequences
+[-s || --ialigned]    -input file with aligned sequences
 -d || --ithird        -input file with phylogenetic tree  
 -f || --ifourth       -input file with protein domains information
 [-o || --oaligned]    -output file with aligned sequences with changed protein names
@@ -31,6 +31,14 @@ PROTEIN_NAME_TO_SEQ = dict()
 PROTEIN_DOMAINS = dict()
 PROTEIN_TO_DOMAINS = collections.defaultdict(list) #{protName1: [[], [], ...], protName2: [[], [], ...]}
 
+
+FEATURE_NAMES_TO_PROCESSED = dict()
+ALIGNED_NAMES_TO_PROCESSED = dict()
+PROTEIN_NAMES_TO_PROCESSED = dict()
+
+PROCESSED_TO_FEATURE_NAMES = dict()
+PROCESSED_TO_ALIGNED_NAMES = dict()
+PROCESSED_TO_PROTEIN_NAMES = dict()
 
 # Maximum number of domains in then merged domain syt to be displayed
 MAX_DOMAIN_COUNT = 6
@@ -73,7 +81,7 @@ def initialyze(argv):
 		elif opt in ("-n", "--osecond"):
 			OUTPUT_TREE_SVG_FILENAME = str(arg).strip()   
 		elif opt in ("-b", "--othird"):
-			OUTPUT_TREE_NEWICK_FILENAME = str(arg).strip()    
+			OUTPUT_TREE_NEWICK_FILENAME = str(arg).strip()
 
 def prepareProteinToDomainsDict():
 	for proteinName, proteinData in PROTEIN_DOMAINS.items():
@@ -290,9 +298,10 @@ def processFileWithSeqs():
 	with open(SEQS, "r") as seqs:
 		for sequence in SeqIO.parse(seqs, "fasta"):
 			PROTEIN_NAME_TO_SEQ[sequence.description.strip()] = str(sequence.seq)
-	with open(SEQS_ALIGNED, "r") as alignedSeqs:
-		for sequence in SeqIO.parse(alignedSeqs, "fasta"):
-			ALIGNED_PROTEIN_NAME_TO_SEQ[sequence.description.strip()] = str(sequence.seq)
+	if SEQS_ALIGNED != None:		
+		with open(SEQS_ALIGNED, "r") as alignedSeqs:
+			for sequence in SeqIO.parse(alignedSeqs, "fasta"):
+				ALIGNED_PROTEIN_NAME_TO_SEQ[sequence.description.strip()] = str(sequence.seq)                   #
 
 def layout(node):
     if node.is_leaf():
@@ -303,31 +312,66 @@ def layout(node):
 			add_face_to_node(seqFace, node, 0, position="aligned")
        
 def writeSeqsAndTree():
+	prepareNameDict()
 	tree = Tree(TREE_FILE)
 	terminals = tree.get_leaves()
-	# Change protein names in datas sctrucuters and write protein sequences with changed names to file 
-	with open(OUTPUT_ALIGNED_FILENAME, "w") as outputFile:
+	# Change protein names in datas sctrucuters and write protein sequences with changed names to file 					
+	if SEQS_ALIGNED != None:
+		with open(OUTPUT_ALIGNED_FILENAME, "w") as outputFile:
+			for i in xrange(len(terminals)):
+				proteinName = terminals[i].name.strip("'")
+				processedName = prepareName(proteinName)
+				if processedName in PROCESSED_TO_ALIGNED_NAMES:
+					terminals[i].name = " " + str(i+1) + "_" + proteinName
+					if processedName in PROCESSED_TO_FEATURE_NAMES:
+						featureName = PROCESSED_TO_FEATURE_NAMES[processedName]
+						PROTEIN_DOMAINS[terminals[i].name] = PROTEIN_DOMAINS[featureName]
+						del PROTEIN_DOMAINS[featureName]
+					proteinSeqName = PROCESSED_TO_PROTEIN_NAMES[processedName] 
+					PROTEIN_NAME_TO_SEQ[terminals[i].name] = PROTEIN_NAME_TO_SEQ[proteinSeqName]
+					del PROTEIN_NAME_TO_SEQ[proteinSeqName]
+					alignedName = PROCESSED_TO_ALIGNED_NAMES[processedName]					
+					ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name] = ALIGNED_PROTEIN_NAME_TO_SEQ[alignedName]
+					del ALIGNED_PROTEIN_NAME_TO_SEQ[alignedName]
+					outputFile.write(">" + terminals[i].name + "\n")
+					outputFile.write(str(ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name]) + "\n")		
+	else:
 		for i in xrange(len(terminals)):
 			proteinName = terminals[i].name.strip("'")
-			if proteinName in ALIGNED_PROTEIN_NAME_TO_SEQ:
-				terminals[i].name = str(i+1) + "_" + proteinName
-				if proteinName in PROTEIN_DOMAINS:
-					PROTEIN_DOMAINS[terminals[i].name] = PROTEIN_DOMAINS[proteinName]
-					del PROTEIN_DOMAINS[proteinName]
-				ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name] = ALIGNED_PROTEIN_NAME_TO_SEQ[proteinName]
-				PROTEIN_NAME_TO_SEQ[terminals[i].name] = PROTEIN_NAME_TO_SEQ[proteinName]
-				del ALIGNED_PROTEIN_NAME_TO_SEQ[proteinName]
-				del PROTEIN_NAME_TO_SEQ[proteinName]
-				outputFile.write(">" + terminals[i].name + "\n")
-				outputFile.write(str(ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name]) + "\n")
-			else: 
-				raise NameError('Name ' + proteinName + 'is absent in the list of sequences.')
-	
+			processedName = prepareName(proteinName)
+			terminals[i].name = " " + str(i+1) + "_" + proteinName
+			if processedName in PROCESSED_TO_FEATURE_NAMES:
+				featureName = PROCESSED_TO_FEATURE_NAMES[processedName]
+				PROTEIN_DOMAINS[terminals[i].name] = PROTEIN_DOMAINS[featureName]
+				del PROTEIN_DOMAINS[featureName]
+				proteinSeqName = PROCESSED_TO_PROTEIN_NAMES[processedName]				
+				PROTEIN_NAME_TO_SEQ[terminals[i].name] = PROTEIN_NAME_TO_SEQ[proteinSeqName]
+				del PROTEIN_NAME_TO_SEQ[proteinSeqName]											
+						
 	prepareProteinToDomainsDict()
 	tree.write(outfile=OUTPUT_TREE_NEWICK_FILENAME)
 	treeStyle = TreeStyle()
 	treeStyle.layout_fn = layout
 	tree.render(OUTPUT_TREE_SVG_FILENAME, w=800, dpi=400, tree_style=treeStyle)
+
+
+def prepareNameDict():
+	for protein in PROTEIN_DOMAINS:
+		processdName = prepareName(protein)
+		PROCESSED_TO_FEATURE_NAMES[processdName] = protein
+	for protein in ALIGNED_PROTEIN_NAME_TO_SEQ:
+		processdName = prepareName(protein)		
+		PROCESSED_TO_ALIGNED_NAMES[processdName] = protein		
+	for protein in PROTEIN_NAME_TO_SEQ:
+		processdName = prepareName(protein)		
+		PROCESSED_TO_PROTEIN_NAMES[processdName] = protein		
+
+		
+REGEX_UNDERSCORE = re.compile(r"(\W|_)")
+REGEX_UNDERSCORE_SUBST = ""
+
+def prepareName(line):
+	return REGEX_UNDERSCORE.sub(REGEX_UNDERSCORE_SUBST, line)
 	
 def main(argv):
 	initialyze(argv)

@@ -42,41 +42,34 @@ function takeCareOfFields() {
 	$('#first-file').change(function() {
 	    $('#first-file-info').html(this.files[0].name);
 	    $('#first-file-area').val('');
-	    $('.result-container').hide();
 	});
 
     $('#second-file').change(function() {
 	    $('#second-file-info').html(this.files[0].name);
 	    $('#second-file-area').val('');
-	    $('.result-container').hide();
-	});
-
-    $('#third-file').change(function() {
-	    $('#third-file-info').html(this.files[0].name);
-	    $('#third-file-area').val('');
-	    $('.result-container').hide();
 	});
 
     $('#first-file-area').keyup(function() {
         $('#first-file-info').empty();
         $('#first-file').val('');
-        $('.result-container').hide();
     });
 
 	$('#second-file-area').keyup(function() {
 	    $('#second-file-info').empty();
 	    $('#second-file').val('');
-	    $('.result-container').hide();
-
 	});
 
-    $('#third-file-area').keyup(function() {
-        $('#third-file-info').empty();
-        $('#third-file').val('');
-        $('.result-container').hide();
+    $('#sequence-file').change(function() {
+	    $('#sequence-file-info').html(this.files[0].name);
+	});
 
+    $('#alignment-file').change(function() {
+        $('#alignment-file-info').html(this.files[0].name);
     });
 
+    $('#tree-file').change(function() {
+        $('#tree-file-info').html(this.files[0].name);
+    });
 
     $('#gaps-missing').change(function() {
         var checkedOption = $('#gaps-missing').val();

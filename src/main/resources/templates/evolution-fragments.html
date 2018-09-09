@@ -17,7 +17,7 @@
             </div> <br /> <br />
         </div>
 
-        <div class="col-md-8 my-textarea">
+        <div class="col-md-8 my-textarea full-pipe">
             <div class="row">
                 <textarea id="first-file-area" class="form-control" rows="12"> </textarea>
             </div>
@@ -34,6 +34,40 @@
                     <span>SUBMIT</span>
                 </button>
             </div> <br /> <br />
+        </div>
+        <div class="col-md-8 my-textarea partial-pipe">
+            <div class="row partial-pipe-file">
+                <div class="partial-pipe-interior">
+                    <label class="btn btn-primary btn-md proto-tree-button">
+                        Choose file with protein sequences <input id="sequence-file" type="file" style="display: none" multiple/>
+                    </label>
+                    <span class='label label-info' id="sequence-file-info"></span>
+                </div>
+            </div>
+
+            <div class="row partial-pipe-file">
+                <div class="partial-pipe-interior">
+                    <label class="btn btn-primary btn-md proto-tree-button">
+                        Choose file with alignment (optional) <input id="alignment-file" type="file" style="display: none" multiple/>
+                    </label>
+                    <span class='label label-info' id="alignment-file-info"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="partial-pipe-file">
+                    <div class="partial-pipe-interior">
+                        <label class="btn btn-primary btn-md proto-tree-button">
+                            Choose file with tree (newick) <input id="tree-file" type="file" style="display: none" multiple/>
+                        </label>
+                        <span class='label label-info' id="tree-file-info"></span>
+                    </div>
+                </div>
+                <button id="GoAsyncPartial" class="btn btn-primary btn-md pull-right proto-tree-button" type="button">
+                    <span>SUBMIT</span>
+                </button>
+            </div>
+
         </div>
 
     </div>
@@ -75,11 +109,22 @@
         </div>
     </div>
 
+    <div th:fragment="navigator">
+        <div class="navigator">
+            <button id="full-pipeline" class="btn btn-primary btn-md pipeline-button-selected" type="button">
+                Full Pipeline
+            </button>
+            <button id="partial-pipeline" class="btn btn-primary btn-md pipeline-button" type="button">
+                Partial Pipeline
+            </button>
+        </div>
+    </div>
+
     <div th:fragment="proto-tree-filter">
         <div class="col-md-2 panel panel-default">
             <div class="panel-body">
                 <h3 class="text-primary">Set options:</h3>
-                <div class="form-group">
+                <div class="form-group full-pipe">
                     <form id="first">
                         <h4 class="text-info" >Alignment:</h4>
                         <span>Alignment Algorithm:</span>
@@ -176,6 +221,7 @@
                         </div>
                     </form>
                 </div>
+                <span id="isFullPipeline">true</span>
                 <h4 class="text-info">Protein Features:</h4>
                 <div class="form-group">
                     <form id="second">

@@ -60,7 +60,8 @@ public class EvolutionController extends BioUniverseController {
         addToModelCommon(model, "/js/send-and-process-data.js");
         model.addAttribute("subnavigationTab", BioPrograms.PROTO_TREE.getProgramName());
         return "main-view  :: addContent(" +
-                "fragmentsMain='evolution-fragments', searchArea='proto-tree', filter='proto-tree-filter')";
+                "fragmentsMain='evolution-fragments', searchArea='proto-tree', filter='proto-tree-filter'" +
+                ", navigation='navigator')";
     }
 
     @GetMapping(value={"/tree-for-you/{jobId:.+}"})

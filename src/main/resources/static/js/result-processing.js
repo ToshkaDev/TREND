@@ -57,7 +57,6 @@ function processRetrievedDataAsync(data) {
         $('.wait-for-it').hide();
         $('.no-such-biojob').show();
     }
-
     else  if (data.status[0] === 'ready') {
         clearInterval(fileGetter);
         displayStage(data.stage[0], true);
@@ -66,18 +65,26 @@ function processRetrievedDataAsync(data) {
             $('#results-load').attr('href', data.result[0]);
         }
         if (data.result.length > 1) {
-
             // Add corresponding links to download buttons
             $('#results-load').attr('href', data.result[1]);
             $('#tree-load').attr('href', data.result[0]);
-            $('#alignment-load').attr('href', data.result[2]);
-            $('#features-load').attr('href', data.result[3]);
-
+            var featureData;
+            // if all the files were provided for the pipeline
+            if (data.result.length == 4) {
+                $('#alignment-load').attr('href', data.result[2]);
+                $('#features-load').attr('href', data.result[3]);
+                featureData = data.result[3];
+                // if alignement file was not provided for the pipeline (the partial one)
+            } else if (data.result.length == 3) {
+                $('#alignment-load').hide();
+                $('#features-load').attr('href', data.result[2]);
+                featureData = data.result[2];
+            }
             prepareTreeContainer();
             d3.xml(data.result[1]).then(function(xml) {
                 console.log(xml.documentElement)
                 document.getElementById("treeContainer").appendChild(xml.documentElement);
-                $.get(data.result[3], function(data, status){
+                $.get(featureData, function(data, status){
                     addEventListeners(data);
                 });
             });
@@ -118,8 +125,8 @@ function processStageMessage(stage) {
 }
 
 function addEventListeners(data) {
-	var re = /^\d{1,}_/;
-	var notAllowedClassCharacters = /(\.|\~|!|$|@|\*|%|&|,|\?|#|`|:|;|>|<|\/|\\|{|}|[|])/g;
+	var re = /^ \d{1,}_/;
+	var notAllowedClassCharacters = /(\W|_)/g;
 	var currentClassName;
 	var proteinIdToRendered = {};
 	var trueClassNameToChanged = {};
@@ -128,7 +135,7 @@ function addEventListeners(data) {
 			if (d3.select(this).text().length > 0 && re.test(d3.select(this).text())) {
 			    classNameForJson = d3.select(this).text().replace(re, '');
 				currentClassName = classNameForJson.replace(notAllowedClassCharacters, '');
-				console.log("currentClassName " + currentClassName)
+				console.log("currentClassName " + currentClassName);
 				trueClassNameToChanged[currentClassName] = classNameForJson;
 
 				d3.select(this).attr("class", currentClassName+"_text");
@@ -165,7 +172,7 @@ function checkTableAndDisplay(event, currentClassName, data, proteinIdToRendered
 
 function createTable(event, data, currentClassName, trueClassNameToChanged) {
     var organizedData = organizeData(data, trueClassNameToChanged[currentClassName]);
-    var divToAddTo = createDivToAddTo(event, currentClassName);
+    var divToAddTo = createDivToAddTo(event, currentClassName, trueClassNameToChanged[currentClassName]);
     addButtons(divToAddTo, organizedData);
     var isFirstEncountered = false;
     isFirstEncountered = makeTable(divToAddTo, organizedData.domainOrganizedData, "domain-table", isFirstEncountered);
@@ -250,7 +257,7 @@ function organizeData(data, currentClassName) {
     };
 }
 
-function createDivToAddTo(event, currentClassName) {
+function createDivToAddTo(event, currentClassName, classNameForJson) {
     var xCoor = event.clientX - xOffset + "px";
     var yCoor = event.clientY - yOffset + "px";
     var readyClassName = currentClassName + infoPostfix;
@@ -258,7 +265,7 @@ function createDivToAddTo(event, currentClassName) {
     var removeElement = $("<div><a href='#' class='proto-tree-link'><span class='glyphicon glyphicon-remove pull-right'></span></a></div>");
     divElement.addClass(readyClassName + " protein-info-container");
     divElement.append(removeElement);
-    divElement.append($("<h4>" + currentClassName.replace(/_/g, " ") + "</h4><hr/>"));
+    divElement.append($("<h4>" + classNameForJson + "</h4><hr/>"));
 
     divElement.click(function(event){
         event.stopPropagation();

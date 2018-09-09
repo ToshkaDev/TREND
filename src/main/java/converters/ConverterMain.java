@@ -11,10 +11,13 @@ public class ConverterMain {
 	}
 
 	public static ProtoTreeInternal fromProtoTreeRequestToProtoTreeInternal(ProtoTreeRequest protoTreeRequest,
-                                                                            String firstFileName, String secondFileName) {
+                                                                            String firstFileName, String secondFileName,
+																			String alignedFileName, String treeFileName) {
 		ProtoTreeInternal protoTreeInternal = new ProtoTreeInternal();
         protoTreeInternal.setFirstFileName(checkForNullAndGet(ParamPrefixes.INPUT.getPrefix(), firstFileName));
 		protoTreeInternal.setSecondFileName(checkForNullAndGet(ParamPrefixes.INPUT.getPrefix(), secondFileName));
+		protoTreeInternal.setAlignmentFile(alignedFileName);
+		protoTreeInternal.setTreeFile(treeFileName);
 		protoTreeInternal.setCommandToBeProcessedBy(protoTreeRequest.getCommandToBeProcessedBy());
 
         protoTreeInternal.setTreeBuildMethod(checkForNullAndGet(ParamPrefixes.TREE_BUILD_METHOD.getPrefix(), protoTreeRequest.getTreeBuildMethod()));
@@ -32,7 +35,8 @@ public class ConverterMain {
 		protoTreeInternal.seteValue(checkEvalueAndGet(ParamPrefixes.EVAL_THRESH.getPrefix(), protoTreeRequest.geteValue()));
 		protoTreeInternal.setProbability(checkProbabilityAndGet(ParamPrefixes.PROBABILITY.getPrefix(), protoTreeRequest.getProbability()));
 		protoTreeInternal.setLcrPrediction(checkLcrPredictionAndGet(ParamPrefixes.RUN_SEGMASKER.getPrefix(), protoTreeRequest.getLcrPrediction()));
-        return protoTreeInternal;
+		protoTreeInternal.setFullPipeline(protoTreeRequest.isFullPipeline());
+		return protoTreeInternal;
 	}
 
 	private static String checkForNullAndGet(String paramPrefix, String param) {

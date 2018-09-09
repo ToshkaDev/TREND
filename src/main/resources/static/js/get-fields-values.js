@@ -1,14 +1,20 @@
 function getOptions() {
-	var firstFile = $('#first-file')[0].files[0];
-	if (typeof $('#second-file')[0] != 'undefined') {
-	    var secondFile = $('#second-file')[0].files[0];
-    }
-    if (typeof $('#third-file')[0] != 'undefined') {
-        var thirdFile = $('#third-file')[0].files[0];
-    }
-	var firstFileArea = $('#first-file-area').val() ? $('#first-file-area').val().trim() : '';
-	var secondFileArea = $('#second-file-area').val() ? $('#second-file-area').val().trim() : '';
-	var thirdFileArea = $('#third-file-area').val() ? $('#third-file-area').val().trim() : '';
+    var isFullPipeline = $('#isFullPipeline').text();
+	if (isFullPipeline == 'false') {
+        if (typeof $('#sequence-file')[0] != 'undefined')
+            var firstFile = $('#sequence-file')[0].files[0];
+        if (typeof $('#alignment-file')[0] != 'undefined')
+            var alignmentFile = $('#alignment-file')[0].files[0];
+        if (typeof $('#tree-file')[0] != 'undefined')
+            var treeFile = $('#tree-file')[0].files[0];
+	} else {
+	    if (typeof $('#first-file')[0] != 'undefined')
+            var firstFile = $('#first-file')[0].files[0];
+    	if (typeof $('#second-file')[0] != 'undefined')
+    	    var secondFile = $('#second-file')[0].files[0];
+    	var firstFileArea = $('#first-file-area').val() ? $('#first-file-area').val().trim() : '';
+    	var secondFileArea = $('#second-file-area').val() ? $('#second-file-area').val().trim() : '';
+	}
 
     var alignmentAlg = $('#alignment-alg').val();
     var treeBuildMethod = $('#tree-method').val();
@@ -28,12 +34,13 @@ function getOptions() {
     Cookies.set('HEYE', 'This');
     console.log("cookie.get('HEYE') " + Cookies.get('HEYE'))
     var optionToOptionName = {
+        "isFullPipeline": isFullPipeline,
         "firstFile": firstFile,
         "secondFile": secondFile,
-        "thirdFile": thirdFile,
         "firstFileArea": firstFileArea,
         "secondFileArea": secondFileArea,
-        "thirdFileArea": thirdFileArea,
+        "alignmentFile": alignmentFile,
+        "treeFile": treeFile,
         "alignmentAlg": alignmentAlg,
         "treeBuildMethod": treeBuildMethod,
         "aaSubstRate": aaSubstRate,

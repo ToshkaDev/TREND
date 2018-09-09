@@ -3,15 +3,14 @@ $(document).ready(function (){
 	takeCareOfFields();
 
     setCookie();
-    $('#Go').click(function() {
-    	options = getOptions();
-    	getData(options);
-    });
-
     $('#GoAsync').click(function() {
     	options = getOptions();
     	getDataAsync(options);
+    });
 
+    $('#GoAsyncPartial').click(function() {
+        options = getOptions();
+        getDataAsync(options);
     });
 
     $('#options').click(function() {
@@ -27,6 +26,26 @@ $(document).ready(function (){
         else {
             $('#addSecondArea').html("Add Second Area")
         }
+    });
+
+    $('#full-pipeline').click(function() {
+        $('.partial-pipe').hide();
+        $('.full-pipe').show();
+        $('#full-pipeline').removeClass('pipeline-button');
+        $('#full-pipeline').addClass('pipeline-button-selected');
+        $('#partial-pipeline').removeClass('pipeline-button-selected');
+        $('#partial-pipeline').addClass('pipeline-button');
+        $('#isFullPipeline').text("true");
+    });
+    $('#partial-pipeline').click(function() {
+        $('.full-pipe').hide();
+        $('.partial-pipe').show();
+        $('.second-area').hide();
+        $('#full-pipeline').removeClass('pipeline-button-selected');
+        $('#full-pipeline').addClass('pipeline-button');
+        $('#partial-pipeline').removeClass('pipeline-button');
+        $('#partial-pipeline').addClass('pipeline-button-selected');
+        $('#isFullPipeline').text("false");
     });
 });
 

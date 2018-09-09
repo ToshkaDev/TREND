@@ -63,6 +63,23 @@ nav div.bottom-nav-bar {
     border: 1px solid  #47476b;
 }
 
+.pipeline-button, .pipeline-button:focus {
+    background-color: #7FB9AB;
+    border: 1px solid #7FB9AB;
+    color: #ededed;
+}
+
+.pipeline-button:hover, .pipeline-button:active, .pipeline-button:visited{
+    background-color: #3F7C7A !important;
+    border: 1px solid #3F7C7A;
+}
+
+.pipeline-button-selected {
+    background-color: #3F7C7A !important;
+    border: 1px solid #3F7C7A;
+}
+
+
 #GoAsync{
 	width:7em;
 }
@@ -83,6 +100,25 @@ label.error {
 }
 
 .second-area {
+    display: none;
+}
+
+.partial-pipe {
+    display: none;
+}
+
+.partial-pipe-file {
+    border-style: groove;
+    border-width: 2px;
+    border-radius: 5px;
+    margin-bottom: 7px;
+}
+
+.partial-pipe-interior {
+    padding: 20px;
+}
+
+#isFullPipeline {
     display: none;
 }
  /*End of Activity associated elements: buttons and so on*/
@@ -143,6 +179,23 @@ div.result-area {
     margin-left: 5px;
 }
 
+.navigator {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#full-pipeline {
+    margin-left: 33%;
+    margin-bottom: 3%;
+    width: 140px;
+    height: 38px;
+}
+#partial-pipeline {
+    margin-left: 33%;
+    width: 140px;
+    height: 38px;
+}
 /*End of filter options styles*/
 
 

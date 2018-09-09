@@ -10,8 +10,8 @@ public class ProtoTreeInternal {
 
     private String firstFileName;
     private String secondFileName;
-    private String thirdFileName;
-
+    private String alignmentFile;
+    private String treeFile;
     private String alignmentAlg;
     private String reorderOrNot;
 
@@ -32,6 +32,7 @@ public class ProtoTreeInternal {
     private String lcrPrediction;
 
     private String  commandToBeProcessedBy;
+    private String isFullPipeline;
     private List<List<String>> commandsAndArguments;
     private List<String> outputFilesNames = new LinkedList<>();
 
@@ -78,6 +79,22 @@ public class ProtoTreeInternal {
         this.secondFileName = secondFileName;
     }
 
+    public String getAlignmentFile() {
+        return alignmentFile;
+    }
+
+    public void setAlignmentFile(String alignmentFile) {
+        this.alignmentFile = alignmentFile;
+    }
+
+    public String getTreeFile() {
+        return treeFile;
+    }
+
+    public void setTreeFile(String treeFile) {
+        this.treeFile = treeFile;
+    }
+
     public String getCommandToBeProcessedBy() {
         return commandToBeProcessedBy;
     }
@@ -85,15 +102,6 @@ public class ProtoTreeInternal {
     public void setCommandToBeProcessedBy(String commandToBeProcessedBy) {
         this.commandToBeProcessedBy = commandToBeProcessedBy;
     }
-
-    public String getThirdFileName() {
-        return thirdFileName;
-    }
-
-    public void setThirdFileName(String thirdFileName) {
-        this.thirdFileName = thirdFileName;
-    }
-
 
     public String getAlignmentAlg() {
         return alignmentAlg;
@@ -248,4 +256,11 @@ public class ProtoTreeInternal {
         return fieldsForFeaturesPrediction;
     }
 
+    public String isFullPipeline() {
+        return isFullPipeline;
+    }
+
+    public void setFullPipeline(String fullPipeline) {
+        isFullPipeline = fullPipeline;
+    }
 }

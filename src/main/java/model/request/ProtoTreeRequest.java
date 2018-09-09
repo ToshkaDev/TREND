@@ -6,8 +6,8 @@ public class ProtoTreeRequest {
     private String firstFileArea;
     private MultipartFile secondFile;
     private String secondFileArea;
-    private MultipartFile thirdFile;
-    private String thirdFileArea;
+    private MultipartFile alignmentFile;
+    private MultipartFile treeFile;
 
     private String treeBuildMethod;
     private String aaSubstModel;
@@ -25,6 +25,7 @@ public class ProtoTreeRequest {
     private String lcrPrediction;
 
     private String commandToBeProcessedBy;
+    private String isFullPipeline;
 
     public MultipartFile getFirstFile() {
         return firstFile;
@@ -54,20 +55,20 @@ public class ProtoTreeRequest {
         this.secondFileArea = secondFileArea;
     }
 
-    public MultipartFile getThirdFile() {
-        return thirdFile;
+    public MultipartFile getAlignmentFile() {
+        return alignmentFile;
     }
 
-    public void setThirdFile(MultipartFile thirdFile) {
-        this.thirdFile = thirdFile;
+    public void setAlignmentFile(MultipartFile alignmentFile) {
+        this.alignmentFile = alignmentFile;
     }
 
-    public String getThirdFileArea() {
-        return thirdFileArea;
+    public MultipartFile getTreeFile() {
+        return treeFile;
     }
 
-    public void setThirdFileArea(String thirdFileArea) {
-        this.thirdFileArea = thirdFileArea;
+    public void setTreeFile(MultipartFile treeFile) {
+        this.treeFile = treeFile;
     }
 
     public String getAlignmentAlg() {
@@ -188,6 +189,14 @@ public class ProtoTreeRequest {
 
     public void setLcrPrediction(String lcrPrediction) {
         this.lcrPrediction = lcrPrediction;
+    }
+
+    public String isFullPipeline() {
+        return isFullPipeline;
+    }
+
+    public void setIsFullPipeline(String fullPipeline) {
+        isFullPipeline = fullPipeline;
     }
 }
 
