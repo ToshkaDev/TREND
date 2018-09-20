@@ -59,7 +59,7 @@ function getDataAsync(options) {
     console.log("getDataAsync() called!");
 	$.ajax({
 	      type: 'POST',
-	      url: 'prototree/process-request',
+	      url: 'process-request',
 	      data : options,
 	      success: redirect,
 	      error: error,
@@ -73,7 +73,7 @@ function getDataAsync(options) {
 function redirect(jobId) {
     console.log("Job is launched");
     console.log('jobId ' + jobId);
-    window.location.replace("prototree/tree-for-you/" + jobId);
+    window.location.replace("tree-for-you/" + jobId);
 }
 
 function error(jqXHR, textStatus, errorThrown) {

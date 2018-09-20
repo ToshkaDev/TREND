@@ -103,27 +103,9 @@ label.error {
     display: none;
 }
 
-.partial-pipe {
-    display: none;
-}
-
-.partial-pipe-file {
-    border-style: groove;
-    border-width: 2px;
-    border-radius: 5px;
-    margin-bottom: 7px;
-}
-
-.partial-pipe-interior {
-    padding: 20px;
-}
-
-#isFullPipeline {
-    display: none;
-}
  /*End of Activity associated elements: buttons and so on*/
 
-/*Filter options styles*/
+/*Main area and Filter options styles*/
 div.ml-options, div#rpsblast-db, div.cov-cutoff, div.number-of-replicates {
     display: none;
 }
@@ -196,7 +178,45 @@ div.result-area {
     width: 140px;
     height: 38px;
 }
-/*End of filter options styles*/
+
+.partial-pipe {
+    display: none;
+}
+
+.partial-pipe-file {
+    border-style: groove;
+    border-width: 2px;
+    border-radius: 5px;
+    margin-bottom: 7px;
+}
+
+.partial-pipe-interior {
+    padding: 20px;
+}
+
+#isFullPipeline {
+    display: none;
+}
+
+.help-div {
+    max-width: 70%;
+    margin-left: 15%;
+    border-radius: 5px;
+}
+
+.move-text {
+    margin-left: 30px;
+}
+
+.text-head3 {
+    margin-bottom: 15px;
+}
+
+.text-head4 {
+    margin-top: 20px;
+    margin-bottom: 15px;
+}
+/*End of main area and filter options styles*/
 
 
 /*Results area */

@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  */
 
 @Controller
-@RequestMapping("/prototree")
+@RequestMapping("/")
 public class EvolutionController extends BioUniverseController {
 
     @Autowired
@@ -55,7 +55,7 @@ public class EvolutionController extends BioUniverseController {
     	this.evolutionService = evolutionService;
     }
 
-    @GetMapping(value={"", "/"})
+    @GetMapping(value={"", "/home"})
     public String protoTree(Model model) {
         addToModelCommon(model, "/js/send-and-process-data.js");
         model.addAttribute("subnavigationTab", BioPrograms.PROTO_TREE.getProgramName());
@@ -64,18 +64,23 @@ public class EvolutionController extends BioUniverseController {
                 ", navigation='navigator')";
     }
 
-    @GetMapping(value={"/tree-for-you/{jobId:.+}"})
+    @GetMapping(value={"/help"})
+    public String help(Model model) {
+        model.addAttribute("mainTab", "help");
+        return "main-view  :: addContent(" +
+                "fragmentsMain='about', help='help')";
+    }
+
+    @GetMapping(value={"tree-for-you/{jobId:.+}"})
     public String result(@PathVariable Integer jobId, Model model) {
         addToModelCommon(model, "/js/result-processing.js");
         System.out.println("jobId " + jobId);
         model.addAttribute("jobId", jobId);
         model.addAttribute("subnavigationTab", BioPrograms.PROTO_TREE.getProgramName());
-        return "main-view  :: addContent(" +
-                "fragmentsMain='evolution-fragments', " +
-                "tab='evolution-navbar', result='result')";
+        return "main-view  :: addContent(fragmentsMain='evolution-fragments', result='result')";
     }
 
-    @PostMapping(value="/process-request", produces="text/plain")
+    @PostMapping(value="process-request", produces="text/plain")
     @ResponseBody
     public String processTreeRequest(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException, ExecutionException, InterruptedException {
 	    ProtoTreeInternal protoTreeInternal = null;
@@ -91,11 +96,11 @@ public class EvolutionController extends BioUniverseController {
         return String.valueOf(jobId);
     }
 
-    @GetMapping(value="/tree-for-you/get-filename", produces="application/json")
+    @GetMapping(value="tree-for-you/get-filename", produces="application/json")
     @ResponseBody
     public Map<String, List<String>> getFileNameIfReady(@RequestParam("jobId") String jobId) {
         BioJob bioJob;
-        String urlPath = ServletUriComponentsBuilder.fromCurrentContextPath().path("/prototree/univ_files/").build().toString();
+        String urlPath = ServletUriComponentsBuilder.fromCurrentContextPath().path("univ_files/").build().toString();
 
         Map<String, List<String>> result = new HashMap<>();
         result.put("status", noSuchBioJob);
@@ -119,7 +124,7 @@ public class EvolutionController extends BioUniverseController {
         return result;
     }
 
-    @GetMapping("/univ_files/{filename:.+}")
+    @GetMapping("univ_files/{filename:.+}")
     public void getFileFromDbP(@PathVariable String filename, HttpServletResponse response) throws IOException {
         BioJobResult bioJobResult = ((BioUniverseService) evolutionService).getBioJobResultDao().findByResultFileName(filename);
         if (filename.split("\\.")[1].equals("txt")) {
