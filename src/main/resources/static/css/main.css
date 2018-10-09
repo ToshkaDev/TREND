@@ -1,5 +1,5 @@
 body {
-	font: 1.4em Arial, helvetica, sans-serif;
+	font: 1.6em Arial, helvetica, sans-serif;
 	margin: 0;
 	padding: 0;
 }
@@ -10,7 +10,7 @@ body {
 
 /*Navigation bar styles*/
 .navbar-inverse {
-	font-size:130%;
+	font-size:120%;
 	color:white;
 	background-color: #3F7C7A;
 }
