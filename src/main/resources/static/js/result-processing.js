@@ -4,7 +4,7 @@ $(document).ready(function (){
     infoPostfix = "_table";
     stageList = [];
     xOffset = 400;
-    yOffset = 670;
+    yOffset = 660;
     buttonIds = ["Domains", "TMs", "LCRs", "Sequence", "Additional"];
     buttonIdToTableClass = {"Domains": "domain-table", "TMs": "tm-table", "LCRs": "lcr-table", "Sequence": "sequence-table", "Additional": "additional-table"};
     entityToButton = {"domainOrganizedData": buttonIds[0], 'tmOrganizedData': buttonIds[1],
@@ -84,7 +84,6 @@ function processRetrievedDataAsync(data) {
             }
             prepareTreeContainer();
             d3.xml(data.result[1]).then(function(xml) {
-                console.log(xml.documentElement)
                 document.getElementById("treeContainer").appendChild(xml.documentElement);
                 $.get(featureData, function(data, status){
                     addEventListeners(data);
@@ -142,7 +141,6 @@ function addEventListeners(data) {
 			if (d3.select(this).text().length > 0 && re.test(d3.select(this).text())) {
 			    classNameForJson = d3.select(this).text();
 				currentClassName = classNameForJson.replace(notAllowedClassCharacters, '');
-				console.log("currentClassName " + currentClassName);
 				trueClassNameToChanged[currentClassName] = classNameForJson;
 
 				d3.select(this).attr("class", currentClassName+"_text");
@@ -162,7 +160,7 @@ function addEventListeners(data) {
 				d3.select(this).selectAll('*').attr("class", currentClassName);
 
 				d3.select(this).on("click", function(){
-						checkTableAndDisplay(d3.event, d3.select(this).attr("class"), data, proteinIdToRendered);
+						checkTableAndDisplay(d3.event, d3.select(this).attr("class"), proteinIdToRendered);
 
                         var proteinName = d3.select(this).attr("class");
                         var domainFlag = d3.select(this).attr("domainFlag");
@@ -176,19 +174,19 @@ function addEventListeners(data) {
 
 					});
 				d3.select(this).selectAll('*').on("click", function(){
-						checkTableAndDisplay(d3.event, d3.select(this).attr("class"), data, proteinIdToRendered);
+						checkTableAndDisplay(d3.event, d3.select(this).attr("class"), proteinIdToRendered);
 					});
 			}
 	  });
 }
 
-function checkTableAndDisplay(event, currentClassName, data, proteinIdToRendered) {
+function checkTableAndDisplay(event, currentClassName, proteinIdToRendered) {
     event.stopPropagation();
     if (renderedClass) {
         $("." + renderedClass + infoPostfix).hide();
     }
     if (!proteinIdToRendered[currentClassName]) {
-        createTable(event, data, currentClassName);
+        createTable(event, currentClassName);
         proteinIdToRendered[currentClassName] = true;
         renderedClass = currentClassName;
     } else {
@@ -197,8 +195,8 @@ function checkTableAndDisplay(event, currentClassName, data, proteinIdToRendered
     }
 }
 
-function createTable(event, data, currentClassName) {
-    var organizedData = organizeData(data, trueClassNameToChanged[currentClassName]);
+function createTable(event, currentClassName) {
+    var organizedData = organizeData(trueClassNameToChanged[currentClassName]);
     var divToAddTo = createDivToAddTo(event, currentClassName, trueClassNameToChanged[currentClassName]);
     addButtons(divToAddTo, organizedData);
     var isFirstEncountered = false;
@@ -209,9 +207,9 @@ function createTable(event, data, currentClassName) {
     isFirstEncountered = makeTable(divToAddTo, organizedData.additionalOrganizedData, "additional-table", isFirstEncountered);
 }
 
-function organizeData(data, currentClassName) {
+function organizeData(currentClassName) {
     var domainOrganizedData = [], tmOrganizedData = [], sequenceData = [], additionalOrganizedData = [], lcrOrganized = [], score;
-    var dataAsJson = JSON.parse(data)[currentClassName];
+    var dataAsJson = featureJSON[currentClassName];
 
     if (dataAsJson) {
         var sequenceHeader = [""]
@@ -318,13 +316,8 @@ function addButtons(container, organizedData) {
         organizedData[entity].length > 0 && entityToButton[entity] ? buttonTexts.push(entityToButton[entity]) : null;
     }
     var button;
-    buttonTexts.forEach((buttonText, idx) => {
-        if (idx === 0) {
-            button = $("<button/>").addClass("btn btn-md protein-info-buttons-selected ");
-        } else {
-            button = $("<button/>").addClass("btn btn-md protein-info-buttons ");
-        }
-
+    buttonTexts.forEach((buttonText) => {
+        button = $("<button/>").addClass("btn btn-md protein-info-buttons ");
         button.attr("id", buttonText);
         addButtonEventListener(button);
         button.html(buttonText);
@@ -335,8 +328,11 @@ function addButtons(container, organizedData) {
 function addButtonEventListener(buttonElement) {
     buttonElement.click(function(event) {
         event.stopPropagation();
-        $(".protein-info-buttons-selected").removeClass("protein-info-buttons-selected").addClass("protein-info-buttons");
-        $(this).removeClass("protein-info-buttons").addClass("protein-info-buttons-selected");
+
+        if ($(this).attr("class").split(" ")[2] == 'protein-info-buttons') {
+           $(".protein-info-buttons-selected").removeClass("protein-info-buttons-selected").addClass("protein-info-buttons");
+           $(this).removeClass("protein-info-buttons").addClass("protein-info-buttons-selected");
+        }
         if ($(this).attr("id") === "Domains") {
             $("." + "domain-table").show();
             $("." + "lcr-table").hide();
@@ -414,31 +410,26 @@ function getHighlightedSequence(proteinName, domainCount) {
     sequenceFirstFragment = (''+proteinSequnce).substring(0, domStart);
     sequenceMiddleFragment = "<span style='background-color: #d8f7dd'>" + proteinSequnce.substring(domStart, domEnd+1) + "</span>";
     sequenceLastFragment = proteinSequnce.substring(domEnd+1, proteinSequnce.length);
-    console.log("sequenceFirstFragment " + sequenceFirstFragment);
-    console.log("sequenceMiddleFragment " + sequenceMiddleFragment);
-    console.log("sequenceLastFragment "  + sequenceLastFragment);
     return sequenceFirstFragment+sequenceMiddleFragment+sequenceLastFragment;
 }
 
 function updatePositionAndShow(event, readyClassName) {
-    console.log("Show")
     var xCoor = event.clientX - xOffset + "px";
     var yCoor = event.clientY - yOffset + "px";
     $("." + readyClassName).css({"left": xCoor, "top": yCoor});
     $("." + readyClassName).show();
     var buttons = $("."+readyClassName).children(".btn");
 
-    var buttonId, counter = 0;
+    var buttonId;
     for (button of buttons) {
         buttonId = $(button).attr("id");
-        if (counter === 0) {
+        if (buttonId === "Sequence") {
             $(button).removeClass("protein-info-buttons").addClass("protein-info-buttons-selected");
             $("."+buttonIdToTableClass[buttonId]).show();
         } else {
             $(button).removeClass("protein-info-buttons-selected").addClass("protein-info-buttons");
             $("."+buttonIdToTableClass[buttonId]).hide();
         }
-        counter = counter + 1;
      }
 }
 

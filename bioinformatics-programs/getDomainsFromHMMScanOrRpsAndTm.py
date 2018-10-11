@@ -381,6 +381,7 @@ def processHmmscan():
 def processRpsbproc():
 	domainListBegan = False
 	siteListBegan = False
+	proteinObject = None
 	with open(OUTPUT_RPSBPROC, "r") as rpsbprocFile:
 		for record in rpsbprocFile:
 			if proteinObject and not len(proteinObject.sequence) and query:

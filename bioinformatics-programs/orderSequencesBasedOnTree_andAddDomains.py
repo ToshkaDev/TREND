@@ -119,51 +119,52 @@ def prepareProteinToDomainsDict():
 			domainsOK = dict()		
 			
 			##### Prepare Domains ######
-			#Sort domains by alisStart to use for merging or removing overlaps		 
-			domainsWithNoOverlaps = sorted(proteinData["domains"], key=lambda x: x["aliStart"], reverse=False)
-			if REMOVE_OVELAPS:
-				domainsWithNoOverlaps = removeOverlapps(domainsWithNoOverlaps)
-			PROTEIN_DOMAINS_FINAL[proteinName]["domainsWithNoOverlaps"] = []
-			
-			
-			# Doing the following to shift starts if diferent domains have the same starts
-			# If REMOVE_OVELAPS == True this is not needed, that's why in elif REMOVE_OVELAPS is checked
-			dmainStartsProcessed = []
-			dmainStartToDomainInfo = {}				
-			for region in domainsWithNoOverlaps:
-				if region["aliStart"]-1 not in dmainStartsProcessed:
-					dmainStartToDomainInfo[region["aliStart"]-1] = region
-					if REMOVE_OVELAPS:
-						PROTEIN_DOMAINS_FINAL[proteinName]["domainsWithNoOverlaps"] \
-						.append({"domainName": region["domainName"], "start": region["aliStart"]-1, "end": region["aliEnd"]-1})
-						
-				# taking care of possible domains with the same start but different names
-				elif region["aliStart"]-1 in dmainStartsProcessed and REMOVE_OVELAPS == False:
-					region["aliStart"] = region["aliStart"]+1 
-					dmainStartToDomainInfo[region["aliStart"]-1] = region					
-				dmainStartsProcessed.append(region["aliStart"]-1)	
+			#Sort domains by alisStart to use for merging or removing overlaps
+			if len(proteinData["domains"]):	 
+				domainsWithNoOverlaps = sorted(proteinData["domains"], key=lambda x: x["aliStart"], reverse=False)
+				if REMOVE_OVELAPS:
+					domainsWithNoOverlaps = removeOverlapps(domainsWithNoOverlaps)
+				PROTEIN_DOMAINS_FINAL[proteinName]["domainsWithNoOverlaps"] = []
 				
-			# Here addToCoordinateLists will increment the coordinates if they are repeated for domains and/or tms, lcr
-			# And if the same domain was identified in several places in the protein unique names are generated
-			# domainsOK with not overalpped domains is generated and will be used to draw separate domains. 
-			# These steps are basically not needed if REMOVE_OVELAPS == True
-			for key in dmainStartToDomainInfo:
-				region = dmainStartToDomainInfo[key]
-				correctedCoords = addToCoordinateLists(aliStarts, aliEnds, region["aliStart"]-1, region["aliEnd"]-1)
-				aliStart = correctedCoords[0]
-				aliEnd = correctedCoords[1]
-				# taking care of domains with the same names but different coordinates
-				domainName = str(region["domainName"])+"&"+str(aliStart)+str(aliEnd)
-				domainSpan = correctedCoords[2]
-				if REMOVE_OVELAPS != True:
-					createMergeGrps(aliStart, aliEnd, domainName, domainSpan, domainToCoords, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domainsOK)							
-				if domainName not in domToMergeGrpNames:
-					domainsOK[domainName] = ""
-				domainToCoords[domainName] = [aliStart, aliEnd, domainSpan]
 				
-			processSeparateDomains(domainsOK, domainToCoords, domains, startsToDomainList)
-			if REMOVE_OVELAPS != True :
-				processDomainsForMerge(domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domains, startsToDomainList)
+				# Doing the following to shift starts if diferent domains have the same starts
+				# If REMOVE_OVELAPS == True this is not needed, that's why in elif REMOVE_OVELAPS is checked
+				dmainStartsProcessed = []
+				dmainStartToDomainInfo = {}				
+				for region in domainsWithNoOverlaps:
+					if region["aliStart"]-1 not in dmainStartsProcessed:
+						dmainStartToDomainInfo[region["aliStart"]-1] = region
+						if REMOVE_OVELAPS:
+							PROTEIN_DOMAINS_FINAL[proteinName]["domainsWithNoOverlaps"] \
+							.append({"domainName": region["domainName"], "start": region["aliStart"]-1, "end": region["aliEnd"]-1})
+							
+					# taking care of possible domains with the same start but different names
+					elif region["aliStart"]-1 in dmainStartsProcessed and REMOVE_OVELAPS == False:
+						region["aliStart"] = region["aliStart"]+1 
+						dmainStartToDomainInfo[region["aliStart"]-1] = region					
+					dmainStartsProcessed.append(region["aliStart"]-1)	
+					
+				# Here addToCoordinateLists will increment the coordinates if they are repeated for domains and/or tms, lcr
+				# And if the same domain was identified in several places in the protein unique names are generated
+				# domainsOK with not overalpped domains is generated and will be used to draw separate domains. 
+				# These steps are basically not needed if REMOVE_OVELAPS == True
+				for key in dmainStartToDomainInfo:
+					region = dmainStartToDomainInfo[key]
+					correctedCoords = addToCoordinateLists(aliStarts, aliEnds, region["aliStart"]-1, region["aliEnd"]-1)
+					aliStart = correctedCoords[0]
+					aliEnd = correctedCoords[1]
+					# taking care of domains with the same names but different coordinates
+					domainName = str(region["domainName"])+"&"+str(aliStart)+str(aliEnd)
+					domainSpan = correctedCoords[2]
+					if REMOVE_OVELAPS != True:
+						createMergeGrps(aliStart, aliEnd, domainName, domainSpan, domainToCoords, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domainsOK)							
+					if domainName not in domToMergeGrpNames:
+						domainsOK[domainName] = ""
+					domainToCoords[domainName] = [aliStart, aliEnd, domainSpan]
+					
+				processSeparateDomains(domainsOK, domainToCoords, domains, startsToDomainList)
+				if REMOVE_OVELAPS != True :
+					processDomainsForMerge(domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domains, startsToDomainList)
 				
 			#Prepare TM Regions
 			if "tmRegions" in proteinData["tmInfo"]:
@@ -235,8 +236,12 @@ def removeOverlapps(dmainStartToDomainInfoSorted):
 	return pfam31Final					
                                        
 def compareEvalues(pfam1, pfam2):
-	eval1 = pfam1["ieValue"]
-	eval2 = pfam2["ieValue"]
+	if "ieValue" in pfam1:
+		eval1 = pfam1["ieValue"]
+		eval2 = pfam2["ieValue"]
+	else:
+		eval1 = pfam1["eValue"]
+		eval2 = pfam2["eValue"]
 	significantPfam = None
 	if eval1 < eval2:
 		significantPfam = pfam1

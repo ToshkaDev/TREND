@@ -249,21 +249,24 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         String outNewickFile = super.getPrefix() + UUID.randomUUID().toString() + ".newick";
         String outSvgFile = super.getPrefix() + UUID.randomUUID().toString() + ".svg";
 
-        if (outAlgnFile != null) {
-            String outOrderedAlgnFile = super.getPrefix() + UUID.randomUUID().toString() + ".fa";
-            protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, outOrderedAlgnFile, proteinFeaturesOutFile));
-            argsForTreeWithDomains.add(ParamPrefixes.INPUT_SECOND.getPrefix() + outAlgnFile);
-        } else {
-            protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, proteinFeaturesOutFile));
-        }
-
+        String proteinFeaturesChangedOutFile = getRandomFileName();
         argsForTreeWithDomains.addAll(Arrays.asList(
                 inputFileNameForProtFeatures,
                 ParamPrefixes.INPUT_THIRD.getPrefix() + outNewickTree,
                 ParamPrefixes.INPUT_FOURTH.getPrefix() + proteinFeaturesOutFile,
                 ParamPrefixes.OUTPUT_SECOND.getPrefix() + outSvgFile,
-                ParamPrefixes.OUTPUT_THIRD.getPrefix() + outNewickFile
+                ParamPrefixes.OUTPUT_THIRD.getPrefix() + outNewickFile,
+                ParamPrefixes.OUTPUT_FOURTH.getPrefix() + proteinFeaturesChangedOutFile
         ));
+
+        if (outAlgnFile != null) {
+            String outOrderedAlgnFile = super.getPrefix() + UUID.randomUUID().toString() + ".fa";
+            protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, outOrderedAlgnFile, proteinFeaturesChangedOutFile));
+            argsForTreeWithDomains.add(ParamPrefixes.INPUT_SECOND.getPrefix() + outAlgnFile);
+        } else {
+            protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, proteinFeaturesChangedOutFile));
+        }
+
 
         List<String> listOfPrograms = new LinkedList<>();
         List<List<String>> listOfArgumentLists = new LinkedList<>();
