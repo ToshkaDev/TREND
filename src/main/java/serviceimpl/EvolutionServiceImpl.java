@@ -167,8 +167,7 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         String outSvgFile = super.getPrefix() + UUID.randomUUID().toString() + ".svg";
         String outOrderedAlgnFile = super.getPrefix() + UUID.randomUUID().toString() + ".fa";
 
-        protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, outOrderedAlgnFile, proteinFeaturesOutFile));
-
+        String proteinFeaturesChangedOutFile = getRandomFileName();
         argsForTreeWithDomains.addAll(Arrays.asList(
                 inputFileNameForProtFeatures,
                 ParamPrefixes.INPUT_SECOND.getPrefix() + outAlgnFile,
@@ -176,8 +175,11 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
                 ParamPrefixes.INPUT_FOURTH.getPrefix() + proteinFeaturesOutFile,
                 ParamPrefixes.OUTPUT.getPrefix() + outOrderedAlgnFile,
                 ParamPrefixes.OUTPUT_SECOND.getPrefix() + outSvgFile,
-                ParamPrefixes.OUTPUT_THIRD.getPrefix() + outNewickFile
+                ParamPrefixes.OUTPUT_THIRD.getPrefix() + outNewickFile,
+                ParamPrefixes.OUTPUT_FOURTH.getPrefix() + proteinFeaturesChangedOutFile
         ));
+
+        protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, outOrderedAlgnFile, proteinFeaturesChangedOutFile));
 
         listOfPrograms.addAll(Arrays.asList(
                 super.getProperties().getCalculateProteinFeatures(),

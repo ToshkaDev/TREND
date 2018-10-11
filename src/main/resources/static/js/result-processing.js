@@ -4,10 +4,11 @@ $(document).ready(function (){
     infoPostfix = "_table";
     stageList = [];
     xOffset = 400;
-    yOffset = 200;
-    buttonIds = ["Domains", "TMs", "LCRs", "Additional"];
-    buttonIdToTableClass = {"Domains": "domain-table", "TMs": "tm-table", "LCRs": "lcr-table", "Additional": "additional-table"};
-    entityToButton = {"domainOrganizedData": buttonIds[0], 'tmOrganizedData': buttonIds[1], "lcrOrganized": buttonIds[2], "additionalOrganizedData": buttonIds[3]};
+    yOffset = 670;
+    buttonIds = ["Domains", "TMs", "LCRs", "Sequence", "Additional"];
+    buttonIdToTableClass = {"Domains": "domain-table", "TMs": "tm-table", "LCRs": "lcr-table", "Sequence": "sequence-table", "Additional": "additional-table"};
+    entityToButton = {"domainOrganizedData": buttonIds[0], 'tmOrganizedData': buttonIds[1],
+    "lcrOrganized": buttonIds[2], "sequenceData": buttonIds[3], "additionalOrganizedData": buttonIds[4]};
     getIfReady(jobId);
 
 });
@@ -73,6 +74,7 @@ function processRetrievedDataAsync(data) {
             if (data.result.length == 4) {
                 $('#alignment-load').attr('href', data.result[2]);
                 $('#features-load').attr('href', data.result[3]);
+
                 featureData = data.result[3];
                 // if alignement file was not provided for the pipeline (the partial one)
             } else if (data.result.length == 3) {
@@ -125,43 +127,68 @@ function processStageMessage(stage) {
 }
 
 function addEventListeners(data) {
+    featureJSON = JSON.parse(data)
+    var domStart, domStop;
 	var re = /^ \d{1,}_/;
 	var notAllowedClassCharacters = /(\W|_)/g;
 	var currentClassName;
 	var proteinIdToRendered = {};
-	var trueClassNameToChanged = {};
+	trueClassNameToChanged = {};
+	var pathFound = false;
+	var treeCirclePath = "M3,1.5 C3,2.32843 2.32843,3 1.5,3 C0.671573,3 0,2.32843 0,1.5 C0,0.671573 0.671573,0 1.5,0 C2.32843,0 3,0.671573 3,1.5"
+	var domainCount;
 	d3.select('#treeContainer>svg').selectAll('*')
 	  .attr("dummy", function(){
 			if (d3.select(this).text().length > 0 && re.test(d3.select(this).text())) {
-			    classNameForJson = d3.select(this).text().replace(re, '');
+			    classNameForJson = d3.select(this).text();
 				currentClassName = classNameForJson.replace(notAllowedClassCharacters, '');
 				console.log("currentClassName " + currentClassName);
 				trueClassNameToChanged[currentClassName] = classNameForJson;
 
 				d3.select(this).attr("class", currentClassName+"_text");
 				d3.select(this).selectAll('*').attr("class", currentClassName);
+				domainCount = 0;
 
 			} else if (currentClassName) {
+			    if (!d3.select(this).select("path").empty()) {
+			       // "C" means that this shape is ellipse an so it's a domain
+			       if (d3.select(this).select("path").attr("d").split(' ')[1][0] == "C"
+			           && d3.select(this).select("path").attr("d").trim() != treeCirclePath) {
+                        d3.select(this).select("path").attr("domainFlag", classNameForJson + ":" + domainCount++)
+			       }
+			    }
+
 				d3.select(this).attr("class", currentClassName);
 				d3.select(this).selectAll('*').attr("class", currentClassName);
 
 				d3.select(this).on("click", function(){
-						checkTableAndDisplay(d3.event, d3.select(this).attr("class"), data, proteinIdToRendered, trueClassNameToChanged);
+						checkTableAndDisplay(d3.event, d3.select(this).attr("class"), data, proteinIdToRendered);
+
+                        var proteinName = d3.select(this).attr("class");
+                        var domainFlag = d3.select(this).attr("domainFlag");
+                        var domainCount;
+                        if ($("." + proteinName + infoPostfix).is(':visible') && domainFlag) {
+                            domainCount = domainFlag.split(":")[1];
+                            var seq = getHighlightedSequence(proteinName, domainCount);
+                            $("#Sequence").click();
+                            $("." + "protein-sequence").html(seq);
+                        }
+
 					});
 				d3.select(this).selectAll('*').on("click", function(){
-						checkTableAndDisplay(d3.event, d3.select(this).attr("class"), data, proteinIdToRendered, trueClassNameToChanged);
+						checkTableAndDisplay(d3.event, d3.select(this).attr("class"), data, proteinIdToRendered);
 					});
 			}
 	  });
 }
 
-function checkTableAndDisplay(event, currentClassName, data, proteinIdToRendered, trueClassNameToChanged) {
+function checkTableAndDisplay(event, currentClassName, data, proteinIdToRendered) {
     event.stopPropagation();
     if (renderedClass) {
         $("." + renderedClass + infoPostfix).hide();
     }
     if (!proteinIdToRendered[currentClassName]) {
-        createTable(event, data, currentClassName, trueClassNameToChanged);
+        createTable(event, data, currentClassName);
         proteinIdToRendered[currentClassName] = true;
         renderedClass = currentClassName;
     } else {
@@ -170,7 +197,7 @@ function checkTableAndDisplay(event, currentClassName, data, proteinIdToRendered
     }
 }
 
-function createTable(event, data, currentClassName, trueClassNameToChanged) {
+function createTable(event, data, currentClassName) {
     var organizedData = organizeData(data, trueClassNameToChanged[currentClassName]);
     var divToAddTo = createDivToAddTo(event, currentClassName, trueClassNameToChanged[currentClassName]);
     addButtons(divToAddTo, organizedData);
@@ -178,18 +205,22 @@ function createTable(event, data, currentClassName, trueClassNameToChanged) {
     isFirstEncountered = makeTable(divToAddTo, organizedData.domainOrganizedData, "domain-table", isFirstEncountered);
     isFirstEncountered = makeTable(divToAddTo, organizedData.tmOrganizedData, "tm-table", isFirstEncountered);
     isFirstEncountered = makeTable(divToAddTo, organizedData.lcrOrganized, "lcr-table", isFirstEncountered);
+    isFirstEncountered = makeTable(divToAddTo, organizedData.sequenceData, "sequence-table", isFirstEncountered);
     isFirstEncountered = makeTable(divToAddTo, organizedData.additionalOrganizedData, "additional-table", isFirstEncountered);
 }
 
 function organizeData(data, currentClassName) {
-    var domainOrganizedData = [], tmOrganizedData = [], additionalOrganizedData = [], lcrOrganized = [], score;
+    var domainOrganizedData = [], tmOrganizedData = [], sequenceData = [], additionalOrganizedData = [], lcrOrganized = [], score;
     var dataAsJson = JSON.parse(data)[currentClassName];
 
     if (dataAsJson) {
+        var sequenceHeader = [""]
+        sequenceData.push(sequenceHeader)
+        sequenceData.push([dataAsJson.sequence])
+
         var hrefRootPath;
         var domainHeaders;
         var domainCounter = 1, tmCounter = 1, lcrCounter = 1, domainRaw, tmRaw, domainName;
-
         if (dataAsJson.domains && dataAsJson.domains.length > 0) {
             if ( dataAsJson.domains[0].predictor == "RpsBlast") {
                 score = "Bitscore";
@@ -253,7 +284,8 @@ function organizeData(data, currentClassName) {
         'domainOrganizedData': domainOrganizedData,
         'tmOrganizedData': tmOrganizedData,
         'lcrOrganized': lcrOrganized,
-        'additionalOrganizedData': additionalOrganizedData
+        'additionalOrganizedData': additionalOrganizedData,
+        'sequenceData': sequenceData
     };
 }
 
@@ -310,33 +342,48 @@ function addButtonEventListener(buttonElement) {
             $("." + "lcr-table").hide();
             $("." + "tm-table").hide();
             $("." + "additional-table").hide();
+            $("." + "sequence-table").hide();
         } else if ($(this).attr("id") === "TMs") {
             $("." + "domain-table").hide();
             $("." + "lcr-table").hide();
             $("." + "tm-table").show();
             $("." + "additional-table").hide();
+            $("." + "sequence-table").hide();
         } else if ($(this).attr("id") === "LCRs") {
             $("." + "domain-table").hide();
             $("." + "lcr-table").show();
             $("." + "tm-table").hide();
             $("." + "additional-table").hide();
+            $("." + "sequence-table").hide();
         } else if ($(this).attr("id") === "Additional") {
             $("." + "domain-table").hide();
             $("." + "lcr-table").hide();
             $("." + "tm-table").hide();
             $("." + "additional-table").show();
+            $("." + "sequence-table").hide();
+        } else if ($(this).attr("id") === "Sequence") {
+            $("." + "domain-table").hide();
+            $("." + "lcr-table").hide();
+            $("." + "tm-table").hide();
+            $("." + "additional-table").hide();
+            $("." + "sequence-table").show();
         }
     });
 }
 
 function makeTable(container, data, tableClass, isFirstEncountered) {
+    var divBeginning = "<div>";
+    if (tableClass == "sequence-table")
+        divBeginning = "<div class='protein-sequence' style='font-family: monospace; font-size: 12px'>";
     if (data && data.length > 0) {
-        console.log("DATA=== " + data)
         var table = $("<table/>").addClass('table table-condensed ' + tableClass);
         $.each(data, function(rowIndex, r) {
             var row = $("<tr/>");
             $.each(r, function(colIndex, c) {
-                row.append($("<t"+(rowIndex == 0 ?  "h" : "d")+"/>").html(c));
+                if (rowIndex == 0)
+                    row.append($("<th/>").html(c));
+                else
+                    row.append($("<td/>").html(divBeginning + c + "</div>"));
             });
             table.append(row);
         });
@@ -349,7 +396,32 @@ function makeTable(container, data, tableClass, isFirstEncountered) {
     return isFirstEncountered;
 }
 
+function getTranslatedCoordinate(coordinate) {
+    // shift to zero-based first
+    var myCoordinate = --coordinate;
+    if (myCoordinate <= 59) {
+        return myCoordinate;
+    } else if (myCoordinate > 59) {
+        return myCoordinate + Math.floor(myCoordinate / 60);
+    }
+}
+
+function getHighlightedSequence(proteinName, domainCount) {
+    var domainWithNoOverlaps = featureJSON[trueClassNameToChanged[proteinName]]["domainsWithNoOverlaps"][domainCount];
+    var proteinSequnce = featureJSON[trueClassNameToChanged[proteinName]].sequence
+    domStart = getTranslatedCoordinate(+domainWithNoOverlaps.start);
+    domEnd = getTranslatedCoordinate(+domainWithNoOverlaps.end);
+    sequenceFirstFragment = (''+proteinSequnce).substring(0, domStart);
+    sequenceMiddleFragment = "<span style='background-color: #d8f7dd'>" + proteinSequnce.substring(domStart, domEnd+1) + "</span>";
+    sequenceLastFragment = proteinSequnce.substring(domEnd+1, proteinSequnce.length);
+    console.log("sequenceFirstFragment " + sequenceFirstFragment);
+    console.log("sequenceMiddleFragment " + sequenceMiddleFragment);
+    console.log("sequenceLastFragment "  + sequenceLastFragment);
+    return sequenceFirstFragment+sequenceMiddleFragment+sequenceLastFragment;
+}
+
 function updatePositionAndShow(event, readyClassName) {
+    console.log("Show")
     var xCoor = event.clientX - xOffset + "px";
     var yCoor = event.clientY - yOffset + "px";
     $("." + readyClassName).css({"left": xCoor, "top": yCoor});

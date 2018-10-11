@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import sys, getopt, json, collections, re
+import copy
 from Bio import Phylo, SeqIO
 from ete2 import Tree, SeqMotifFace, TreeStyle, add_face_to_node
 
@@ -13,7 +14,9 @@ USAGE = "\nThis script enumerates protein sequence names on the provided phyloge
 [-o || --oaligned]         -output file with aligned sequences with changed protein names
 [-n || --osecond]          -output file with prepared tree with domains and changed protein names in svg format
 [-b || --othird]           -output file with prepared tree with changed protein and no domains in newick format
+[-r || --ojson]            -output fiel with json, unchenaged or with not overallped domains if --removeOverlaps is "yes"
 [-v || --removeOverlaps]   -remove overlaps: "yes" or "no"
+
 '''
 
 # Specified via program arguments
@@ -24,12 +27,14 @@ DOMAINS = None                                       #file with protein domains 
 OUTPUT_ALIGNED_FILENAME = "alignerProteins.fa"       #file with aligned sequences with changed protein names
 OUTPUT_TREE_SVG_FILENAME = "newTree.svg"             #file with prepared tree with domains in svg format
 OUTPUT_TREE_NEWICK_FILENAME = "newTree.newick"       #file with prepared tree with no domains in newick format
+OUTPUT_PROTEIN_DOMAINS_JSON = "proteinsToDomains.json"
 
 
 # Datastructures which are get initialized and manipulated by the program
 ALIGNED_PROTEIN_NAME_TO_SEQ = dict()
 PROTEIN_NAME_TO_SEQ = dict()
 PROTEIN_DOMAINS = dict()
+PROTEIN_DOMAINS_FINAL = dict()
 PROTEIN_TO_DOMAINS = collections.defaultdict(list) #{protName1: [[], [], ...], protName2: [[], [], ...]}
 
 
@@ -59,8 +64,10 @@ DOMAIN_BORDER_COLOR="steelblue"
 
 def initialyze(argv):
 	global SEQS, SEQS_ALIGNED, TREE_FILE, DOMAINS, OUTPUT_ALIGNED_FILENAME, OUTPUT_TREE_SVG_FILENAME, OUTPUT_TREE_NEWICK_FILENAME
+	global OUTPUT_PROTEIN_DOMAINS_JSON, REMOVE_OVELAPS
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:s:d:f:o:n:b:",["isequence=", "ialigned=", "ithird=", "ifourth=", "oaligned=", "osecond=", "othird="])
+		opts, args = getopt.getopt(argv[1:],"hi:s:d:f:o:n:b:r:v",["isequence=", "ialigned=", "ithird=", "ifourth=", "oaligned=", \
+		 "osecond=", "othird=", "ojson", "removeOverlaps"])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
@@ -84,12 +91,15 @@ def initialyze(argv):
 			OUTPUT_TREE_SVG_FILENAME = str(arg).strip()   
 		elif opt in ("-b", "--othird"):
 			OUTPUT_TREE_NEWICK_FILENAME = str(arg).strip()
+		elif opt in ("-r", "--ojson"):
+			OUTPUT_PROTEIN_DOMAINS_JSON = str(arg).strip()
 		elif opt in ("-v", "--removeOverlaps"):
 			val = str(arg).strip()
 			if val == "yes" or val == "y":
 				REMOVE_OVELAPS = True
 			else:
 				REMOVE_OVELAPS = False
+
 					
 def prepareProteinToDomainsDict():
 	for proteinName, proteinData in PROTEIN_DOMAINS.items():
@@ -109,18 +119,24 @@ def prepareProteinToDomainsDict():
 			domainsOK = dict()		
 			
 			##### Prepare Domains ######
-			#Sort domains by alisStart to use for merging or removing overlaps		
-			domainsWithNoOverlapps = sorted(proteinData["domains"], key=lambda x: x["aliStart"], reverse=False)
+			#Sort domains by alisStart to use for merging or removing overlaps		 
+			domainsWithNoOverlaps = sorted(proteinData["domains"], key=lambda x: x["aliStart"], reverse=False)
 			if REMOVE_OVELAPS:
-				domainsWithNoOverlapps = removeOverlapps(domainsWithNoOverlapps)
-				
+				domainsWithNoOverlaps = removeOverlapps(domainsWithNoOverlaps)
+			PROTEIN_DOMAINS_FINAL[proteinName]["domainsWithNoOverlaps"] = []
+			
+			
 			# Doing the following to shift starts if diferent domains have the same starts
 			# If REMOVE_OVELAPS == True this is not needed, that's why in elif REMOVE_OVELAPS is checked
 			dmainStartsProcessed = []
 			dmainStartToDomainInfo = {}				
-			for region in domainsWithNoOverlapps:
+			for region in domainsWithNoOverlaps:
 				if region["aliStart"]-1 not in dmainStartsProcessed:
 					dmainStartToDomainInfo[region["aliStart"]-1] = region
+					if REMOVE_OVELAPS:
+						PROTEIN_DOMAINS_FINAL[proteinName]["domainsWithNoOverlaps"] \
+						.append({"domainName": region["domainName"], "start": region["aliStart"]-1, "end": region["aliEnd"]-1})
+						
 				# taking care of possible domains with the same start but different names
 				elif region["aliStart"]-1 in dmainStartsProcessed and REMOVE_OVELAPS == False:
 					region["aliStart"] = region["aliStart"]+1 
@@ -185,22 +201,26 @@ def takeCareOfEdgeCoords(proteinName, aliEnds, aliStarts, domainsFinal):
 def removeOverlapps(dmainStartToDomainInfoSorted):				
 	tolerance = 10
 	pfam31Final = []
+	pfam31FinalSet = set()
 	pfam1 = dmainStartToDomainInfoSorted[0]
 	significantPfam = pfam1
 	overlapLength = None
 	lastAdded = pfam1
 	pfam31Final.append(pfam1)
-	
 	for pfam2 in dmainStartToDomainInfoSorted[1:]:
 		if pfam1["aliEnd"] > pfam2["aliStart"]:
 			overlapLength = pfam1["aliEnd"] - pfam2["aliStart"]
 			if overlapLength > tolerance:
 				significantPfam = compareEvalues(pfam1, pfam2)  
 				# if the previously added is pfam1 and it's less significant than pfam 2
-				# then remove this previously added        
+				# then remove this previously added  
 				if lastAdded == pfam1 and lastAdded != significantPfam:
 					pfam31Final.remove(lastAdded)
-				pfam31Final.append(significantPfam)
+				#Don't add repeatedly. Dict is not hashable so we are using set of difct string representations	
+				significantPfamStr = str(significantPfam)
+				if not significantPfamStr in pfam31FinalSet:
+					pfam31Final.append(significantPfam)
+					pfam31FinalSet.add(significantPfamStr)
 				lastAdded = significantPfam
 			else:
 				pfam31Final.append(pfam2)
@@ -364,6 +384,7 @@ def makeThinLine(startPosition, endPosition, notInsideDomain=True):
 def processFileWithDomains():
 	with open(DOMAINS, "r") as domainsFile:
 		global PROTEIN_DOMAINS
+		global PROTEIN_DOMAINS_FINAL
 		PROTEIN_DOMAINS = json.load(domainsFile)
 	
 def processFileWithSeqs():
@@ -382,7 +403,14 @@ def layout(node):
 			protDomains = PROTEIN_TO_DOMAINS[node.name]
 			seqFace = SeqMotifFace(seq, protDomains, scale_factor=1.3)
 			add_face_to_node(seqFace, node, 0, position="aligned")
-       
+
+def saveChangedDomainsJSON():
+	with open(OUTPUT_PROTEIN_DOMAINS_JSON, "w") as proteinToDomainsJson:
+		json.dump(PROTEIN_DOMAINS_FINAL, proteinToDomainsJson, 
+		default=lambda o: o.__dict__, 
+		sort_keys=True, indent=4)
+
+	       
 def writeSeqsAndTree():
 	prepareNameDict()
 	tree = Tree(TREE_FILE)
@@ -418,8 +446,10 @@ def writeSeqsAndTree():
 				del PROTEIN_DOMAINS[featureName]
 				proteinSeqName = PROCESSED_TO_PROTEIN_NAMES[processedName]				
 				PROTEIN_NAME_TO_SEQ[terminals[i].name] = PROTEIN_NAME_TO_SEQ[proteinSeqName]
-				del PROTEIN_NAME_TO_SEQ[proteinSeqName]											
-						
+				del PROTEIN_NAME_TO_SEQ[proteinSeqName]	
+			
+	global PROTEIN_DOMAINS_FINAL											
+	PROTEIN_DOMAINS_FINAL = copy.deepcopy(PROTEIN_DOMAINS)
 	prepareProteinToDomainsDict()
 	tree.write(outfile=OUTPUT_TREE_NEWICK_FILENAME)
 	treeStyle = TreeStyle()
@@ -449,6 +479,7 @@ def main(argv):
 	processFileWithDomains()
 	processFileWithSeqs()
 	writeSeqsAndTree()
+	saveChangedDomainsJSON()
 
 if __name__ == "__main__":
 	main(sys.argv)
