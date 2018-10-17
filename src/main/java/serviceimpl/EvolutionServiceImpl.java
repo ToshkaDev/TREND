@@ -29,15 +29,22 @@ import springconfiguration.AppProperties;
 
 public class EvolutionServiceImpl extends BioUniverseServiceImpl implements EvolutionService {
 	private final int defaultLastJobId = 1;
-	private Map<Integer, String> counterToStage = new HashMap<>();
+	private final String bootstrapFilePostfix = "_consensus";
+	private Map<Integer, String> counterToStageOneInput = new HashMap<>();
+    private Map<Integer, String> counterToStageTwoInputs = new HashMap<>();
     private Map<Integer, String> counterToStagePartial = new HashMap<>();
 
 
 	public EvolutionServiceImpl(final StorageService storageService, final AppProperties properties, final BioJobDao bioJobDao, final BioJobResultDao bioJobResultDao) {
 		super(storageService, properties, bioJobResultDao, bioJobDao);
-        counterToStage.put(1, "['Predicting proteins features.']");
-        counterToStage.put(2, "['Predicting proteins features.', 'Aligning and building tree.']");
-        counterToStage.put(3, "['Predicting proteins features.', 'Aligning and building tree.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStageOneInput.put(1, "['Predicting proteins features.']");
+        counterToStageOneInput.put(2, "['Predicting proteins features.', 'Aligning and building tree.']");
+        counterToStageOneInput.put(3, "['Predicting proteins features.', 'Aligning and building tree.', 'Ordering alignment and putting features and tree together.-last']");
+
+        counterToStageTwoInputs.put(2, "['Predicting proteins features.']");
+        counterToStageTwoInputs.put(3, "['Predicting proteins features.', 'Aligning and building tree.']");
+        counterToStageTwoInputs.put(4, "['Predicting proteins features.', 'Aligning and building tree.', 'Ordering alignment and putting features and tree together.-last']");
+
         counterToStagePartial.put(1, "['Predicting proteins features.']");
         counterToStagePartial.put(2, "['Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
 	}
@@ -127,9 +134,9 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         String proteinFeaturesOutFile = getRandomFileName();
         String segmakserOutFile = getRandomFileName();
 
-        String numberOfThreadsForProtFeatures = "4";
-        String numberOfThreadsForTree = "4";
-        String numberOfThreadsForAlgn = "4";
+        String numberOfThreadsForProtFeatures = "7";
+        String numberOfThreadsForTree = "7";
+        String numberOfThreadsForAlgn = "7";
         argsForProteinFeatures.addAll(protoTreeInternal.getFieldsForFeaturesPrediction());
         argsForProteinFeatures.addAll(Arrays.asList(
                 inputFileNameForProtFeatures,
@@ -162,6 +169,10 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
                 ParamPrefixes.THREAD.getPrefix() + numberOfThreadsForTree,
                 ParamPrefixes.OUTPUT.getPrefix() + outAlgnFile
         ));
+
+        if (!protoTreeRequest.getPhylogenyTest().equals("none")) {
+            outNewickTree = outNewickTree + bootstrapFilePostfix;
+        }
 
         String outNewickFile = super.getPrefix() + UUID.randomUUID().toString() + ".newick";
         String outSvgFile = super.getPrefix() + UUID.randomUUID().toString() + ".svg";
@@ -319,9 +330,12 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
     public void runMainProgram(ProtoTreeInternal protoTreeInternal) throws IncorrectRequestException {
 	    int counter = 0;
         for (List<String> commandArgument : protoTreeInternal.getCommandsAndArguments()) {
-            if (protoTreeInternal.isFullPipeline().equals("true"))
-                saveStage(protoTreeInternal, counter, counterToStage);
-            else if (protoTreeInternal.isFullPipeline().equals("false"))
+            if (protoTreeInternal.isFullPipeline().equals("true")) {
+                if (protoTreeInternal.getSecondFileName() == null)
+                    saveStage(protoTreeInternal, counter, counterToStageOneInput);
+                else
+                    saveStage(protoTreeInternal, counter, counterToStageTwoInputs);
+            } else if (protoTreeInternal.isFullPipeline().equals("false"))
                 saveStage(protoTreeInternal, counter, counterToStagePartial);
             counter++;
             super.launchProcess(commandArgument);

@@ -459,6 +459,7 @@ def writeSeqsAndTree():
 	tree.write(outfile=OUTPUT_TREE_NEWICK_FILENAME)
 	treeStyle = TreeStyle()
 	treeStyle.layout_fn = layout
+	treeStyle.show_branch_support = True
 	tree.render(OUTPUT_TREE_SVG_FILENAME, w=800, dpi=400, tree_style=treeStyle)
 
 

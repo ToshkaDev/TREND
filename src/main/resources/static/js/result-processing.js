@@ -4,7 +4,7 @@ $(document).ready(function (){
     infoPostfix = "_table";
     stageList = [];
     xOffset = 400;
-    yOffset = 660;
+    yOffset = 600;
     buttonIds = ["Domains", "TMs", "LCRs", "Sequence", "Additional"];
     buttonIdToTableClass = {"Domains": "domain-table", "TMs": "tm-table", "LCRs": "lcr-table", "Sequence": "sequence-table", "Additional": "additional-table"};
     entityToButton = {"domainOrganizedData": buttonIds[0], 'tmOrganizedData': buttonIds[1],
@@ -15,7 +15,7 @@ $(document).ready(function (){
 
 function getIfReady(jobId) {
     console.log('Checking if ready ');
-    console.log('jobId ' + jobId + Cookies.get('protoTree'));
+    console.log('jobId ' + jobId + " " + Cookies.get('protoTree'));
     fileGetter = setInterval(function() {
         tryToGetFileName(jobId + "-" + Cookies.get('protoTree'))
     }, 2000);
@@ -370,7 +370,7 @@ function addButtonEventListener(buttonElement) {
 function makeTable(container, data, tableClass, isFirstEncountered) {
     var divBeginning = "<div>";
     if (tableClass == "sequence-table")
-        divBeginning = "<div class='protein-sequence' style='font-family: monospace; font-size: 12px'>";
+        divBeginning = "<div class='protein-sequence' style='width: 200px; font-family: monospace; font-size: 12px'>";
     if (data && data.length > 0) {
         var table = $("<table/>").addClass('table table-condensed ' + tableClass);
         $.each(data, function(rowIndex, r) {
