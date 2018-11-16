@@ -4,7 +4,7 @@ $(document).ready(function (){
     infoPostfix = "_table";
     stageList = [];
     xOffset = 400;
-    yOffset = 600;
+    yOffset = 550;
     buttonIds = ["Domains", "TMs", "LCRs", "Sequence", "Additional"];
     buttonIdToTableClass = {"Domains": "domain-table", "TMs": "tm-table", "LCRs": "lcr-table", "Sequence": "sequence-table", "Additional": "additional-table"};
     entityToButton = {"domainOrganizedData": buttonIds[0], 'tmOrganizedData': buttonIds[1],

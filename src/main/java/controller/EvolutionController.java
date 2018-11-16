@@ -57,11 +57,19 @@ public class EvolutionController extends BioUniverseController {
 
     @GetMapping(value={"", "/home"})
     public String protoTree(Model model) {
+        model.addAttribute("mainTab", "home");
         addToModelCommon(model, "/js/send-and-process-data.js");
-        model.addAttribute("subnavigationTab", BioPrograms.PROTO_TREE.getProgramName());
         return "main-view  :: addContent(" +
                 "fragmentsMain='evolution-fragments', searchArea='proto-tree', filter='proto-tree-filter'" +
                 ", navigation='navigator')";
+    }
+
+    @GetMapping(value={"/gene-neighborhoods"})
+    public String geneNeighborhoods(Model model) {
+        model.addAttribute("mainTab", "gene-neighborhoods");
+        addToModelCommon(model, "/js/result-processing-gene-neighborhoods.js");
+        return "main-view  :: addContent(" +
+                "fragmentsMain='evolution-fragments', searchArea='gene-neighborhoods')";
     }
 
     @GetMapping(value={"/help"})
@@ -73,10 +81,9 @@ public class EvolutionController extends BioUniverseController {
 
     @GetMapping(value={"tree-for-you/{jobId:.+}"})
     public String result(@PathVariable Integer jobId, Model model) {
+        model.addAttribute("mainTab", "home");
         addToModelCommon(model, "/js/result-processing.js");
-        System.out.println("jobId " + jobId);
         model.addAttribute("jobId", jobId);
-        model.addAttribute("subnavigationTab", BioPrograms.PROTO_TREE.getProgramName());
         return "main-view  :: addContent(fragmentsMain='evolution-fragments', result='result')";
     }
 
@@ -146,9 +153,9 @@ public class EvolutionController extends BioUniverseController {
 
     @Override
     void addToModelCommon(Model model, String sendOrGiveResult) {
-        model.addAttribute("mainTab", "home");
-        model.addAttribute("sendOrGiveResult", sendOrGiveResult);
         model.addAttribute("specificJs", "/js/get-fields-values.js");
+        model.addAttribute("subnavigationTab", BioPrograms.PROTO_TREE.getProgramName());
+        model.addAttribute("sendOrGiveResult", sendOrGiveResult);
     }
 
 }

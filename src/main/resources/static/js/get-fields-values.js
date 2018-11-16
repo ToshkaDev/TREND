@@ -30,7 +30,6 @@ function getOptions() {
 
     var lcrPrediction = $("#lc-value").attr("checked");
 
-    console.log("lcrPrediction " + lcrPrediction)
     Cookies.set('HEYE', 'This');
     console.log("cookie.get('HEYE') " + Cookies.get('HEYE'))
     var optionToOptionName = {

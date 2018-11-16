@@ -3,6 +3,59 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <body>
+    <div th:fragment="gene-neighborhoods">
+        <div class="col-md-8 my-textarea">
+            <div class="row">
+                <textarea id="first-file-area" class="form-control" rows="12"> </textarea>
+            </div>
+            <br />
+            <div class="row">
+                <label class="btn btn-primary btn-md proto-tree-button">
+                    Choose file with protein sequences <input id="first-file" type="file" style="display: none" multiple/>
+                </label>
+                <span class='label label-info' id="first-file-info"></span>
+                <button id="GoAsync" class="btn btn-primary btn-md pull-right proto-tree-button" type="button">
+                    <span>SUBMIT</span>
+                </button>
+            </div> <br /> <br />
+        </div>
+        <div class="col-md-12 wait-for-it">
+            <div id="result-stage"></div>
+        </div>
+        <div class="col-md-12 no-such-biojob">
+            No such job found
+        </div>
+        <div class="col-md-12 text-center result-container">
+            <div class="btn-group" role="group" aria-label="...">
+                <a id="results-load" class="btn btn-info btn-lg proto-tree-button" href="#">
+                    Download Tree (SVG) <span class="glyphicon glyphicon-download-alt "> </span>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-12 my-result">
+            <div style="display: inline">
+                <span id="jobId" th:text="${jobId}"></span>
+            </div>
+            <div id="svgContainer"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center result-container raw-files-containers">
+                <div class="secondary-buttons">
+                    <a id="tree-load" class="btn btn-info btn-md proto-tree-button" href="#">
+                        Download Tree (Newick) <span class="glyphicon glyphicon-download-alt"> </span>
+                    </a>
+                    <a id="alignment-load" class="btn btn-info btn-md proto-tree-button" href="#">
+                        Download Alignment <span class="glyphicon glyphicon-download-alt"> </span>
+                    </a>
+                    <a id="features-load" class="btn btn-info btn-md proto-tree-button" href="#">
+                        Download Protein Features(JSON) <span class="glyphicon glyphicon-download-alt"> </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div th:fragment="proto-tree">
         <div class="col-md-8 my-textarea second-area">
             <div class="row">
@@ -108,6 +161,28 @@
             </div>
         </div>
     </div>
+
+    <!--<div th:fragment="result-gene-neighborhoods">-->
+        <!--<div class="col-md-12 wait-for-it">-->
+            <!--<div id="result-stage"></div>-->
+        <!--</div>-->
+        <!--<div class="col-md-12 no-such-biojob">-->
+            <!--No such job found-->
+        <!--</div>-->
+        <!--<div class="col-md-12 text-center result-container">-->
+            <!--<div class="btn-group" role="group" aria-label="...">-->
+                <!--<a id="results-load" class="btn btn-info btn-lg proto-tree-button" href="#">-->
+                    <!--Download Tree (SVG) <span class="glyphicon glyphicon-download-alt "> </span>-->
+                <!--</a>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="col-md-12 my-result">-->
+            <!--<div style="display: none">-->
+                <!--<span id="jobId" th:text="${jobId}"></span>-->
+            <!--</div>-->
+            <!--<div id="svgContainer"></div>-->
+        <!--</div>-->
+    <!--</div>-->
 
     <div th:fragment="navigator">
         <div class="navigator">
