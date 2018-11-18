@@ -67,6 +67,7 @@ public class EvolutionController extends BioUniverseController {
     @GetMapping(value={"/gene-neighborhoods"})
     public String geneNeighborhoods(Model model) {
         model.addAttribute("mainTab", "gene-neighborhoods");
+        model.addAttribute("newickJs", "/js/vendor/newick_modified.js");
         addToModelCommon(model, "/js/result-processing-gene-neighborhoods.js");
         return "main-view  :: addContent(" +
                 "fragmentsMain='evolution-fragments', searchArea='gene-neighborhoods')";

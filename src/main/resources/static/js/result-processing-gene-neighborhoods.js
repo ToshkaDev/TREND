@@ -31,10 +31,11 @@ infoBoxRectXRadius = 3;
 infoBoxRectYRadius = 3;
 directGeneInfoBoxY = directGeneFigureTopY-89;
 reverseGeneInfoBoxY = reverseGeneFigureTopY-89;
-textPositionFactorDirectY = 110;
-textPositionFactorReverseY = 83;
-textPositionFactorX = -10;
-textPositionFactorXLast = -10;
+textPositionFactorDirectY = 95;
+textPositionFactorReverseY = 68;
+textPositionZoomCorrection = 1;
+textPositionFactorX = 10;
+textPositionFactorXLast = 10;
 xShiftLeft = 0.03;
 xShiftLeftLast = 0.03;
 clusterOffsetLeft = 0.05;
@@ -49,58 +50,58 @@ $(document).ready(function (){
         var dataObject;
     	options = getOptions();
     	if (options.get("firstFile")) {
-    	    console.log("first")
             var fileReader = new FileReader();
             fileReader.readAsText(options.get("firstFile"));
             fileReader.onloadend = function() {
                 buildGeneTree({newick: fileReader.result.trim()});
             }
     	} else if (options.get("firstFileArea")) {
-            console.log("second")
     	    buildGeneTree({newick: options.get("firstFileArea")});
     	}
     });
 
 });
 
-function buildGeneTree(dataObject) {
-    phylocanvas = new Smits.PhyloCanvas(
-        dataObject,
-        'svgContainer',
-        1500, 1300
-    );
-    var processed = false;
-    var textCounter = 0;
-    // first we count the number of leaves
-    d3.select('#svgContainer>svg').selectAll('*')
-        .attr("dummy", function() {
-            // a) we check 'processed' because text() gives text for actual 'text' and 'tspan' tag
-            // which is inside 'text' tag
-            // b) we check 'textCounter++ > 0' because the first text is a text from rafael package
-            // c) we check 'isNaN(d3.select(this).text())' because if it's a number then this is bootstrap value
-            if (d3.select(this).text().length && isNaN(d3.select(this).text()) && !processed && textCounter++ > 0)
-                processed = true;
-            else
-                processed = false;
-        });
+function createZoomableBox () {
+    var minSvgWidth = 650;
+    var widthShrinkageFactor = 0.89;
+    var heightShrinkageFactor = 0.8;
+    var width = window.innerWidth*widthShrinkageFactor;
+    var height = window.innerHeight*heightShrinkageFactor;
+    var tree = d3.select('#svgContainer')
+        .style("border", "1.4px solid #9494b8")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .style("pointer-events", "all")
+        .call(d3.zoom().on("zoom", function() {
+            tree.attr("transform", d3.event.transform);
+            textPositionZoomCorrection = d3.event.transform.k;
+        }))
+        .append("g")
+        .attr("id", "treeContainer");
+}
 
-    // after that we remove the built tree, in order to build a new one with the corrected height
-    // 1300 and 21 are empirically deduced values
-    d3.select('#svgContainer>svg').remove();
+function buildGeneTree(dataObject) {
+    createZoomableBox();
+    var textCounter = Newick.parse(dataObject.newick)[1]
     phylocanvas = new Smits.PhyloCanvas(
         dataObject,
-        'svgContainer',
+        'treeContainer',
         1500, 1300*textCounter/21
     );
-
-    processed = false;
+    var processed = false;
     textCounter = 0;
     var refSeqsAndYCoords = {};
     var refSeqs = [];
     var longestXCoord = 0;
     var longestXCoordText;
-    d3.select('#svgContainer>svg').selectAll('*')
+    d3.select('#treeContainer>svg').selectAll('*')
         .attr("dummy", function(){
+            // a) we check 'processed' because text() gives text for actual 'text' and 'tspan' tag
+            // which is inside 'text' tag
+            // b) we check 'textCounter++ > 0' because the first text is a text from rafael package
+            // c) we check 'isNaN(d3.select(this).text())' because if it's a number then this is bootstrap value
             if (d3.select(this).text().length && isNaN(d3.select(this).text()) && !processed && textCounter++ > 0) {
                 var yCoord = +d3.select(this).attr('y');
                 var xCoord = +d3.select(this).attr('x');
@@ -115,7 +116,6 @@ function buildGeneTree(dataObject) {
             } else
                 processed = false;
         });
-
     getGenesAndDraw(refSeqs, refSeqsAndYCoords, longestXCoord, longestXCoordText);
 }
 
@@ -149,7 +149,6 @@ function getGenesAndDraw(refSeqs, refSeqsAndYCoords, xCoordinate, xCoordinateTex
     //recursive function
     function fetchGene(refSeq, refSeqCounter) {
         $.ajax(getFetchSettings(refSeq)).done(function (gene) {
-            console.log(refSeqCounter)
             fetchNeighborGenes(gene, refSeqsAndYCoords, xCoordinate, refSeq, refSeqs, refSeqCounter);
         }).fail(function(jqXHR, textStatus, errorThrown) {
             fetchNext(refSeqs, refSeqCounter);
@@ -159,8 +158,9 @@ function getGenesAndDraw(refSeqs, refSeqsAndYCoords, xCoordinate, xCoordinateTex
     function fetchNeighborGenes(gene, refSeqsAndYCoords, xCoordinate, refSeq, refSeqs, refSeqCounter) {
         if (gene[0]) {
             $.ajax(getFetchSettings(gene[0].stable_id, "neighbors")).done(function (neighbGenes) {
-                console.log(refSeqCounter + " +++++++++++++++++++++ ")
-                drawNeighborGenes(d3.select('#svgContainer>svg'), gene[0], neighbGenes, refSeqsAndYCoords[refSeq], xCoordinate);
+                if (neighbGenes.length == 10)
+                    drawNeighborGenes(d3.select('#treeContainer>svg'), gene[0], neighbGenes,
+                        refSeqsAndYCoords[refSeq], xCoordinate);
                 fetchNext(refSeqs, refSeqCounter);
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 fetchNext(refSeqs, refSeqCounter);
@@ -170,12 +170,10 @@ function getGenesAndDraw(refSeqs, refSeqsAndYCoords, xCoordinate, xCoordinateTex
     }
 
     function fetchNext(refSeqs, refSeqCounter) {
-        console.log(refSeqCounter + " -------------------------")
         if (++refSeqCounter < refSeqs.length)
             fetchGene(refSeqs[refSeqCounter], refSeqCounter);
         else {
             //$('#svgContainer').show();
-            console.log($("#svgContainer>svg")[0]);
         }
 
     }
@@ -315,24 +313,25 @@ function createDescriptionBoxes(geneCluster, geneScale, span, mainGeneId) {
 function addEventListeneres(geneCluster, geneScale) {
     geneCluster
     .on("mouseover", function (){
+        //if the svg zoomed out proportion is less than 0.6 don't show anything
+        if (textPositionZoomCorrection < 0.6)
+            return
         var element = d3.select(this);
         var mainGeneIdentifier = element.attr("class").split(" ")[2];
         var axisElem = document.getElementsByClassName('gene-axis-'+mainGeneIdentifier)[0].getBoundingClientRect();
-        console.log('document ' + document.getElementsByClassName('gene-axis-'+mainGeneIdentifier)[0])
         var textPositionFactorXMain;
         var top, left, xAbsolute = axisElem["x"] + window.scrollX, yAbsolute = axisElem["y"] + window.scrollY;
-        console.log('yAbsolute ' + yAbsolute)
-        element.attr("dummy", function(gene){
+        element.attr("dummy", function(gene) {
             let isComplement = gene.strand === "-" ? true : false;
             if (!isComplement)
-                top = yAbsolute - textPositionFactorDirectY + "px;";
-            else top = yAbsolute - textPositionFactorReverseY + "px;";
+                top = yAbsolute - (textPositionFactorDirectY*textPositionZoomCorrection) + "px;";
+            else top = yAbsolute - (textPositionFactorReverseY*textPositionZoomCorrection) + "px;";
             if (gene.stop === lastGeneStop) {
                 textPositionFactorXMain = textPositionFactorXLast;
             }
             else
                 textPositionFactorXMain = textPositionFactorX;
-            left = geneScale(gene.start) + xAbsolute + textPositionFactorXMain + "px;";
+            left = geneScale(gene.start)*textPositionZoomCorrection + xAbsolute + textPositionFactorXMain + "px;";
         });
 
         var elementsOfTheClass = document.getElementsByClassName(element.attr("class"));
@@ -372,6 +371,9 @@ function addEventListeneres(geneCluster, geneScale) {
 function addHtmlEventListeneres(divs, geneScale) {
     divs
     .on("mouseover", function () {
+        //if the svg zoomed out proportion is less than 0.6 don't show anything
+        if (textPositionZoomCorrection < 0.6)
+            return
         var element = d3.select(this);
         var mainGeneIdentifier = element.attr("class").split(" ")[2];
         var axisElem = document.getElementsByClassName('gene-axis-'+mainGeneIdentifier)[0].getBoundingClientRect();
@@ -381,8 +383,8 @@ function addHtmlEventListeneres(divs, geneScale) {
             .style("top", function(gene) {
                 var isComplement = gene.strand === "-" ? true : false;
                 if (!isComplement)
-                    return yAbsolute - textPositionFactorDirectY + "px";
-                return yAbsolute - textPositionFactorReverseY + "px";
+                    return yAbsolute - (textPositionFactorDirectY*textPositionZoomCorrection) + "px";
+                return yAbsolute - (textPositionFactorReverseY*textPositionZoomCorrection) + "px";
 
             })
             .style("left", function(gene) {
@@ -390,7 +392,7 @@ function addHtmlEventListeneres(divs, geneScale) {
                     textPositionFactorXMain = textPositionFactorXLast;
                 else
                     textPositionFactorXMain = textPositionFactorX;
-                return geneScale(gene.start) + xAbsolute + textPositionFactorXMain + "px";
+                return geneScale(gene.start)*textPositionZoomCorrection + xAbsolute + textPositionFactorXMain + "px";
             })
             .style("display", "inline");
 
