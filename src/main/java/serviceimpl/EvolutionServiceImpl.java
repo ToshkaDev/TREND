@@ -78,6 +78,8 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
                 break;
             case "pfam31":
                 db = db + super.getProperties().getPfam();
+            case "mist":
+                db = db + super.getProperties().getMist();
         }
         return db;
     }

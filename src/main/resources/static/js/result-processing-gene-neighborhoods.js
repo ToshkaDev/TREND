@@ -88,7 +88,7 @@ function buildGeneTree(dataObject) {
     phylocanvas = new Smits.PhyloCanvas(
         dataObject,
         'treeContainer',
-        1500, 1300*textCounter/21
+        1800, 1300*textCounter/21
     );
     var processed = false;
     textCounter = 0;
@@ -105,7 +105,7 @@ function buildGeneTree(dataObject) {
             if (d3.select(this).text().length && isNaN(d3.select(this).text()) && !processed && textCounter++ > 0) {
                 var yCoord = +d3.select(this).attr('y');
                 var xCoord = +d3.select(this).attr('x');
-                var text = d3.select(this).text().split("_").slice(0, 2).join("_");
+                var text = d3.select(this).text().split("_").slice(0, 2).join("_").trim();
                 refSeqsAndYCoords[text] = yCoord-yShiftOfClusterRegardingLeafeYCoord;
                 refSeqs.push(text);
                 if (xCoord > longestXCoord) {

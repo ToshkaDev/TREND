@@ -32,6 +32,7 @@ public class AppProperties {
     private String rpsblastDbPath = "/home/vadim/Softs/rpsblastdb/";
     private String rpsprocDbPath = "/home/vadim/Softs/rpsbproc/data/";
     private String pfam = "Pfam31/Pfam-A.hmm";
+    private String mist = "Mist-mcp_and_che.hmm";
     private String rpsblastCddSuper = "Cdd";
     private String rpsblastCddNcbi = "Cdd_NCBI";
     private String rpsblastCog = "Cog";
@@ -299,5 +300,13 @@ public class AppProperties {
 
     public void setRpsblastCddSuper(String rpsblastCddSuper) {
         this.rpsblastCddSuper = rpsblastCddSuper;
+    }
+
+    public String getMist() {
+        return mist;
+    }
+
+    public void setMist(String mist) {
+        this.mist = mist;
     }
 }
