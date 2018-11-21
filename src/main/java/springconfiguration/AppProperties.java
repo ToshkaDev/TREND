@@ -31,8 +31,8 @@ public class AppProperties {
     private String hmmscanDbPath = "/home/vadim/UTOakRidge/Soft/hmmer3_data/";
     private String rpsblastDbPath = "/home/vadim/Softs/rpsblastdb/";
     private String rpsprocDbPath = "/home/vadim/Softs/rpsbproc/data/";
-    private String pfam = "Pfam31/Pfam-A.hmm";
-    private String mist = "Mist-mcp_and_che.hmm";
+    private String pfam = "Pfam-A.hmm";
+    private String pfamAndMist = "Pfam-A_and_Mist-specific.hmm";
     private String rpsblastCddSuper = "Cdd";
     private String rpsblastCddNcbi = "Cdd_NCBI";
     private String rpsblastCog = "Cog";
@@ -302,11 +302,11 @@ public class AppProperties {
         this.rpsblastCddSuper = rpsblastCddSuper;
     }
 
-    public String getMist() {
-        return mist;
+    public String getPfamAndMist() {
+        return pfamAndMist;
     }
 
-    public void setMist(String mist) {
-        this.mist = mist;
+    public void setPfamAndMist(String pfamAndMist) {
+        this.pfamAndMist = pfamAndMist;
     }
 }

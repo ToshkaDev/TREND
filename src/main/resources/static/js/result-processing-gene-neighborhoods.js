@@ -88,7 +88,7 @@ function buildGeneTree(dataObject) {
     phylocanvas = new Smits.PhyloCanvas(
         dataObject,
         'treeContainer',
-        1800, 1300*textCounter/21
+        2000, 1300*textCounter/21
     );
     var processed = false;
     textCounter = 0;

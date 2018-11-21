@@ -76,10 +76,12 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
             case "tigr":
                 db = db + super.getProperties().getRpsblastTigr();
                 break;
-            case "pfam31":
+            case "pfam-only":
                 db = db + super.getProperties().getPfam();
-            case "mist":
-                db = db + super.getProperties().getMist();
+                break;
+            case "pfam_and_mist":
+                db = db + super.getProperties().getPfamAndMist();
+                break;
         }
         return db;
     }
