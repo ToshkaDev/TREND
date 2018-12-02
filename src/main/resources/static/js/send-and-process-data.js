@@ -4,20 +4,15 @@ $(document).ready(function (){
 
     setCookie();
     $('#GoAsync').click(function() {
+        $("#first-area-message, #second-area-message, #both-areas-message, #one-area-message").hide();
     	options = getOptions();
-    	var dataIsSent = checkFileAndSendQuery(options, "secondFile");
-    	if (!dataIsSent)
-    	    	dataIsSent = checkFileAreaAndSendQuery(options);
-        if (!dataIsSent)
-            window.alert("To start the analysis you need to choose a file with full-length protein sequences or paste these sequences in the area below.");
-   	    //getDataAsync(options);
+    	checkFileAndSendQuery(options, "secondFile");
     });
 
     $('#GoAsyncPartial').click(function() {
+        $("#second-area-message-partialP, #first-area-message-partialP, #partial-pipeline-message").hide();
         options = getOptions();
-        var dataIsSent = checkFileAndSendQuery(options, "alignmentFile");
-        if (!dataIsSent)
-            window.alert("Both a file with protein sequences and a file with phylogenetic tree should be provided.");
+        checkFileAndSendQuery(options, "alignmentFile");
     });
 
     $('#options').click(function() {
@@ -58,25 +53,34 @@ $(document).ready(function (){
 
 function checkFileAndSendQuery(options, secondFile) {
     if (secondFile === "alignmentFile") {
-        if (!(options.get("firstFile") && options.get("treeFile")))
-            return false;
+        if (!(options.get("firstFile") && options.get("treeFile"))) {
+            $("#partial-pipeline-message").show();
+            return;
+        }
     } else if (secondFile === "secondFile") {
-        if (!options.get("firstFile"))
-            return false;
+        if ((!$(".second-area").is(':hidden') && !(options.get("secondFile") && options.get("firstFile")))
+            || ($(".second-area").is(':hidden') && !options.get("firstFile"))) {
+                checkFileAreaAndSendQuery(options);
+                return;
+        }
     }
-
     var fileReader = new FileReader();
-    console.log(options.get("firstFile"))
     fileReader.readAsText(options.get("firstFile"));
     fileReader.onloadend = function() {
         if (fileReader.result.trim().slice(0, 1) !== ">") {
-            window.alert("Wrong format of the file with protein sequences. The fasta format is expected to begin with '>' sign.");
+            if (secondFile === "alignmentFile")
+                $("#first-area-message-partialP").show();
+            else
+                $("#first-area-message").show();
         } else if (options.get(secondFile)) {
             var alignmentFileReader = new FileReader();
             alignmentFileReader.readAsText(options.get(secondFile));
             alignmentFileReader.onloadend = function() {
                 if (alignmentFileReader.result.trim().slice(0, 1) !== ">") {
-                    window.alert("Wrong format of the file with the alignment. The fasta format is expected to begin with '>' sign.");
+                    if (secondFile === "alignmentFile")
+                        $("#second-area-message-partialP").show();
+                    else
+                        $("#second-area-message").show();
                 } else
                     getDataAsync(options);
             }
@@ -87,13 +91,15 @@ function checkFileAndSendQuery(options, secondFile) {
 }
 
 function checkFileAreaAndSendQuery(options) {
-    if (!options.get("firstFileArea"))
-        return false;
-    if (options.get("firstFileArea").trim().slice(0, 1) !== ">") {
-        window.alert("Wrong format of the sequences in the first file area. The fasta format is expected to begin with '>' sign.");
-    } else if (options.get("secondFileArea").trim().slice(0, 1) !== ">") {
-        window.alert("Wrong format of the sequences in the second file area. The fasta format is expected to begin with '>' sign.");
-    } else
+    if (!$(".second-area").is(':hidden') && !(options.get("secondFileArea") && options.get("firstFileArea")))
+        $("#both-areas-message").show();
+    else if ($(".second-area").is(':hidden') && !options.get("firstFileArea"))
+        $("#one-area-message").show();
+    else if (options.get("firstFileArea").trim().slice(0, 1) !== ">")
+        $("#first-area-message").show();
+    else if (options.get("secondFileArea").trim().slice(0, 1) !== ">")
+        $("#second-area-message").show();
+    else
         getDataAsync(options);
 }
 

@@ -103,6 +103,14 @@ label.error {
     display: none;
 }
 
+#first-area-message, #second-area-message,
+#both-areas-message, #one-area-message,
+#partial-pipeline-message, #second-area-message-partialP,
+#first-area-message-partialP {
+    color: red;
+    display: none;
+}
+
  /*End of Activity associated elements: buttons and so on*/
 
 /*Main area and Filter options styles*/
