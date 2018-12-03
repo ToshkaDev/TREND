@@ -90,7 +90,6 @@
             tree.name = token;
             // added by Vadim Gumerov
             if (isNaN(token)) {
-				console.log(token)
 				++counter;
 			}
           } else if (x == ':') {

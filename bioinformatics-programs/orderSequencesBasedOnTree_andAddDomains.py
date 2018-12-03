@@ -427,7 +427,7 @@ def writeSeqsAndTree():
 				proteinName = terminals[i].name.strip("'")
 				processedName = prepareName(proteinName)
 				if processedName in PROCESSED_TO_ALIGNED_NAMES:
-					terminals[i].name = " " + str(i+1) + "_" + proteinName
+					terminals[i].name = str(i+1) + "_" + proteinName
 					if processedName in PROCESSED_TO_FEATURE_NAMES:
 						featureName = PROCESSED_TO_FEATURE_NAMES[processedName]
 						PROTEIN_DOMAINS[terminals[i].name] = PROTEIN_DOMAINS[featureName]
@@ -444,7 +444,7 @@ def writeSeqsAndTree():
 		for i in xrange(len(terminals)):
 			proteinName = terminals[i].name.strip("'")
 			processedName = prepareName(proteinName)
-			terminals[i].name = " " + str(i+1) + "_" + proteinName
+			terminals[i].name = str(i+1) + "_" + proteinName
 			if processedName in PROCESSED_TO_FEATURE_NAMES:
 				featureName = PROCESSED_TO_FEATURE_NAMES[processedName]
 				PROTEIN_DOMAINS[terminals[i].name] = PROTEIN_DOMAINS[featureName]

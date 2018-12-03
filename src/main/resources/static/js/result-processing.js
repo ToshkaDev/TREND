@@ -128,7 +128,7 @@ function processStageMessage(stage) {
 function addEventListeners(data) {
     featureJSON = JSON.parse(data)
     var domStart, domStop;
-	var re = /^ \d{1,}_/;
+	var re = /^\d{1,}_/;
 	var notAllowedClassCharacters = /(\W|_)/g;
 	var currentClassName;
 	var proteinIdToRendered = {};

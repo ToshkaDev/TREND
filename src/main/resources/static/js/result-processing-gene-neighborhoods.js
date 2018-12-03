@@ -105,7 +105,8 @@ function buildGeneTree(dataObject) {
             if (d3.select(this).text().length && isNaN(d3.select(this).text()) && !processed && textCounter++ > 0) {
                 var yCoord = +d3.select(this).attr('y');
                 var xCoord = +d3.select(this).attr('x');
-                var text = d3.select(this).text().split("_").slice(0, 2).join("_").trim();
+                var text = d3.select(this).text().replace(/^\d+_/, "");
+                text = text.split("_").slice(0, 2).join("_").trim();
                 refSeqsAndYCoords[text] = yCoord-yShiftOfClusterRegardingLeafeYCoord;
                 refSeqs.push(text);
                 if (xCoord > longestXCoord) {
