@@ -20,7 +20,7 @@ USAGE = "\nThis script enumerates protein sequence names on the provided phyloge
 '''
 
 # Specified via program arguments
-SEQS = None                                          #file with sequences
+SEQS = None                                          #file with sequencesdomainsWithNoOverlaps
 SEQS_ALIGNED = None          	                     #file with aligned sequences
 TREE_FILE = None    			                     #file with tree
 DOMAINS = None                                       #file with protein domains information
@@ -45,7 +45,7 @@ PROTEIN_NAMES_TO_PROCESSED = dict()
 PROCESSED_TO_FEATURE_NAMES = dict()
 PROCESSED_TO_ALIGNED_NAMES = dict()
 PROCESSED_TO_PROTEIN_NAMES = dict()
-REMOVE_OVELAPS = True
+REMOVE_OVERLAPS = True
 
 # Maximum number of domains in then merged domain syt to be displayed
 MAX_DOMAIN_COUNT = 6
@@ -64,7 +64,7 @@ DOMAIN_BORDER_COLOR="steelblue"
 
 def initialyze(argv):
 	global SEQS, SEQS_ALIGNED, TREE_FILE, DOMAINS, OUTPUT_ALIGNED_FILENAME, OUTPUT_TREE_SVG_FILENAME, OUTPUT_TREE_NEWICK_FILENAME
-	global OUTPUT_PROTEIN_DOMAINS_JSON, REMOVE_OVELAPS
+	global OUTPUT_PROTEIN_DOMAINS_JSON, REMOVE_OVERLAPS
 	try:
 		opts, args = getopt.getopt(argv[1:],"hi:s:d:f:o:n:b:r:v",["isequence=", "ialigned=", "ithird=", "ifourth=", "oaligned=", \
 		 "osecond=", "othird=", "ojson", "removeOverlaps"])
@@ -96,77 +96,27 @@ def initialyze(argv):
 		elif opt in ("-v", "--removeOverlaps"):
 			val = str(arg).strip()
 			if val == "yes" or val == "y":
-				REMOVE_OVELAPS = True
+				REMOVE_OVERLAPS = TruedomainsWithNoOverlaps
 			else:
-				REMOVE_OVELAPS = False
-
-					
+				REMOVE_OVERLAPS = False
+			
+						
 def prepareProteinToDomainsDict():
 	for proteinName, proteinData in PROTEIN_DOMAINS.items():
 		if proteinData["domains"] or "tmRegions" in proteinData["tmInfo"] or proteinData["lowComplexity"]:
 			tms = list()
 			lowComplexityRegions = list()
 			domains = list()
-			domainsFinal = list()
-			domainToCoords = dict()
 			aliEnds = set()
 			aliStarts = set()
 			startsToDomainList = collections.defaultdict(list)
-			
-			domToMergeGrpNames = collections.defaultdict(set)
-			domToMergeGrpStarts = collections.defaultdict(set)
-			domToMergeGrpEnds = collections.defaultdict(set)
-			domainsOK = dict()		
-			
 			##### Prepare Domains ######
-			#Sort domains by alisStart to use for merging or removing overlaps
-			if len(proteinData["domains"]):	 
-				domainsWithNoOverlaps = sorted(proteinData["domains"], key=lambda x: x["aliStart"], reverse=False)
-				if REMOVE_OVELAPS:
-					domainsWithNoOverlaps = removeOverlapps(domainsWithNoOverlaps)
-				PROTEIN_DOMAINS_FINAL[proteinName]["domainsWithNoOverlaps"] = []
-				
-				
-				# Doing the following to shift starts if diferent domains have the same starts
-				# If REMOVE_OVELAPS == True this is not needed, that's why in elif REMOVE_OVELAPS is checked
-				dmainStartsProcessed = []
-				dmainStartToDomainInfo = {}				
-				for region in domainsWithNoOverlaps:
-					if region["aliStart"]-1 not in dmainStartsProcessed:
-						dmainStartToDomainInfo[region["aliStart"]-1] = region
-						if REMOVE_OVELAPS:
-							PROTEIN_DOMAINS_FINAL[proteinName]["domainsWithNoOverlaps"] \
-							.append({"domainName": region["domainName"], "start": region["aliStart"]-1, "end": region["aliEnd"]-1})
-							
-					# taking care of possible domains with the same start but different names
-					elif region["aliStart"]-1 in dmainStartsProcessed and REMOVE_OVELAPS == False:
-						region["aliStart"] = region["aliStart"]+1 
-						dmainStartToDomainInfo[region["aliStart"]-1] = region					
-					dmainStartsProcessed.append(region["aliStart"]-1)	
-					
-				# Here addToCoordinateLists will increment the coordinates if they are repeated for domains and/or tms, lcr
-				# And if the same domain was identified in several places in the protein unique names are generated
-				# domainsOK with not overalpped domains is generated and will be used to draw separate domains. 
-				# These steps are basically not needed if REMOVE_OVELAPS == True
-				for key in dmainStartToDomainInfo:
-					region = dmainStartToDomainInfo[key]
-					correctedCoords = addToCoordinateLists(aliStarts, aliEnds, region["aliStart"]-1, region["aliEnd"]-1)
-					aliStart = correctedCoords[0]
-					aliEnd = correctedCoords[1]
-					# taking care of domains with the same names but different coordinates
-					domainName = str(region["domainName"])+"&"+str(aliStart)+str(aliEnd)
-					domainSpan = correctedCoords[2]
-					if REMOVE_OVELAPS != True:
-						createMergeGrps(aliStart, aliEnd, domainName, domainSpan, domainToCoords, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domainsOK)							
-					if domainName not in domToMergeGrpNames:
-						domainsOK[domainName] = ""
-					domainToCoords[domainName] = [aliStart, aliEnd, domainSpan]
-					
-				processSeparateDomains(domainsOK, domainToCoords, domains, startsToDomainList)
-				if REMOVE_OVELAPS != True :
-					processDomainsForMerge(domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domains, startsToDomainList)
-				
-			#Prepare TM Regions
+			if REMOVE_OVERLAPS:
+				prepareDomainsWithNoOverlapps(proteinName, proteinData, domains, aliEnds, aliStarts, startsToDomainList)
+			else:
+				prepareDomainsWithOverlapps(proteinName, proteinData, domains, aliEnds, aliStarts, startsToDomainList)
+								
+			##### Prepare TM Regions ######
 			if "tmRegions" in proteinData["tmInfo"]:
 				for region in proteinData["tmInfo"]["tmRegions"]:
 					correctedCoords = addToCoordinateLists(aliStarts, aliEnds, int(region["tmSart"])-1, int(region["tmEnd"])-1)
@@ -179,62 +129,105 @@ def prepareProteinToDomainsDict():
 				correctedCoords = addToCoordinateLists(aliStarts, aliEnds, int(region["start"])-1, int(region["end"])-1)
 				lowComplexityRegions.append([correctedCoords[0], correctedCoords[1], "[]", None, 35, LCR_COLOR, LCR_COLOR, ""])
 				startsToDomainList[correctedCoords[0]].append(correctedCoords[1])
-			domains.extend(lowComplexityRegions)	
-			
-			domainsFinal.extend(domains)
-			addThinLines(proteinName, domainsFinal, startsToDomainList)
+			domains.extend(lowComplexityRegions)
 				
-			takeCareOfEdgeCoords(proteinName, aliEnds, aliStarts, domainsFinal)
-			PROTEIN_TO_DOMAINS[proteinName].extend(domainsFinal)
+			addThinLines(proteinName, domains, startsToDomainList)
+			takeCareOfEdgeCoords(proteinName, aliEnds, aliStarts, domains)
+			PROTEIN_TO_DOMAINS[proteinName].extend(domains)
+	
+def prepareDomainsWithNoOverlapps(proteinName, proteinData, domains, aliEnds, aliStarts, startsToDomainList):
+	domainToCoords = dict()
+	domainsOK = set()		
+	#Sort domains by alisStart to use for merging or removing overlaps
+	if len(proteinData["domains"]):	 
+		domainsSorted = sorted(proteinData["domains"], key=lambda x: x["aliStart"], reverse=False)
+		domainsWithNoOverlaps = removeOverlapps(domainsSorted)
+		PROTEIN_DOMAINS_FINAL[proteinName]["domainsWithNoOverlaps"] = []
+					
+		for region in domainsWithNoOverlaps:
+			correctedCoords = addToCoordinateLists(aliStarts, aliEnds, region["aliStart"]-1, region["aliEnd"]-1)
+			aliStart, aliEnd = (correctedCoords[0], correctedCoords[1])
+			# taking care of domains with the same names but different coordinates
+			domainName = str(region["domainName"])+"&"+str(aliStart)+str(aliEnd)
+			domainSpan = correctedCoords[2]
+			domainsOK.add(domainName)
+			domainToCoords[domainName] = [aliStart, aliEnd, domainSpan]
+			PROTEIN_DOMAINS_FINAL[proteinName]["domainsWithNoOverlaps"] \
+				.append({"domainName": region["domainName"], "start": region["aliStart"]-1, "end": region["aliEnd"]-1})	
+		processSeparateDomains(domainsOK, domainToCoords, domains, startsToDomainList)
 
-def takeCareOfEdgeCoords(proteinName, aliEnds, aliStarts, domainsFinal):
-	# If len of a protein is bigger than the last coordinate do the following:
-	endOfLastDomain = max(aliEnds)
-	startOfFirstDomain = min(aliStarts)
-	if len(PROTEIN_NAME_TO_SEQ[proteinName]) > endOfLastDomain:
-		thisThinLine = makeThinLine(endOfLastDomain+1, len(PROTEIN_NAME_TO_SEQ[proteinName])-1)
-		domainsFinal.append(thisThinLine)
-	# If start of the first domain is bigger then 0:
-	if startOfFirstDomain > 0:
-		thisThinLine = makeThinLine(0, startOfFirstDomain-1)
-		domainsFinal.append(thisThinLine)
+def prepareDomainsWithOverlapps(proteinName, proteinData, domains, aliEnds, aliStarts, startsToDomainList):
+	domainToCoords = dict()
+	domToMergeGrpNames = collections.defaultdict(set)
+	domToMergeGrpStarts = collections.defaultdict(set)
+	domToMergeGrpEnds = collections.defaultdict(set)
+	domainsOK = set()		
+	
+	##### Prepare Domains ######
+	#Sort domains by alisStart to use for merging or removing overlaps
+	if len(proteinData["domains"]):	 
+		domainsSorted = sorted(proteinData["domains"], key=lambda x: x["aliStart"], reverse=False)
+		# Doing the following to shift starts if diferent domains have the same starts
+		dmainStartsProcessed = []
+		dmainStartToDomainInfo = {}				
+		for region in domainsSorted:
+			if region["aliStart"]-1 not in dmainStartsProcessed:
+				dmainStartToDomainInfo[region["aliStart"]-1] = region						
+			# taking care of possible domains with same starts but different names
+			elif region["aliStart"]-1 in dmainStartsProcessed:
+				region["aliStart"] = region["aliStart"]+1 
+				dmainStartToDomainInfo[region["aliStart"]-1] = region					
+			dmainStartsProcessed.append(region["aliStart"]-1)	
+			
+		# Here addToCoordinateLists will increment the coordinates if they are repeated for domains and/or tms, lcr
+		# And if the same domain was identified in several places in the protein unique names are generated
+		# domainsOK with not overalpped domains is generated and will be used to draw separate domains. 
+		for key in dmainStartToDomainInfo:
+			region = dmainStartToDomainInfo[key]
+			correctedCoords = addToCoordinateLists(aliStarts, aliEnds, region["aliStart"]-1, region["aliEnd"]-1)
+			aliStart, aliEnd = (correctedCoords[0], correctedCoords[1])
+			# taking care of domains with the same names but different coordinates
+			domainName = str(region["domainName"])+"&"+str(aliStart)+str(aliEnd)
+			domainSpan = correctedCoords[2]
+			createMergeGrps(aliStart, aliEnd, domainName, domainSpan, domainToCoords, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domainsOK)							
+			if domainName not in domToMergeGrpNames:
+				domainsOK.add(domainName)
+			domainToCoords[domainName] = [aliStart, aliEnd, domainSpan]
+			
+		processSeparateDomains(domainsOK, domainToCoords, domains, startsToDomainList)
+		processDomainsForMerge(domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domains, startsToDomainList)
 		
-def removeOverlapps(dmainStartToDomainInfoSorted):				
+def removeOverlapps(domainsSorted):				
 	tolerance = 10
 	pfam31Final = []
-	pfam31FinalSet = set()
-	pfam1 = dmainStartToDomainInfoSorted[0]
+	pfam1 = domainsSorted[0]
 	significantPfam = pfam1
 	overlapLength = None
 	lastAdded = pfam1
 	pfam31Final.append(pfam1)
-	for pfam2 in dmainStartToDomainInfoSorted[1:]:
+	for pfam2 in domainsSorted[1:]:
 		if pfam1["aliEnd"] > pfam2["aliStart"]:
 			overlapLength = pfam1["aliEnd"] - pfam2["aliStart"]
 			if overlapLength > tolerance:
 				significantPfam = compareEvalues(pfam1, pfam2)  
 				# if the previously added is pfam1 and it's less significant than pfam 2
-				# then remove this previously added  
+				# then remove this previously added and add pfam 2 
 				if lastAdded == pfam1 and lastAdded != significantPfam:
 					pfam31Final.remove(lastAdded)
-				#Don't add repeatedly. Dict is not hashable so we are using set of difct string representations	
-				significantPfamStr = str(significantPfam)
-				if not significantPfamStr in pfam31FinalSet:
 					pfam31Final.append(significantPfam)
-					pfam31FinalSet.add(significantPfamStr)
 				lastAdded = significantPfam
 			else:
 				pfam31Final.append(pfam2)
 				lastAdded = pfam2
 				significantPfam = pfam2
 			pfam1 = significantPfam
-		else: 
+		else:
 			pfam31Final.append(pfam2)
 			lastAdded = pfam2
 			significantPfam = pfam2
 			pfam1 = significantPfam
 	return pfam31Final					
-                                       
+
 def compareEvalues(pfam1, pfam2):
 	if "ieValue" in pfam1:
 		eval1 = pfam1["ieValue"]
@@ -268,6 +261,18 @@ def addToCoordinateLists(starts, ends, regionStart, regionEnd):
 		end = regionEnd + 1
 		ends.add(end)
 	return (start, end, end - start)
+	                 
+def takeCareOfEdgeCoords(proteinName, aliEnds, aliStarts, domains):
+	# If len of a protein is bigger than the last coordinate do the following:
+	endOfLastDomain = max(aliEnds)
+	startOfFirstDomain = min(aliStarts)
+	if len(PROTEIN_NAME_TO_SEQ[proteinName]) > endOfLastDomain:
+		thisThinLine = makeThinLine(endOfLastDomain+1, len(PROTEIN_NAME_TO_SEQ[proteinName])-1)
+		domains.append(thisThinLine)
+	# If start of the first domain is bigger than 0:
+	if startOfFirstDomain > 0:
+		thisThinLine = makeThinLine(0, startOfFirstDomain-1)
+		domains.append(thisThinLine)
 	
 def createMergeGrps(aliStart, aliEnd, domainName, domainSpan, domainToCoords, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domainsOK):
 	for processedDomain, domainCoords in domainToCoords.items():
@@ -290,7 +295,7 @@ def createMergeGrps(aliStart, aliEnd, domainName, domainSpan, domainToCoords, do
 				elif domainName in domToMergeGrpNames:
 					mergeIfOneIsInMergeGrp(domainName, processedDomain, aliStart, aliEnd, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds)
 				if processedDomain in domainsOK:
-					del domainsOK[processedDomain]
+					domainsOK.remove(processedDomain)
 					
 def mergeIfOneIsInMergeGrp(domainName1, domainName2, aliStart, aliEnd, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds):
 	domToMergeGrpNames[domainName1].add(domainName2)
@@ -326,7 +331,7 @@ def processDomainsForMerge(domToMergeGrpNames, domToMergeGrpStarts, domToMergeGr
 		domains.append([aliStart, aliEnd, "()", None, 35, DOMAIN_BORDER_COLOR, DOMAIN_COLOR, domainName.rstrip(", |\n")])
 		startsToDomainList[aliStart].append(aliEnd)
 		
-def addThinLines(proteinName, domainsFinal, startsToDomainList):
+def addThinLines(proteinName, domains, startsToDomainList):
 	domsStartsSorted = sorted(startsToDomainList.keys())
 	# Used for taking care of situations when transmembrane domain is in the protein domain
 	tempDom1End = None
@@ -350,7 +355,7 @@ def addThinLines(proteinName, domainsFinal, startsToDomainList):
 				# and make invisible line between dom1 and dom2
 				if dom2Start < dom1End:
 					thisThinLine = makeThinLine(dom1EndTrue+1, dom2Start-1, False)
-					domainsFinal.append(thisThinLine)
+					domains.append(thisThinLine)
 			# If the second domain is TM/lowComplexity domain and it's inside the first protein domain
 			if dom2End < dom1End:
 				# this is the end of a larger domain inside which a second domain is placed
@@ -366,14 +371,14 @@ def addThinLines(proteinName, domainsFinal, startsToDomainList):
 				if lastSmallDomainInBiggerDomain:
 					lastSmallDomainInBiggerDomain = False
 					thisThinLine = makeThinLine(dom1EndTrue+1, dom1End, False)
-					domainsFinal.append(thisThinLine)
+					domains.append(thisThinLine)
 				thisThinLine = makeThinLine(dom1End+1, dom2Start-1)
-				domainsFinal.append(thisThinLine)
+				domains.append(thisThinLine)
 			# case: dom1 is a large domain and dom2 is domain inside dom1 and 
 			# dom2 is the last domain
 			elif tempDom1End and ind == (len(domsStartsSorted)-2):
 				thisThinLine = makeThinLine(dom2End+1, tempDom1End, False)
-				domainsFinal.append(thisThinLine)
+				domains.append(thisThinLine)
 				
 def makeThinLine(startPosition, endPosition, notInsideDomain=True):
 	if notInsideDomain:
@@ -414,7 +419,6 @@ def saveChangedDomainsJSON():
 		json.dump(PROTEIN_DOMAINS_FINAL, proteinToDomainsJson, 
 		default=lambda o: o.__dict__, 
 		sort_keys=True, indent=4)
-
 	       
 def writeSeqsAndTree():
 	prepareNameDict()
@@ -461,7 +465,6 @@ def writeSeqsAndTree():
 	treeStyle.layout_fn = layout
 	treeStyle.show_branch_support = True
 	tree.render(OUTPUT_TREE_SVG_FILENAME, w=800, dpi=400, tree_style=treeStyle)
-
 
 def prepareNameDict():
 	for protein in PROTEIN_DOMAINS:

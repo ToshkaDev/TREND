@@ -236,8 +236,8 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
         String proteinFeaturesOutFile = getRandomFileName();
         String segmakserOutFile = getRandomFileName();
 
-        String numberOfThreadsForProtFeatures = "4";
-        String numberOfThreadsForTree = "4";
+        String numberOfThreadsForProtFeatures = "7";
+        String numberOfThreadsForTree = "7";
         argsForProteinFeatures.addAll(protoTreeInternal.getFieldsForFeaturesPrediction());
         argsForProteinFeatures.addAll(Arrays.asList(
                 inputFileNameForProtFeatures,

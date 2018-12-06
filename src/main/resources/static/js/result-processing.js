@@ -151,6 +151,7 @@ function addEventListeners(data) {
 			    if (!d3.select(this).select("path").empty()) {
 			       // "C" means that this shape is ellipse an so it's a domain
 			       if (d3.select(this).select("path").attr("d").split(' ')[1][0] == "C"
+			           && d3.select(this).select("path").attr("d").split(' ')[4][0] == "C"
 			           && d3.select(this).select("path").attr("d").trim() != treeCirclePath) {
                         d3.select(this).select("path").attr("domainFlag", classNameForJson + ":" + domainCount++)
 			       }
@@ -161,7 +162,6 @@ function addEventListeners(data) {
 
 				d3.select(this).on("click", function(){
 						checkTableAndDisplay(d3.event, d3.select(this).attr("class"), proteinIdToRendered);
-
                         var proteinName = d3.select(this).attr("class");
                         var domainFlag = d3.select(this).attr("domainFlag");
                         var domainCount;
@@ -175,6 +175,10 @@ function addEventListeners(data) {
 					});
 				d3.select(this).selectAll('*').on("click", function(){
 						checkTableAndDisplay(d3.event, d3.select(this).attr("class"), proteinIdToRendered);
+//                        var proteinName = d3.select(this).attr("class");
+//                        var seq = getNotHighlightedSequence(proteinName);
+//                        $("#Sequence").click();
+//                        $("." + "protein-sequence").html(seq);
 					});
 			}
 	  });
@@ -411,6 +415,10 @@ function getHighlightedSequence(proteinName, domainCount) {
     sequenceMiddleFragment = "<span style='background-color: #d8f7dd'>" + proteinSequnce.substring(domStart, domEnd+1) + "</span>";
     sequenceLastFragment = proteinSequnce.substring(domEnd+1, proteinSequnce.length);
     return sequenceFirstFragment+sequenceMiddleFragment+sequenceLastFragment;
+}
+
+function getNotHighlightedSequence(proteinName) {
+    return featureJSON[trueClassNameToChanged[proteinName]].sequence;
 }
 
 function updatePositionAndShow(event, readyClassName) {

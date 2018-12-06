@@ -95,9 +95,9 @@ function checkFileAreaAndSendQuery(options) {
         $("#both-areas-message").show();
     else if ($(".second-area").is(':hidden') && !options.get("firstFileArea"))
         $("#one-area-message").show();
-    else if (options.get("firstFileArea").trim().slice(0, 1) !== ">")
+    else if (options.get("firstFileArea") && options.get("firstFileArea").trim().slice(0, 1) !== ">")
         $("#first-area-message").show();
-    else if (options.get("secondFileArea").trim().slice(0, 1) !== ">")
+    else if (options.get("secondFileArea") && options.get("secondFileArea").trim().slice(0, 1) !== ">")
         $("#second-area-message").show();
     else
         getDataAsync(options);
