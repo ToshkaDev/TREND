@@ -278,6 +278,7 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
             String outOrderedAlgnFile = super.getPrefix() + UUID.randomUUID().toString() + ".fa";
             protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, outOrderedAlgnFile, proteinFeaturesChangedOutFile));
             argsForTreeWithDomains.add(ParamPrefixes.INPUT_SECOND.getPrefix() + outAlgnFile);
+            argsForTreeWithDomains.add(ParamPrefixes.OUTPUT.getPrefix() + outOrderedAlgnFile);
         } else {
             protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, proteinFeaturesChangedOutFile));
         }
