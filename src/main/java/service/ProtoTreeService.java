@@ -8,7 +8,7 @@ import model.request.ProtoTreeRequest;
 import java.util.Map;
 
 
-public interface EvolutionService {
+public interface ProtoTreeService {
 	void runMainProgram(ProtoTreeInternal protoTreeInternal) throws IncorrectRequestException;
 	ProtoTreeInternal storeFilesAndPrepareCommandArguments(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException;
 	BioJob getBioJob(int jobId);

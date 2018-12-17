@@ -125,7 +125,29 @@ function getDataAsync(options) {
 	    });
 }
 
+function getDataAsyncNeighborGenes(options) {
+    console.log("options " + options)
+    console.log("getDataAsyncNeighbors() called!");
+	$.ajax({
+	      type: 'POST',
+	      url: 'process-request-neighbor-genes',
+	      data : options,
+	      success: redirectNeighborGenes,
+	      error: error,
+	      contentType: false,
+	      processData: false,
+	      dataType:'text',
+	      enctype: 'multipart/form-data'
+	    });
+}
+
 function redirect(jobId) {
+    console.log("Job is launched");
+    console.log('jobId ' + jobId);
+    window.location.replace("gene-neighborhoods/tree/" + jobId);
+}
+
+function redirectNeighborGenes(jobId) {
     console.log("Job is launched");
     console.log('jobId ' + jobId);
     window.location.replace("tree-for-you/" + jobId);

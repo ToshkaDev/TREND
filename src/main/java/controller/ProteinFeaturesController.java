@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import service.BioUniverseService;
-import service.EvolutionService;
+import service.ProtoTreeService;
 import service.StorageService;
 import exceptions.IncorrectRequestException;
 import enums.BioPrograms;
@@ -37,22 +37,29 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/")
-public class EvolutionController extends BioUniverseController {
+public class ProteinFeaturesController extends BioUniverseController {
 
     @Autowired
-    public final EvolutionService evolutionService;
+    public final ProtoTreeService proteinFeaturesService;
 
 
-    private static final Log logger = LogFactory.getLog(EvolutionController.class);
+    private static final Log logger = LogFactory.getLog(ProteinFeaturesController.class);
 
     private final List<String> statusReady = Arrays.asList("ready");
     private final List<String> statusNotReady = Arrays.asList("notReady");
     private final List<String> noSuchBioJob = Arrays.asList("noSuchBioJob");
 
 
-	public EvolutionController(StorageService storageService, EvolutionService evolutionService) {
+	public ProteinFeaturesController(StorageService storageService, ProtoTreeService proteinFeaturesService) {
     	super(storageService);
-    	this.evolutionService = evolutionService;
+    	this.proteinFeaturesService = proteinFeaturesService;
+    }
+
+    @GetMapping(value={"/help"})
+    public String help(Model model) {
+        model.addAttribute("mainTab", "help");
+        return "main-view  :: addContent(" +
+                "fragmentsMain='about', help='help')";
     }
 
     @GetMapping(value={"", "/home"})
@@ -64,7 +71,7 @@ public class EvolutionController extends BioUniverseController {
                 ", navigation='navigator')";
     }
 
-    @GetMapping(value={"/gene-neighborhoods"})
+    @GetMapping(value={"gene-neighborhoods"})
     public String geneNeighborhoods(Model model) {
         model.addAttribute("mainTab", "gene-neighborhoods");
         model.addAttribute("newickJs", "/js/vendor/newick_modified.js");
@@ -73,11 +80,13 @@ public class EvolutionController extends BioUniverseController {
                 "fragmentsMain='evolution-fragments', searchArea='gene-neighborhoods')";
     }
 
-    @GetMapping(value={"/help"})
-    public String help(Model model) {
-        model.addAttribute("mainTab", "help");
+    @GetMapping(value={"gene-neighborhoods/tree/{jobId:.+}"})
+    public String geneNeighborhoodsResult(Model model) {
+        model.addAttribute("mainTab", "gene-neighborhoods");
+        model.addAttribute("newickJs", "/js/vendor/newick_modified.js");
+        addToModelCommon(model, "/js/result-processing-gene-neighborhoods.js");
         return "main-view  :: addContent(" +
-                "fragmentsMain='about', help='help')";
+                "fragmentsMain='evolution-fragments', searchArea='gene-neighborhoods')";
     }
 
     @GetMapping(value={"tree-for-you/{jobId:.+}"})
@@ -95,11 +104,11 @@ public class EvolutionController extends BioUniverseController {
         //Split it to several functions because 'PROTO_TREE' method is asynchronous
         //and files in 'listOfFiles' field of evolutionRequest are got cleared at the end of request processing.
         if (protoTreeRequest.getCommandToBeProcessedBy().equals(BioPrograms.PROTO_TREE.getProgramName())) {
-            protoTreeInternal = evolutionService.storeFilesAndPrepareCommandArguments(protoTreeRequest);
+            protoTreeInternal = proteinFeaturesService.storeFilesAndPrepareCommandArguments(protoTreeRequest);
         }
 
         Integer jobId = protoTreeInternal.getJobId();
-        evolutionService.runMainProgram(protoTreeInternal);
+        proteinFeaturesService.runMainProgram(protoTreeInternal);
 
         return String.valueOf(jobId);
     }
@@ -117,7 +126,7 @@ public class EvolutionController extends BioUniverseController {
 
 	     if (jobId != null ) {
 	        int id = Integer.valueOf(jobId.split("-")[0]);
-            bioJob = evolutionService.getBioJob(id);
+            bioJob = proteinFeaturesService.getBioJob(id);
 	        if (bioJob != null) {
 	            if (bioJob.isFinished()) {
                     listOfResultFileNames = bioJob.getBioJobResultList().stream().map(bjResult -> urlPath + bjResult.getResultFileName()).collect(Collectors.toList());
@@ -134,7 +143,7 @@ public class EvolutionController extends BioUniverseController {
 
     @GetMapping("univ_files/{filename:.+}")
     public void getFileFromDbP(@PathVariable String filename, HttpServletResponse response) throws IOException {
-        BioJobResult bioJobResult = ((BioUniverseService) evolutionService).getBioJobResultDao().findByResultFileName(filename);
+        BioJobResult bioJobResult = ((BioUniverseService) proteinFeaturesService).getBioJobResultDao().findByResultFileName(filename);
         if (filename.split("\\.")[1].equals("txt")) {
             response.setContentType("text/plain");
         } else {

@@ -20,14 +20,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import service.EvolutionService;
+import service.ProtoTreeService;
 import service.StorageService;
 import exceptions.IncorrectRequestException;
 import springconfiguration.AppProperties;
 
 @Service
 
-public class EvolutionServiceImpl extends BioUniverseServiceImpl implements EvolutionService {
+public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implements ProtoTreeService {
 	private final int defaultLastJobId = 1;
 	private final String bootstrapFilePostfix = "_consensus";
 	private Map<Integer, String> counterToStageOneInput = new HashMap<>();
@@ -35,7 +35,7 @@ public class EvolutionServiceImpl extends BioUniverseServiceImpl implements Evol
     private Map<Integer, String> counterToStagePartial = new HashMap<>();
 
 
-	public EvolutionServiceImpl(final StorageService storageService, final AppProperties properties, final BioJobDao bioJobDao, final BioJobResultDao bioJobResultDao) {
+	public ProteinFeaturesServiceImpl(final StorageService storageService, final AppProperties properties, final BioJobDao bioJobDao, final BioJobResultDao bioJobResultDao) {
 		super(storageService, properties, bioJobResultDao, bioJobDao);
         counterToStageOneInput.put(1, "['Predicting proteins features.']");
         counterToStageOneInput.put(2, "['Predicting proteins features.', 'Aligning and building tree.']");
