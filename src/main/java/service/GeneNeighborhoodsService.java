@@ -7,6 +7,6 @@ import model.request.ProtoTreeRequest;
 
 public interface GeneNeighborhoodsService {
     void runMainProgram(ProtoTreeInternal protoTreeInternal) throws IncorrectRequestException;
-    ProtoTreeInternal storeFilesAndPrepareCommandArguments(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException;
     BioJob getBioJob(int jobId);
+    ProtoTreeInternal storeFilesAndPrepareCommandArguments(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException;
 }

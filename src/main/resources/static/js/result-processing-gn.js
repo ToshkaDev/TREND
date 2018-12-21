@@ -41,12 +41,9 @@ xShiftLeftLast = 0.03;
 clusterOffsetLeft = 0.05;
 clusterOffsetRight = 0.084;
 
-$(document).ready(function (){
-	takeCareOfValidators();
+$(document).ready(function(){
 	takeCareOfFields();
-
-    setCookie();
-    $('#GoAsync').click(function() {
+    $('#GoJs').click(function() {
         var dataObject;
     	options = getOptions();
     	if (options.get("firstFile")) {
@@ -59,27 +56,62 @@ $(document).ready(function (){
     	    buildGeneTree({newick: options.get("firstFileArea")});
     	}
     });
-
 });
 
-function createZoomableBox () {
-    var minSvgWidth = 650;
-    var widthShrinkageFactor = 0.89;
-    var heightShrinkageFactor = 0.8;
-    var width = window.innerWidth*widthShrinkageFactor;
-    var height = window.innerHeight*heightShrinkageFactor;
-    var tree = d3.select('#svgContainer')
-        .style("border", "1.4px solid #9494b8")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .style("pointer-events", "all")
-        .call(d3.zoom().on("zoom", function() {
-            tree.attr("transform", d3.event.transform);
-            textPositionZoomCorrection = d3.event.transform.k;
-        }))
-        .append("g")
-        .attr("id", "treeContainer");
+function setCookie() {
+    typeof Cookies.get('protoTree') == 'undefined'
+        ? Cookies.set('protoTree', ''+Math.random(), { expires: 1 })
+        : null;
+}
+
+function getIfReady(jobId) {
+    console.log('Checking if ready ');
+    console.log('jobId ' + jobId + " " + Cookies.get('protoTree'));
+    fileGetter = setInterval(function() {
+        tryToGetFileName(jobId + "-" + Cookies.get('protoTree'))
+    }, 2000);
+}
+
+function tryToGetFileName(jobId) {
+    $.ajax({
+      type: 'GET',
+      url: 'get-filename',
+      dataType:'json',
+      contentType: 'application/json',
+      data: {"jobId": jobId},
+      success: processRetrievedDataAsync,
+      error: error
+    });
+}
+
+function error(jqXHR, textStatus, errorThrown) {
+	window.alert('Error happened!');
+	console.log(jqXHR);
+}
+
+function processRetrievedDataAsync(data) {
+    if (data.status[0] === 'noSuchBioJob') {
+        clearInterval(fileGetter);
+        $('.wait-for-it').hide();
+        $('.no-such-biojob').show();
+    }
+    else  if (data.status[0] === 'ready') {
+        clearInterval(fileGetter);
+        displayStage(data.stage[0], true);
+
+        if (data.result.length >= 1) {
+            // Add corresponding links to download buttons
+            $('#alignment-load').attr('href', data.result[1]);
+            $('#tree-load').attr('href', data.result[0]);
+            var newickTree = data.result[0];
+            $.get(newickTree, function(data, status){
+                buildGeneTree({newick: data});
+            });
+        }
+        $('.result-container').show();
+	} else if (data.status[0] === 'notReady') {
+	    displayStage(data.stage[0]);
+	}
 }
 
 function buildGeneTree(dataObject) {
@@ -120,10 +152,24 @@ function buildGeneTree(dataObject) {
     getGenesAndDraw(refSeqs, refSeqsAndYCoords, longestXCoord, longestXCoordText);
 }
 
-function setCookie() {
-    typeof Cookies.get('protoTree') == 'undefined'
-        ? Cookies.set('protoTree', ''+Math.random(), { expires: 1 })
-        : null;
+function createZoomableBox() {
+    var minSvgWidth = 650;
+    var widthShrinkageFactor = 0.89;
+    var heightShrinkageFactor = 0.8;
+    var width = window.innerWidth*widthShrinkageFactor;
+    var height = window.innerHeight*heightShrinkageFactor;
+    var tree = d3.select('#svgContainer')
+        .style("border", "1.4px solid #9494b8")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .style("pointer-events", "all")
+        .call(d3.zoom().on("zoom", function() {
+            tree.attr("transform", d3.event.transform);
+            textPositionZoomCorrection = d3.event.transform.k;
+        }))
+        .append("g")
+        .attr("id", "treeContainer");
 }
 
 function getGenesAndDraw(refSeqs, refSeqsAndYCoords, xCoordinate, xCoordinateText) {
@@ -176,7 +222,6 @@ function getGenesAndDraw(refSeqs, refSeqsAndYCoords, xCoordinate, xCoordinateTex
         else {
             //$('#svgContainer').show();
         }
-
     }
 }
 

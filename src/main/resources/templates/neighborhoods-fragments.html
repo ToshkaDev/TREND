@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <div th:fragment="gene-neighborhoods">
+        <div class="col-md-8 my-textarea">
+            <div class="row">
+                <textarea id="first-file-area" class="form-control" rows="12"> </textarea>
+            </div>
+            <br />
+            <div class="row">
+                <label class="btn btn-primary btn-md proto-tree-button">
+                    Choose file with protein sequences <input id="first-file" type="file" style="display: none" multiple/>
+                </label>
+                <span class='label label-info' id="first-file-info"></span>
+                <div class="btn-group">
+
+                </div>
+                <button id="GoJs" class="btn btn-primary btn-md pull-right proto-tree-button" type="button">
+                    <span>GET NEIGHBORHOODS</span>
+                </button>
+                <button id="GoAsync" style="margin-right: 2px" class="btn btn-primary btn-md pull-right proto-tree-button" type="button">
+                    <span>SUBMIT</span>
+                </button>
+            </div> <br /> <br />
+        </div>
+        <div class="col-md-12 wait-for-it">
+            <div id="result-stage"></div>
+        </div>
+        <div class="col-md-12 no-such-biojob">
+            No such job found
+        </div>
+        <div class="col-md-12 my-result">
+            <div style="display: inline">
+                <span id="jobId" th:text="${jobId}"></span>
+            </div>
+            <div id="svgContainer"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center result-container raw-files-containers">
+                <div class="secondary-buttons">
+                    <a id="tree-load" class="btn btn-info btn-md proto-tree-button" href="#">
+                        Download Tree (Newick) <span class="glyphicon glyphicon-download-alt"> </span>
+                    </a>
+                    <a id="alignment-load" class="btn btn-info btn-md proto-tree-button" href="#">
+                        Download Alignment <span class="glyphicon glyphicon-download-alt"> </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="proto-tree-filter">
+        <div class="col-md-2 panel panel-default">
+            <div class="panel-body">
+                <h3 class="text-primary">Set options:</h3>
+                <div class="form-group">
+                    <form id="first">
+                        <h4 class="text-info" >Alignment (Mafft):</h4>
+                        <span>Alignment Algorithm:</span>
+                        <select id="alignment-alg" class="form-control input-md">
+                            <option selected='selected' value="--retree 2 --maxiterate 0">FFT-NS-2</option>
+                            <option value="--retree 2 --maxiterate 1000">FFT-NS-i</option>
+                            <option value="--localpair">L-INS-i</option>
+                            <option value="--genafpair">E-INS-i</option>
+                            <option value="--globalpair">G-INS-i</option>
+                        </select>
+                        <h4 class="text-info">Tree Building (Mega):</h4>
+                        <span>Tree Building Method:</span>
+                        <select id="tree-method" class="form-control input-md">
+                            <option selected='selected' value="JN">Neighbour Joining</option>
+                            <option value="ML">Maximum Likelihood</option>
+                            <option value="ME">Minimum Evolution</option>
+                        </select>
+                        <div class="ml-options">
+                            <span>A.A. Substitution Model:</span>
+                            <select id="ml-subst-model" class="form-control input-md">
+                                <option selected='selected' value="jtt">Jones-Taylor-Thornton (JTT) model</option>
+                                <option value="pm">Poisson model</option>
+                                <option value="eim">Equal input model</option>
+                                <option value="dm">Dayhoff model</option>
+                                <option value="dmf">Dayhoff model with Freqs. (F+)</option>
+                                <option value="jttf">JTT with Freqs. (F+) model</option>
+                                <option value="wm">WAG model</option>
+                                <option value="wmf">WAG with Freqs. (F+) model</option>
+                                <option value="lg">LG model</option>
+                                <option value="lgf">LG with Freqs. (F+) model</option>
+                                <option value="grm">General Reversible Mitochondrial (mtREV)</option>
+                                <option value="grmf">mtREV with Freqs. (F+) model</option>
+                                <option value="grc">General Reversible Chloroplast (cpREV)</option>
+                                <option value="grcf">cpREV with Freqs. (F+) model</option>
+                                <option value="grt">General Reversible Transcriptase model (rtREV)</option>
+                                <option value="grtf">rtREV with Freqs. (F+) model</option>
+                            </select>
+                        </div>
+                        <div class="nj-and-me-options">
+                            <span>A.A. Substitution Model:</span>
+                            <select id="nj_me-subst-model" class="form-control input-md">
+                                <option selected='selected' value="jtt">Jones-Taylor-Thornton (JTT) model</option>
+                                <option value="nd">No. of differences</option>
+                                <option value="pd">p-distance</option>
+                                <option value="pm">Poisson model</option>
+                                <option value="eim">Equal input model</option>
+                                <option value="dm">Dayhoff model</option>
+                            </select>
+                        </div>
+                        <span>A.A. Substitution Rate:</span>
+                        <select id="subst-rate" class="form-control input-md">
+                            <option selected='selected' value="ur">Uniform Rates</option>
+                            <option value="gd">Gamma Distributed (G)</option>
+                            <option value="ir">Has Invariant Sites (I)</option>
+                            <option value="gir">Gamma Distributed With Invariant Sites (G+I)</option>
+                        </select>
+                        <div class="ml-options">
+                            <span>Initial tree for ML:</span>
+                            <select id="initial-tree-ml" class="form-control input-md">
+                                <option selected='selected' value="njBio">Make initial tree automatically (Default - NJ/BioNJ)</option>
+                                <option value="mp">Make initial tree automatically (Maximum parsimony)</option>
+                                <option value="nj">Make initial tree automatically (Neighbor joining)</option>
+                                <option value="bioNj">Make initial tree automatically (BioNJ)</option>
+                            </select>
+                        </div>
+                        <span>Gaps and Missing Data:</span>
+                        <select id="gaps-missing" class="form-control input-md">
+                            <option selected='selected' value="compDel">Complete deletion</option>
+                            <option value="partDel">Partial deletion</option>
+                            <option value="pairDel">Pairwise deletion</option>
+                        </select>
+                        <div class="cov-cutoff">
+                            <span>TSite Coverage Cutoff:</span>
+                            <input value="95" id="site-cov-cutoff" name="site-cov-cutoff" type="text" class="form-control input-sm"/>
+                        </div>
+                        <div class="nj-and-me-options">
+                            <span>Phylogeny Test:</span>
+                            <select id="nj_me-phylo-test" class="form-control input-md">
+                                <option selected='selected' value="none">None</option>
+                                <option value="bm">Bootstrap method</option>
+                                <option value="ib">Interior-branch test</option>
+                            </select>
+                        </div>
+                        <div class="ml-options">
+                            <span>Phylogeny Test:</span>
+                            <select id="ml-phylo-test" class="form-control input-md">
+                                <option selected='selected' value="none">None</option>
+                                <option value="bm">Bootstrap method</option>
+                            </select>
+                        </div>
+                        <div class="number-of-replicates">
+                            <span>Number of replicates:</span>
+                            <input value="100" id="number-of-replicates" name="number-of-replicates" type="text" class="form-control input-md"/>
+                        </div>
+                    </form>
+                </div>
+                <span id="isFullPipeline">true</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

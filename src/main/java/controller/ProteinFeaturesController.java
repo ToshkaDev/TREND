@@ -64,37 +64,19 @@ public class ProteinFeaturesController extends BioUniverseController {
 
     @GetMapping(value={"", "/home"})
     public String protoTree(Model model) {
-        model.addAttribute("mainTab", "home");
-        addToModelCommon(model, "/js/send-and-process-data.js");
+        model.addAttribute("sendOrGiveResult", "/js/send-and-process-data.js");
+        addToModelCommon(model);
         return "main-view  :: addContent(" +
-                "fragmentsMain='evolution-fragments', searchArea='proto-tree', filter='proto-tree-filter'" +
+                "fragmentsMain='features-fragments', searchArea='proto-tree', filter='proto-tree-filter'" +
                 ", navigation='navigator')";
-    }
-
-    @GetMapping(value={"gene-neighborhoods"})
-    public String geneNeighborhoods(Model model) {
-        model.addAttribute("mainTab", "gene-neighborhoods");
-        model.addAttribute("newickJs", "/js/vendor/newick_modified.js");
-        addToModelCommon(model, "/js/result-processing-gene-neighborhoods.js");
-        return "main-view  :: addContent(" +
-                "fragmentsMain='evolution-fragments', searchArea='gene-neighborhoods')";
-    }
-
-    @GetMapping(value={"gene-neighborhoods/tree/{jobId:.+}"})
-    public String geneNeighborhoodsResult(Model model) {
-        model.addAttribute("mainTab", "gene-neighborhoods");
-        model.addAttribute("newickJs", "/js/vendor/newick_modified.js");
-        addToModelCommon(model, "/js/result-processing-gene-neighborhoods.js");
-        return "main-view  :: addContent(" +
-                "fragmentsMain='evolution-fragments', searchArea='gene-neighborhoods')";
     }
 
     @GetMapping(value={"tree-for-you/{jobId:.+}"})
     public String result(@PathVariable Integer jobId, Model model) {
-        model.addAttribute("mainTab", "home");
-        addToModelCommon(model, "/js/result-processing.js");
+        model.addAttribute("sendOrGiveResult", "/js/result-processing.js");
         model.addAttribute("jobId", jobId);
-        return "main-view  :: addContent(fragmentsMain='evolution-fragments', result='result')";
+        addToModelCommon(model);
+        return "main-view  :: addContent(fragmentsMain='features-fragments', result='result')";
     }
 
     @PostMapping(value="process-request", produces="text/plain")
@@ -162,10 +144,10 @@ public class ProteinFeaturesController extends BioUniverseController {
     }
 
     @Override
-    void addToModelCommon(Model model, String sendOrGiveResult) {
-        model.addAttribute("specificJs", "/js/get-fields-values.js");
+    void addToModelCommon(Model model) {
+        model.addAttribute("mainTab", "home");
+        model.addAttribute("getFieldsValues", "/js/get-fields-values.js");
         model.addAttribute("subnavigationTab", BioPrograms.PROTO_TREE.getProgramName());
-        model.addAttribute("sendOrGiveResult", sendOrGiveResult);
     }
 
 }

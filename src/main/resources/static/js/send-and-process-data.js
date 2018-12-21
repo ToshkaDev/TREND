@@ -91,13 +91,19 @@ function checkFileAndSendQuery(options, secondFile) {
 }
 
 function checkFileAreaAndSendQuery(options) {
-    if (!$(".second-area").is(':hidden') && !(options.get("secondFileArea") && options.get("firstFileArea")))
+    console.log(typeof $(".second-area"))
+    console.log(typeof $(".second-area").val())
+    if (typeof $(".second-area") != 'undefined' && !$(".second-area").is(':hidden') && !(options.get("secondFileArea") && options.get("firstFileArea")))
+        //console.log("Called 1")
         $("#both-areas-message").show();
     else if ($(".second-area").is(':hidden') && !options.get("firstFileArea"))
+        //console.log("Called 2")
         $("#one-area-message").show();
     else if (options.get("firstFileArea").trim().slice(0, 1) !== ">")
+        //console.log("Called 3")
         $("#first-area-message").show();
     else if (options.get("secondFileArea").trim().slice(0, 1) !== ">")
+        //console.log("Called 4")
         $("#second-area-message").show();
     else
         getDataAsync(options);
@@ -130,7 +136,7 @@ function getDataAsyncNeighborGenes(options) {
     console.log("getDataAsyncNeighbors() called!");
 	$.ajax({
 	      type: 'POST',
-	      url: 'process-request-neighbor-genes',
+	      url: 'process-request-gn',
 	      data : options,
 	      success: redirectNeighborGenes,
 	      error: error,
@@ -144,13 +150,13 @@ function getDataAsyncNeighborGenes(options) {
 function redirect(jobId) {
     console.log("Job is launched");
     console.log('jobId ' + jobId);
-    window.location.replace("gene-neighborhoods/tree/" + jobId);
+    window.location.replace("tree-for-you/" + jobId);
 }
 
 function redirectNeighborGenes(jobId) {
     console.log("Job is launched");
     console.log('jobId ' + jobId);
-    window.location.replace("tree-for-you/" + jobId);
+    window.location.replace("gene-neighborhoods/tree/" + jobId);
 }
 
 function error(jqXHR, textStatus, errorThrown) {

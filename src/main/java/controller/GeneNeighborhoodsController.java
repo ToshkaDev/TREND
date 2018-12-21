@@ -1,5 +1,6 @@
 package controller;
 
+import biojobs.BioJob;
 import enums.BioPrograms;
 import exceptions.IncorrectRequestException;
 import model.internal.ProtoTreeInternal;
@@ -9,19 +10,17 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import service.ProtoTreeService;
 import service.StorageService;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("/gene-neighborhoods")
 public class GeneNeighborhoodsController extends BioUniverseController {
     @Autowired
     public final ProtoTreeService proteinFeaturesService;
@@ -39,44 +38,69 @@ public class GeneNeighborhoodsController extends BioUniverseController {
         this.proteinFeaturesService = proteinFeaturesService;
     }
 
-    @GetMapping(value={"gene-neighborhoods"})
+    @GetMapping(value="")
     public String geneNeighborhoods(Model model) {
-        model.addAttribute("mainTab", "gene-neighborhoods");
-        model.addAttribute("newickJs", "/js/vendor/newick_modified.js");
-        addToModelCommon(model, "/js/result-processing-gene-neighborhoods.js");
+        model.addAttribute("sendOrGiveResult", "/js/send-and-process-data.js");
+        addToModelCommon(model);
         return "main-view  :: addContent(" +
-                "fragmentsMain='evolution-fragments', searchArea='gene-neighborhoods')";
+                "fragmentsMain='neighborhoods-fragments', searchArea='gene-neighborhoods', filter='proto-tree-filter')";
     }
 
-    @GetMapping(value={"gene-neighborhoods/tree/{jobId:.+}"})
+    @GetMapping(value={"tree/{jobId:.+}"})
     public String geneNeighborhoodsResult(Model model) {
-        model.addAttribute("mainTab", "gene-neighborhoods");
-        model.addAttribute("newickJs", "/js/vendor/newick_modified.js");
-        addToModelCommon(model, "/js/result-processing-gene-neighborhoods.js");
+        model.addAttribute("sendOrGiveResult","/js/result-processing-gn.js");
+        model.addAttribute("specificJs", "/js/result-processing-gn-server.js");
+        addToModelCommon(model);
         return "main-view  :: addContent(" +
-                "fragmentsMain='evolution-fragments', searchArea='gene-neighborhoods')";
+                "fragmentsMain='neighborhoods-fragments', searchArea='gene-neighborhoods')";
     }
 
-    @PostMapping(value="process-request-neighbor-genes", produces="text/plain")
+    @PostMapping(value="process-request", produces="text/plain")
     @ResponseBody
     public String processTreeRequest(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException, ExecutionException, InterruptedException {
         ProtoTreeInternal protoTreeInternal = null;
         //Split it to several functions because 'PROTO_TREE' method is asynchronous
         //and files in 'listOfFiles' field of evolutionRequest are got cleared at the end of request processing.
-        if (protoTreeRequest.getCommandToBeProcessedBy().equals(BioPrograms.PROTO_TREE.getProgramName())) {
-            protoTreeInternal = proteinFeaturesService.storeFilesAndPrepareCommandArguments(protoTreeRequest);
-        }
-
+        protoTreeInternal = proteinFeaturesService.storeFilesAndPrepareCommandArguments(protoTreeRequest);
         Integer jobId = protoTreeInternal.getJobId();
         proteinFeaturesService.runMainProgram(protoTreeInternal);
 
         return String.valueOf(jobId);
     }
 
+    @GetMapping(value="tree/get-filename", produces="application/json")
+    @ResponseBody
+    public Map<String, List<String>> getFileNameIfReady(@RequestParam("jobId") String jobId) {
+        BioJob bioJob;
+        String urlPath = ServletUriComponentsBuilder.fromCurrentContextPath().path("univ_files/").build().toString();
+
+        Map<String, List<String>> result = new HashMap<>();
+        result.put("status", noSuchBioJob);
+
+        List<String> listOfResultFileNames;
+
+        if (jobId != null ) {
+            int id = Integer.valueOf(jobId.split("-")[0]);
+            bioJob = proteinFeaturesService.getBioJob(id);
+            if (bioJob != null) {
+                if (bioJob.isFinished()) {
+                    listOfResultFileNames = bioJob.getBioJobResultList().stream().map(bjResult -> urlPath + bjResult.getResultFileName()).collect(Collectors.toList());
+                    result.put("result", listOfResultFileNames);
+                    result.put("status", statusReady);
+                } else {
+                    result.put("status", statusNotReady);
+                }
+                result.put("stage", new LinkedList<>(Arrays.asList(bioJob.getStage())));
+            }
+        }
+        return result;
+    }
+
     @Override
-    void addToModelCommon(Model model, String sendOrGiveResult) {
-        model.addAttribute("specificJs", "/js/get-fields-values.js");
+    void addToModelCommon(Model model) {
+        model.addAttribute("mainTab", "gene-neighborhoods");
+        model.addAttribute("newickJs", "/js/vendor/newick_modified.js");
+        model.addAttribute("getFieldsValues", "/js/get-fields-values.js");
         model.addAttribute("subnavigationTab", BioPrograms.PROTO_TREE.getProgramName());
-        model.addAttribute("sendOrGiveResult", sendOrGiveResult);
     }
 }
