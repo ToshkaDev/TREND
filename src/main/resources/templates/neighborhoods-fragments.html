@@ -20,9 +20,13 @@
                 <button id="GoJs" class="btn btn-primary btn-md pull-right proto-tree-button" type="button">
                     <span>GET NEIGHBORHOODS</span>
                 </button>
-                <button id="GoAsync" style="margin-right: 2px" class="btn btn-primary btn-md pull-right proto-tree-button" type="button">
+                <button id="GoAsyncNeib" style="margin-right: 2px" class="btn btn-primary btn-md pull-right proto-tree-button" type="button">
                     <span>SUBMIT</span>
                 </button>
+                <div class="row">
+                    <span id="first-area-message">Wrong format. The fasta format is expected to begin with '>' sign.</span>
+                    <span id="one-area-message">To start the analysis you need to choose a file with protein sequences or paste the sequences in the area above.</span>
+                </div>
             </div> <br /> <br />
         </div>
         <div class="col-md-12 wait-for-it">
@@ -36,18 +40,6 @@
                 <span id="jobId" th:text="${jobId}"></span>
             </div>
             <div id="svgContainer"></div>
-        </div>
-        <div class="row">
-            <div class="col-md-12 text-center result-container raw-files-containers">
-                <div class="secondary-buttons">
-                    <a id="tree-load" class="btn btn-info btn-md proto-tree-button" href="#">
-                        Download Tree (Newick) <span class="glyphicon glyphicon-download-alt"> </span>
-                    </a>
-                    <a id="alignment-load" class="btn btn-info btn-md proto-tree-button" href="#">
-                        Download Alignment <span class="glyphicon glyphicon-download-alt"> </span>
-                    </a>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -153,6 +145,33 @@
                     </form>
                 </div>
                 <span id="isFullPipeline">true</span>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="result">
+        <div class="col-md-12 wait-for-it">
+            <div id="result-stage"></div>
+        </div>
+        <div class="col-md-12 no-such-biojob">
+            No such job found
+        </div>
+        <div class="col-md-12 my-result">
+            <div style="display: none">
+                <span id="jobId" th:text="${jobId}"></span>
+            </div>
+            <div id="svgContainer"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center result-container raw-files-containers">
+                <div class="secondary-buttons">
+                    <a id="tree-load" class="btn btn-info btn-md proto-tree-button" href="#">
+                        Download Tree (Newick) <span class="glyphicon glyphicon-download-alt"> </span>
+                    </a>
+                    <a id="alignment-load" class="btn btn-info btn-md proto-tree-button" href="#">
+                        Download Alignment <span class="glyphicon glyphicon-download-alt"> </span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>

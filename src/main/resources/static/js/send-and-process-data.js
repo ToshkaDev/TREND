@@ -15,6 +15,12 @@ $(document).ready(function (){
         checkFileAndSendQuery(options, "alignmentFile");
     });
 
+    $('#GoAsyncNeib').click(function() {
+        $("#first-area-message, #one-area-message").hide();
+        options = getOptions();
+        checkFileAndSendQuery(options, null);
+    });
+
     $('#options').click(function() {
         $('.extra-result-container').show();
         $('#options').hide();
@@ -63,7 +69,13 @@ function checkFileAndSendQuery(options, secondFile) {
                 checkFileAreaAndSendQuery(options);
                 return;
         }
+    } else if (secondFile === null) {
+        if (!options.get("firstFile")) {
+            checkFileAreaAndSendQueryNeib(options);
+            return;
+        }
     }
+
     var fileReader = new FileReader();
     fileReader.readAsText(options.get("firstFile"));
     fileReader.onloadend = function() {
@@ -84,8 +96,8 @@ function checkFileAndSendQuery(options, secondFile) {
                 } else
                     getDataAsync(options);
             }
-        } else {
-            getDataAsync(options);
+        } else { //main condition
+            secondFile ? getDataAsync(options) : getDataAsyncNeighborGenes(options);
         }
     }
 }
@@ -93,20 +105,25 @@ function checkFileAndSendQuery(options, secondFile) {
 function checkFileAreaAndSendQuery(options) {
     console.log(typeof $(".second-area"))
     console.log(typeof $(".second-area").val())
-    if (typeof $(".second-area") != 'undefined' && !$(".second-area").is(':hidden') && !(options.get("secondFileArea") && options.get("firstFileArea")))
-        //console.log("Called 1")
+    if ($(".second-area").length && !$(".second-area").is(':hidden') && !(options.get("secondFileArea") && options.get("firstFileArea")))
         $("#both-areas-message").show();
     else if ($(".second-area").is(':hidden') && !options.get("firstFileArea"))
-        //console.log("Called 2")
         $("#one-area-message").show();
-    else if (options.get("firstFileArea").trim().slice(0, 1) !== ">")
-        //console.log("Called 3")
+    else if (options.get("firstFileArea") && options.get("firstFileArea").trim().slice(0, 1) !== ">")
         $("#first-area-message").show();
-    else if (options.get("secondFileArea").trim().slice(0, 1) !== ">")
-        //console.log("Called 4")
+    else if (options.get("secondFileArea") && options.get("secondFileArea").trim().slice(0, 1) !== ">")
         $("#second-area-message").show();
     else
         getDataAsync(options);
+}
+
+function checkFileAreaAndSendQueryNeib(options) {
+    if (!options.get("firstFileArea"))
+        $("#one-area-message").show();
+    else if (options.get("firstFileArea") && options.get("firstFileArea").trim().slice(0, 1) !== ">")
+        $("#first-area-message").show();
+    else
+        getDataAsyncNeighborGenes(options);
 }
 
 function setCookie() {
@@ -116,8 +133,6 @@ function setCookie() {
 }
 
 function getDataAsync(options) {
-    console.log("options " + options)
-    console.log("getDataAsync() called!");
 	$.ajax({
 	      type: 'POST',
 	      url: 'process-request',
@@ -132,11 +147,9 @@ function getDataAsync(options) {
 }
 
 function getDataAsyncNeighborGenes(options) {
-    console.log("options " + options)
-    console.log("getDataAsyncNeighbors() called!");
 	$.ajax({
 	      type: 'POST',
-	      url: 'process-request-gn',
+	      url: 'gene-neighborhoods/process-request',
 	      data : options,
 	      success: redirectNeighborGenes,
 	      error: error,
@@ -148,14 +161,10 @@ function getDataAsyncNeighborGenes(options) {
 }
 
 function redirect(jobId) {
-    console.log("Job is launched");
-    console.log('jobId ' + jobId);
-    window.location.replace("tree-for-you/" + jobId);
+    window.location.replace("tree/" + jobId);
 }
 
 function redirectNeighborGenes(jobId) {
-    console.log("Job is launched");
-    console.log('jobId ' + jobId);
     window.location.replace("gene-neighborhoods/tree/" + jobId);
 }
 

@@ -22,7 +22,7 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
 
     public GeneNeighborhoodsServiceImpl(final StorageService storageService, final AppProperties properties, final BioJobDao bioJobDao, final BioJobResultDao bioJobResultDao) {
         super(storageService, properties, bioJobResultDao, bioJobDao);
-        counterToStageOneInput.put(1, "['Aligning and building tree.']");
+        counterToStageOneInput.put(1, "['Aligning and building tree.-last']");
     }
 
     @Override

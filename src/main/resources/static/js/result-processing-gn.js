@@ -42,8 +42,9 @@ clusterOffsetLeft = 0.05;
 clusterOffsetRight = 0.084;
 
 $(document).ready(function(){
-	takeCareOfFields();
     $('#GoJs').click(function() {
+    	takeCareOfValidators();
+    	takeCareOfFields();
         var dataObject;
     	options = getOptions();
     	if (options.get("firstFile")) {
@@ -57,62 +58,6 @@ $(document).ready(function(){
     	}
     });
 });
-
-function setCookie() {
-    typeof Cookies.get('protoTree') == 'undefined'
-        ? Cookies.set('protoTree', ''+Math.random(), { expires: 1 })
-        : null;
-}
-
-function getIfReady(jobId) {
-    console.log('Checking if ready ');
-    console.log('jobId ' + jobId + " " + Cookies.get('protoTree'));
-    fileGetter = setInterval(function() {
-        tryToGetFileName(jobId + "-" + Cookies.get('protoTree'))
-    }, 2000);
-}
-
-function tryToGetFileName(jobId) {
-    $.ajax({
-      type: 'GET',
-      url: 'get-filename',
-      dataType:'json',
-      contentType: 'application/json',
-      data: {"jobId": jobId},
-      success: processRetrievedDataAsync,
-      error: error
-    });
-}
-
-function error(jqXHR, textStatus, errorThrown) {
-	window.alert('Error happened!');
-	console.log(jqXHR);
-}
-
-function processRetrievedDataAsync(data) {
-    if (data.status[0] === 'noSuchBioJob') {
-        clearInterval(fileGetter);
-        $('.wait-for-it').hide();
-        $('.no-such-biojob').show();
-    }
-    else  if (data.status[0] === 'ready') {
-        clearInterval(fileGetter);
-        displayStage(data.stage[0], true);
-
-        if (data.result.length >= 1) {
-            // Add corresponding links to download buttons
-            $('#alignment-load').attr('href', data.result[1]);
-            $('#tree-load').attr('href', data.result[0]);
-            var newickTree = data.result[0];
-            $.get(newickTree, function(data, status){
-                buildGeneTree({newick: data});
-            });
-        }
-        $('.result-container').show();
-	} else if (data.status[0] === 'notReady') {
-	    displayStage(data.stage[0]);
-	}
-}
 
 function buildGeneTree(dataObject) {
     createZoomableBox();
@@ -177,6 +122,7 @@ function getGenesAndDraw(refSeqs, refSeqsAndYCoords, xCoordinate, xCoordinateTex
     var refSeqCounter = 0;
 
     function getFetchSettings(gene, type) {
+        console.log("Fetching")
         var geneUrl = `https://api.mistdb.caltech.edu/v1/genes?search=${gene}`;
         var geneNeighborsUrl = `https://api.mistdb.caltech.edu/v1/genes/${gene}/neighbors`;
         var geneFetchSettings = {

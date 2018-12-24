@@ -71,7 +71,7 @@ public class ProteinFeaturesController extends BioUniverseController {
                 ", navigation='navigator')";
     }
 
-    @GetMapping(value={"tree-for-you/{jobId:.+}"})
+    @GetMapping(value={"tree/{jobId:.+}"})
     public String result(@PathVariable Integer jobId, Model model) {
         model.addAttribute("sendOrGiveResult", "/js/result-processing.js");
         model.addAttribute("jobId", jobId);
@@ -95,7 +95,7 @@ public class ProteinFeaturesController extends BioUniverseController {
         return String.valueOf(jobId);
     }
 
-    @GetMapping(value="tree-for-you/get-filename", produces="application/json")
+    @GetMapping(value="tree/get-filename", produces="application/json")
     @ResponseBody
     public Map<String, List<String>> getFileNameIfReady(@RequestParam("jobId") String jobId) {
         BioJob bioJob;
@@ -126,7 +126,7 @@ public class ProteinFeaturesController extends BioUniverseController {
     @GetMapping("univ_files/{filename:.+}")
     public void getFileFromDbP(@PathVariable String filename, HttpServletResponse response) throws IOException {
         BioJobResult bioJobResult = ((BioUniverseService) proteinFeaturesService).getBioJobResultDao().findByResultFileName(filename);
-        if (filename.split("\\.")[1].equals("txt")) {
+        if (!filename.split("\\.")[1].equals("svg")) {
             response.setContentType("text/plain");
         } else {
             response.setContentType("image/svg+xml");
