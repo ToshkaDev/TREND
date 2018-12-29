@@ -1,0 +1,26 @@
+#!/bin bash
+
+#/app
+APP_DIR=$1
+#3.1b2
+HMMER_VERSION=$2
+#2.7.1
+BLAST_VERSION=$3
+#0.4.0
+RPSBPROC_VERSION=$4
+#/tmpW
+TEMP_DIR=$5
+#7.407
+MAFFT_VERSION=$6
+
+install-pfam VERSION APP_DIR TEMP_DIR;
+
+install-hmmer3 HMMER_VERSION APP_DIR TEMP_DIR;
+
+install-blast BLAST_VERSION APP_DIR TEMP_DIR;
+
+install-rpsbproc RPSBPROC_VERSION BLAST_VERSION APP_DIR TEMP_DIR;
+
+install-mafft MAFFT_VERSION APP_DIR TEMP_DIR;
+
+#install-tmhmm ;
