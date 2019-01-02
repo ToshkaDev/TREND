@@ -41,12 +41,10 @@ xShiftLeftLast = 0.03;
 clusterOffsetLeft = 0.05;
 clusterOffsetRight = 0.084;
 
-$(document).ready(function (){
-	takeCareOfValidators();
-	takeCareOfFields();
-
-    setCookie();
-    $('#GoAsync').click(function() {
+$(document).ready(function(){
+    $('#GoJs').click(function() {
+    	takeCareOfValidators();
+    	takeCareOfFields();
         var dataObject;
     	options = getOptions();
     	if (options.get("firstFile")) {
@@ -59,28 +57,7 @@ $(document).ready(function (){
     	    buildGeneTree({newick: options.get("firstFileArea")});
     	}
     });
-
 });
-
-function createZoomableBox () {
-    var minSvgWidth = 650;
-    var widthShrinkageFactor = 0.89;
-    var heightShrinkageFactor = 0.8;
-    var width = window.innerWidth*widthShrinkageFactor;
-    var height = window.innerHeight*heightShrinkageFactor;
-    var tree = d3.select('#svgContainer')
-        .style("border", "1.4px solid #9494b8")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .style("pointer-events", "all")
-        .call(d3.zoom().on("zoom", function() {
-            tree.attr("transform", d3.event.transform);
-            textPositionZoomCorrection = d3.event.transform.k;
-        }))
-        .append("g")
-        .attr("id", "treeContainer");
-}
 
 function buildGeneTree(dataObject) {
     createZoomableBox();
@@ -120,10 +97,24 @@ function buildGeneTree(dataObject) {
     getGenesAndDraw(refSeqs, refSeqsAndYCoords, longestXCoord, longestXCoordText);
 }
 
-function setCookie() {
-    typeof Cookies.get('protoTree') == 'undefined'
-        ? Cookies.set('protoTree', ''+Math.random(), { expires: 1 })
-        : null;
+function createZoomableBox() {
+    var minSvgWidth = 650;
+    var widthShrinkageFactor = 0.89;
+    var heightShrinkageFactor = 0.8;
+    var width = window.innerWidth*widthShrinkageFactor;
+    var height = window.innerHeight*heightShrinkageFactor;
+    var tree = d3.select('#svgContainer')
+        .style("border", "1.4px solid #9494b8")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .style("pointer-events", "all")
+        .call(d3.zoom().on("zoom", function() {
+            tree.attr("transform", d3.event.transform);
+            textPositionZoomCorrection = d3.event.transform.k;
+        }))
+        .append("g")
+        .attr("id", "treeContainer");
 }
 
 function getGenesAndDraw(refSeqs, refSeqsAndYCoords, xCoordinate, xCoordinateText) {
@@ -131,6 +122,7 @@ function getGenesAndDraw(refSeqs, refSeqsAndYCoords, xCoordinate, xCoordinateTex
     var refSeqCounter = 0;
 
     function getFetchSettings(gene, type) {
+        console.log("Fetching")
         var geneUrl = `https://api.mistdb.caltech.edu/v1/genes?search=${gene}`;
         var geneNeighborsUrl = `https://api.mistdb.caltech.edu/v1/genes/${gene}/neighbors`;
         var geneFetchSettings = {
@@ -176,7 +168,6 @@ function getGenesAndDraw(refSeqs, refSeqsAndYCoords, xCoordinate, xCoordinateTex
         else {
             //$('#svgContainer').show();
         }
-
     }
 }
 

@@ -15,6 +15,12 @@ $(document).ready(function (){
         checkFileAndSendQuery(options, "alignmentFile");
     });
 
+    $('#GoAsyncNeib').click(function() {
+        $("#first-area-message, #one-area-message").hide();
+        options = getOptions();
+        checkFileAndSendQuery(options, null);
+    });
+
     $('#options').click(function() {
         $('.extra-result-container').show();
         $('#options').hide();
@@ -63,7 +69,13 @@ function checkFileAndSendQuery(options, secondFile) {
                 checkFileAreaAndSendQuery(options);
                 return;
         }
+    } else if (secondFile === null) {
+        if (!options.get("firstFile")) {
+            checkFileAreaAndSendQueryNeib(options);
+            return;
+        }
     }
+
     var fileReader = new FileReader();
     fileReader.readAsText(options.get("firstFile"));
     fileReader.onloadend = function() {
@@ -84,14 +96,16 @@ function checkFileAndSendQuery(options, secondFile) {
                 } else
                     getDataAsync(options);
             }
-        } else {
-            getDataAsync(options);
+        } else { //main condition
+            secondFile ? getDataAsync(options) : getDataAsyncNeighborGenes(options);
         }
     }
 }
 
 function checkFileAreaAndSendQuery(options) {
-    if (!$(".second-area").is(':hidden') && !(options.get("secondFileArea") && options.get("firstFileArea")))
+    console.log(typeof $(".second-area"))
+    console.log(typeof $(".second-area").val())
+    if ($(".second-area").length && !$(".second-area").is(':hidden') && !(options.get("secondFileArea") && options.get("firstFileArea")))
         $("#both-areas-message").show();
     else if ($(".second-area").is(':hidden') && !options.get("firstFileArea"))
         $("#one-area-message").show();
@@ -103,6 +117,15 @@ function checkFileAreaAndSendQuery(options) {
         getDataAsync(options);
 }
 
+function checkFileAreaAndSendQueryNeib(options) {
+    if (!options.get("firstFileArea"))
+        $("#one-area-message").show();
+    else if (options.get("firstFileArea") && options.get("firstFileArea").trim().slice(0, 1) !== ">")
+        $("#first-area-message").show();
+    else
+        getDataAsyncNeighborGenes(options);
+}
+
 function setCookie() {
     typeof Cookies.get('protoTree') == 'undefined'
         ? Cookies.set('protoTree', ''+Math.random(), { expires: 1 })
@@ -110,8 +133,6 @@ function setCookie() {
 }
 
 function getDataAsync(options) {
-    console.log("options " + options)
-    console.log("getDataAsync() called!");
 	$.ajax({
 	      type: 'POST',
 	      url: 'process-request',
@@ -125,10 +146,26 @@ function getDataAsync(options) {
 	    });
 }
 
+function getDataAsyncNeighborGenes(options) {
+	$.ajax({
+	      type: 'POST',
+	      url: 'gene-neighborhoods/process-request',
+	      data : options,
+	      success: redirectNeighborGenes,
+	      error: error,
+	      contentType: false,
+	      processData: false,
+	      dataType:'text',
+	      enctype: 'multipart/form-data'
+	    });
+}
+
 function redirect(jobId) {
-    console.log("Job is launched");
-    console.log('jobId ' + jobId);
-    window.location.replace("tree-for-you/" + jobId);
+    window.location.replace("tree/" + jobId);
+}
+
+function redirectNeighborGenes(jobId) {
+    window.location.replace("gene-neighborhoods/tree/" + jobId);
 }
 
 function error(jqXHR, textStatus, errorThrown) {
