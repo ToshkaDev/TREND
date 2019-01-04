@@ -16,8 +16,8 @@ public class ConverterMain {
 		ProtoTreeInternal protoTreeInternal = new ProtoTreeInternal();
         protoTreeInternal.setFirstFileName(checkForNullAndGet(ParamPrefixes.INPUT.getPrefix(), firstFileName));
 		protoTreeInternal.setSecondFileName(checkForNullAndGet(ParamPrefixes.INPUT.getPrefix(), secondFileName));
-		protoTreeInternal.setAlignmentFile(alignedFileName);
-		protoTreeInternal.setTreeFile(treeFileName);
+		protoTreeInternal.setAlignmentFile(checkForNullAndGet(ParamPrefixes.INPUT.getPrefix(), alignedFileName));
+		protoTreeInternal.setTreeFile(checkForNullAndGet(ParamPrefixes.INPUT_SECOND.getPrefix(),treeFileName));
 		protoTreeInternal.setCommandToBeProcessedBy(protoTreeRequest.getCommandToBeProcessedBy());
 
         protoTreeInternal.setTreeBuildMethod(checkForNullAndGet(ParamPrefixes.TREE_BUILD_METHOD.getPrefix(), protoTreeRequest.getTreeBuildMethod()));

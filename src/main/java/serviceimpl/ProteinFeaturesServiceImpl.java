@@ -21,8 +21,9 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
 	private final int defaultLastJobId = 1;
 	private final String bootstrapFilePostfix = "_consensus";
 	private Map<Integer, String> counterToStageOneInput = new HashMap<>();
-    private Map<Integer, String> counterToStageTwoInputs = new HashMap<>();
-    private Map<Integer, String> counterToStagePartial = new HashMap<>();
+	private Map<Integer, String> counterToStageTwoInputs = new HashMap<>();
+	private Map<Integer, String> counterToStagePartialOneInput = new HashMap<>();
+	private Map<Integer, String> counterToStagePartialTwoInputs = new HashMap<>();
 
 
 	public ProteinFeaturesServiceImpl(final StorageService storageService, final AppProperties properties, final BioJobDao bioJobDao, final BioJobResultDao bioJobResultDao) {
@@ -35,8 +36,11 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         counterToStageTwoInputs.put(3, "['Predicting proteins features.', 'Aligning and building tree.']");
         counterToStageTwoInputs.put(4, "['Predicting proteins features.', 'Aligning and building tree.', 'Ordering alignment and putting features and tree together.-last']");
 
-        counterToStagePartial.put(1, "['Predicting proteins features.']");
-        counterToStagePartial.put(2, "['Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStagePartialOneInput.put(1, "['Predicting proteins features.']");
+        counterToStagePartialOneInput.put(2, "['Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
+
+        counterToStagePartialTwoInputs.put(2, "['Predicting proteins features.']");
+        counterToStagePartialTwoInputs.put(3, "['Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
 	}
 
 	private String getDomainPredictionDb(String dbName) {
@@ -209,14 +213,35 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
 
     private ProtoTreeInternal partialPipelineProcessing(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
         ProtoTreeInternal protoTreeInternal = super.storeFileAndGetInternalRepresentation(protoTreeRequest);
+        List<String> listOfPrograms = new LinkedList<>();
+        List<List<String>> listOfArgumentLists = new LinkedList<>();
+
         List<String> argsForPrepareNames = new LinkedList<>();
+        List<String> argsForPrepareNamesSecond = new LinkedList<>();
         List<String> argsForProteinFeatures = new LinkedList<>();
         List<String> argsForTreeWithDomains = new LinkedList<>();
 
-        String firstPreparedFile = super.getRandomFileName();
-        argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + firstPreparedFile));
-        protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + firstPreparedFile);
-        String inputFileNameForProtFeatures = protoTreeInternal.getFirstFileName();
+        String sequencePreparedFile = super.getRandomFileName();
+        String treePreparedFile = super.getRandomFileName();
+        argsForPrepareNames.addAll(Arrays.asList(
+                protoTreeInternal.getFirstFileName(),
+                ParamPrefixes.OUTPUT.getPrefix() + sequencePreparedFile,
+                protoTreeInternal.getTreeFile(),
+                ParamPrefixes.OUTPUT_SECOND.getPrefix() + treePreparedFile
+        ));
+        listOfPrograms.add(super.getProperties().getPrepareNames());
+        listOfArgumentLists.add(argsForPrepareNames);
+
+        protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + sequencePreparedFile);
+        protoTreeInternal.setTreeFile(ParamPrefixes.INPUT_THIRD.getPrefix() + treePreparedFile);
+
+        if (protoTreeInternal.getAlignmentFile() != null) {
+            String alignmentPreparedFile = super.getRandomFileName();
+            argsForPrepareNamesSecond.addAll(Arrays.asList(protoTreeInternal.getAlignmentFile(), ParamPrefixes.OUTPUT.getPrefix() + alignmentPreparedFile));
+            protoTreeInternal.setAlignmentFile(ParamPrefixes.INPUT_SECOND.getPrefix() + alignmentPreparedFile);
+            listOfPrograms.add(super.getProperties().getPrepareNames());
+            listOfArgumentLists.add(argsForPrepareNamesSecond);
+        }
 
         protoTreeInternal.setFields();
 
@@ -230,7 +255,7 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         String numberOfThreadsForProtFeatures = "7";
         argsForProteinFeatures.addAll(protoTreeInternal.getFieldsForFeaturesPrediction());
         argsForProteinFeatures.addAll(Arrays.asList(
-                inputFileNameForProtFeatures,
+                protoTreeInternal.getFirstFileName(),
                 getDomainPredictionDb(protoTreeInternal.getDomainPredictionDb()),
                 ParamPrefixes.OUTPUT_FOURTH.getPrefix() + hmmscanOrRpsbOutFile,
                 ParamPrefixes.OUTPUT_FIFTH.getPrefix() + rpsbProcOutFile,
@@ -248,36 +273,28 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
                 ParamPrefixes.OUTPUT_THIRD.getPrefix() + proteinFeaturesOutFile
         ));
 
-        String outAlgnFile = protoTreeInternal.getAlignmentFile();
-        String outNewickTree = protoTreeInternal.getTreeFile();
-
         String outNewickFile = super.getPrefix() + UUID.randomUUID().toString() + ".newick";
         String outSvgFile = super.getPrefix() + UUID.randomUUID().toString() + ".svg";
-
         String proteinFeaturesChangedOutFile = super.getRandomFileName();
         argsForTreeWithDomains.addAll(Arrays.asList(
-                inputFileNameForProtFeatures,
-                ParamPrefixes.INPUT_THIRD.getPrefix() + outNewickTree,
+                protoTreeInternal.getFirstFileName(),
+                protoTreeInternal.getTreeFile(),
                 ParamPrefixes.INPUT_FOURTH.getPrefix() + proteinFeaturesOutFile,
                 ParamPrefixes.OUTPUT_SECOND.getPrefix() + outSvgFile,
                 ParamPrefixes.OUTPUT_THIRD.getPrefix() + outNewickFile,
                 ParamPrefixes.OUTPUT_FOURTH.getPrefix() + proteinFeaturesChangedOutFile
         ));
 
-        if (outAlgnFile != null) {
+        if (protoTreeInternal.getAlignmentFile() != null) {
             String outOrderedAlgnFile = super.getPrefix() + UUID.randomUUID().toString() + ".fa";
-            protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, outOrderedAlgnFile, proteinFeaturesChangedOutFile));
-            argsForTreeWithDomains.add(ParamPrefixes.INPUT_SECOND.getPrefix() + outAlgnFile);
+            argsForTreeWithDomains.add(protoTreeInternal.getAlignmentFile());
             argsForTreeWithDomains.add(ParamPrefixes.OUTPUT.getPrefix() + outOrderedAlgnFile);
+            protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, outOrderedAlgnFile, proteinFeaturesChangedOutFile));
         } else {
             protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outSvgFile, proteinFeaturesChangedOutFile));
         }
 
 
-        List<String> listOfPrograms = new LinkedList<>();
-        List<List<String>> listOfArgumentLists = new LinkedList<>();
-
-        listOfPrograms.add(super.getProperties().getPrepareNames());
         listOfPrograms.addAll(Arrays.asList(
                 super.getProperties().getCalculateProteinFeatures(),
                 super.getProgram(protoTreeInternal.getCommandToBeProcessedBy())
@@ -286,7 +303,6 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         String[] arrayOfInterpreters = super.prepareInterpreters(listOfPrograms.size());
         String[] arrayOfPrograms = listOfPrograms.toArray(new String[listOfPrograms.size()]);
 
-        listOfArgumentLists.add(argsForPrepareNames);
         listOfArgumentLists.addAll(Arrays.asList(
                 argsForProteinFeatures,
                 argsForTreeWithDomains
@@ -305,8 +321,12 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
                     super.saveStage(protoTreeInternal, counter, counterToStageOneInput);
                 else
                     super.saveStage(protoTreeInternal, counter, counterToStageTwoInputs);
-            } else if (protoTreeInternal.isFullPipeline().equals("false"))
-                super.saveStage(protoTreeInternal, counter, counterToStagePartial);
+            } else if (protoTreeInternal.isFullPipeline().equals("false")) {
+                if (protoTreeInternal.getAlignmentFile() == null)
+                    super.saveStage(protoTreeInternal, counter, counterToStagePartialOneInput);
+                else
+                    super.saveStage(protoTreeInternal, counter, counterToStagePartialTwoInputs);
+            }
             counter++;
             super.launchProcess(commandArgument);
         }

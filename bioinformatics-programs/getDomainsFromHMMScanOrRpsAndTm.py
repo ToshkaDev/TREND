@@ -360,7 +360,7 @@ def processHmmscan():
 					domainDescription = " ".join(record.split(" ")[2:]).strip() #description
 				elif hitFound and record[:3] == "---":
 					domainListBegan = True
-				elif len(record) > 0 and "#" not in record:
+				elif len(record) > 0 and "#" not in record and record[0] != "[":
 					if hitFound and domainListBegan and record != 'Alignments for each domain:' and record != "Internal pipeline statistics summary:":
 						recordListWithoutSpaces = [elem for elem in record.split(" ") if len(elem) > 0]
 						if float(recordListWithoutSpaces[5]) < EVAL_THRESHOLD and float(recordListWithoutSpaces[2]) >= HMMSCAN_PROBABILITY:

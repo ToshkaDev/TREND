@@ -424,6 +424,9 @@ def writeSeqsAndTree():
 	prepareNameDict()
 	tree = Tree(TREE_FILE)
 	terminals = tree.get_leaves()
+	#{0:['featureName, 'protSeqNames', 'alignSeqName']}
+	indexToName = collections.defaultdict(list)
+
 	# Change protein names in datas sctrucuters and write protein sequences with changed names to file 					
 	if SEQS_ALIGNED != None:
 		with open(OUTPUT_ALIGNED_FILENAME, "w") as outputFile:
@@ -435,13 +438,13 @@ def writeSeqsAndTree():
 					if processedName in PROCESSED_TO_FEATURE_NAMES:
 						featureName = PROCESSED_TO_FEATURE_NAMES[processedName]
 						PROTEIN_DOMAINS[terminals[i].name] = PROTEIN_DOMAINS[featureName]
-						del PROTEIN_DOMAINS[featureName]
+						indexToName[i].append(featureName)
 					proteinSeqName = PROCESSED_TO_PROTEIN_NAMES[processedName] 
 					PROTEIN_NAME_TO_SEQ[terminals[i].name] = PROTEIN_NAME_TO_SEQ[proteinSeqName]
-					del PROTEIN_NAME_TO_SEQ[proteinSeqName]
+					indexToName[i].append(proteinSeqName)
 					alignedName = PROCESSED_TO_ALIGNED_NAMES[processedName]					
 					ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name] = ALIGNED_PROTEIN_NAME_TO_SEQ[alignedName]
-					del ALIGNED_PROTEIN_NAME_TO_SEQ[alignedName]
+					indexToName[i].append(alignedName)
 					outputFile.write(">" + terminals[i].name + "\n")
 					outputFile.write(str(ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name]) + "\n")		
 	else:
@@ -452,11 +455,20 @@ def writeSeqsAndTree():
 			if processedName in PROCESSED_TO_FEATURE_NAMES:
 				featureName = PROCESSED_TO_FEATURE_NAMES[processedName]
 				PROTEIN_DOMAINS[terminals[i].name] = PROTEIN_DOMAINS[featureName]
-				del PROTEIN_DOMAINS[featureName]
-				proteinSeqName = PROCESSED_TO_PROTEIN_NAMES[processedName]				
+				indexToName[i].append(featureName)
+				proteinSeqName = PROCESSED_TO_PROTEIN_NAMES[processedName]
 				PROTEIN_NAME_TO_SEQ[terminals[i].name] = PROTEIN_NAME_TO_SEQ[proteinSeqName]
-				del PROTEIN_NAME_TO_SEQ[proteinSeqName]	
-			
+				indexToName[i].append(proteinSeqName)
+
+	#Delete old names
+	for key, val in indexToName.items():
+		if val[0] in PROTEIN_DOMAINS:
+			del PROTEIN_DOMAINS[val[0]]
+			del PROTEIN_NAME_TO_SEQ[val[1]]
+			if len(PROCESSED_TO_ALIGNED_NAMES):
+				del ALIGNED_PROTEIN_NAME_TO_SEQ[val[2]]
+	#clear memory
+	indexToName = None
 	global PROTEIN_DOMAINS_FINAL											
 	PROTEIN_DOMAINS_FINAL = copy.deepcopy(PROTEIN_DOMAINS)
 	prepareProteinToDomainsDict()
