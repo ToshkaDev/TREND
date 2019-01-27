@@ -73,7 +73,6 @@ public class GeneNeighborhoodsController extends BioUniverseController {
         ProtoTreeInternal protoTreeInternal = geneNeighborhoodsService.storeFilesAndPrepareCommandArguments(protoTreeRequest);
         Integer jobId = protoTreeInternal.getJobId();
         geneNeighborhoodsService.runMainProgram(protoTreeInternal);
-        System.out.println("jobId " + jobId);
         return String.valueOf(jobId);
     }
 

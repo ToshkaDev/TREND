@@ -85,10 +85,8 @@ public class ProteinFeaturesController extends BioUniverseController {
 	    ProtoTreeInternal protoTreeInternal = null;
         //Split it to several functions because 'PROTO_TREE' method is asynchronous
         //and files in 'listOfFiles' field of evolutionRequest are got cleared at the end of request processing.
-        if (protoTreeRequest.getCommandToBeProcessedBy().equals(BioPrograms.PROTO_TREE.getProgramName())) {
+        if (protoTreeRequest.getCommandToBeProcessedBy().equals(BioPrograms.PROTO_TREE.getProgramName()))
             protoTreeInternal = proteinFeaturesService.storeFilesAndPrepareCommandArguments(protoTreeRequest);
-        }
-
         Integer jobId = protoTreeInternal.getJobId();
         proteinFeaturesService.runMainProgram(protoTreeInternal);
 

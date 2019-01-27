@@ -41,24 +41,6 @@ xShiftLeftLast = 0.03;
 clusterOffsetLeft = 0.05;
 clusterOffsetRight = 0.084;
 
-$(document).ready(function(){
-    $('#GoJs').click(function() {
-    	takeCareOfValidators();
-    	takeCareOfFields();
-        var dataObject;
-    	options = getOptions();
-    	if (options.get("firstFile")) {
-            var fileReader = new FileReader();
-            fileReader.readAsText(options.get("firstFile"));
-            fileReader.onloadend = function() {
-                buildGeneTree({newick: fileReader.result.trim()});
-            }
-    	} else if (options.get("firstFileArea")) {
-    	    buildGeneTree({newick: options.get("firstFileArea")});
-    	}
-    });
-});
-
 function buildGeneTree(dataObject) {
     createZoomableBox();
     var textCounter = Newick.parse(dataObject.newick)[1]

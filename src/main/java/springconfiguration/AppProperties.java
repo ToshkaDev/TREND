@@ -17,7 +17,7 @@ public class AppProperties {
     private String calculateProteinFeatures = bioProgramsDir + "/getDomainsFromHMMScanOrRpsAndTm.py";
     private String alignAndBuildTree = bioProgramsDir + "/alignAndCunstructTree.py";
     private String addProtFeaturesToTree = bioProgramsDir + "/orderSequencesBasedOnTree_andAddDomains.py";
-    private String enumerate = bioProgramsDir + "orderSequencesBasedOnTree.py";
+    private String enumerate = bioProgramsDir + "/orderSequencesBasedOnTree.py";
 
     public String getProtoTreeProgram() {
         return getAddProtFeaturesToTree();

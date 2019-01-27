@@ -50,11 +50,10 @@ function processRetrievedDataAsync(data) {
 
         if (data.result.length >= 1) {
             // Add corresponding links to download buttons
-            $('#alignment-load').attr('href', data.result[1]);
+            if (data.result.length == 2)
+                $('#alignment-load').attr('href', data.result[1]);
             $('#tree-load').attr('href', data.result[0]);
             var newickTree = data.result[0];
-            console.log(newickTree)
-            console.log(data.result[1])
             $.get(newickTree, function(data, status){
                 console.log("HEREE")
                 buildGeneTree({newick: data});

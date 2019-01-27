@@ -100,7 +100,7 @@ public class BioUniverseServiceImpl implements BioUniverseService {
         String secondFileName = storeAndGetFileName(protoTreeRequest.getSecondFile(), protoTreeRequest.getSecondFileArea());
 
         String alignedFileName = storeAndGetFileName(protoTreeRequest.getAlignmentFile(), null);
-        String treeFileName = storeAndGetFileName(protoTreeRequest.getTreeFile(), null);
+        String treeFileName = storeAndGetFileName(protoTreeRequest.getTreeFile(), protoTreeRequest.getTreeFileArea());
 
         return fromProtoTreeRequestToProtoTreeInternal(protoTreeRequest, firstFileName,
                 secondFileName, alignedFileName, treeFileName);
@@ -121,8 +121,13 @@ public class BioUniverseServiceImpl implements BioUniverseService {
     }
 
     @Override
-    public String getRandomFileName() {
-        return getPrefix() + UUID.randomUUID().toString() + getPostfix();
+    public String getRandomFileName(String postfix) {
+        if (postfix == null)
+            return getPrefix() + UUID.randomUUID().toString() + getPostfix();
+        else if (postfix.equals("noPostfix"))
+            return getPrefix() + UUID.randomUUID().toString();
+        else
+            return getPrefix() + UUID.randomUUID().toString() + postfix;
     }
 
     @Override

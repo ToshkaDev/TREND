@@ -50,7 +50,7 @@ public interface BioUniverseService {
 
     String storeAndGetFileName(final MultipartFile multipartFile, final String fileArea) throws IncorrectRequestException;
 
-    String getRandomFileName();
+    String getRandomFileName(String postfix);
 
     String[] prepareInterpreters(Integer intepreterNum);
 

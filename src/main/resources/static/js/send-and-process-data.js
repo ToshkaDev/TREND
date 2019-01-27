@@ -18,7 +18,7 @@ $(document).ready(function (){
     $('#GoAsyncNeib').click(function() {
         $("#first-area-message, #one-area-message").hide();
         options = getOptions();
-        checkFileAndSendQuery(options, null);
+        checkFileAndSendQueryNeib(options);
     });
 
     $('#options').click(function() {
@@ -69,11 +69,6 @@ function checkFileAndSendQuery(options, secondFile) {
                 checkFileAreaAndSendQuery(options);
                 return;
         }
-    } else if (secondFile === null) {
-        if (!options.get("firstFile")) {
-            checkFileAreaAndSendQueryNeib(options);
-            return;
-        }
     }
 
     var fileReader = new FileReader();
@@ -96,15 +91,12 @@ function checkFileAndSendQuery(options, secondFile) {
                 } else
                     getDataAsync(options);
             }
-        } else { //main condition
-            secondFile ? getDataAsync(options) : getDataAsyncNeighborGenes(options);
-        }
+        } else //main condition
+            getDataAsync(options);
     }
 }
 
 function checkFileAreaAndSendQuery(options) {
-    console.log(typeof $(".second-area"))
-    console.log(typeof $(".second-area").val())
     if ($(".second-area").length && !$(".second-area").is(':hidden') && !(options.get("secondFileArea") && options.get("firstFileArea")))
         $("#both-areas-message").show();
     else if ($(".second-area").is(':hidden') && !options.get("firstFileArea"))
@@ -117,13 +109,42 @@ function checkFileAreaAndSendQuery(options) {
         getDataAsync(options);
 }
 
+function checkFileAndSendQueryNeib(options) {
+    if (!options.get("firstFile")) {
+        checkFileAreaAndSendQueryNeib(options);
+        return;
+    }
+    var fileReader = new FileReader();
+    fileReader.readAsText(options.get("firstFile"));
+    fileReader.onloadend = function() {
+        console.log("fileReader.result.trim().slice(0, 1) " + fileReader.result.trim().slice(0, 2))
+        if (fileReader.result.trim().slice(0, 1) !== ">" && fileReader.result.trim().slice(0, 1) !== "(")
+            $("#first-area-message").show();
+        else {
+            if (fileReader.result.trim().slice(0, 1) === "(") {
+                options.set("treeFile", options.get("firstFile"));
+                options.delete("firstFile");
+                options.set("isFullPipeline", "false");
+            }
+            getDataAsyncNeighborGenes(options);
+        }
+    }
+}
+
 function checkFileAreaAndSendQueryNeib(options) {
     if (!options.get("firstFileArea"))
         $("#one-area-message").show();
-    else if (options.get("firstFileArea") && options.get("firstFileArea").trim().slice(0, 1) !== ">")
+    else if (options.get("firstFileArea") && options.get("firstFileArea").trim().slice(0, 1) !== ">"
+        && options.get("firstFileArea").trim().slice(0, 1) !== "(")
         $("#first-area-message").show();
-    else
+    else {
+        if (options.get("firstFileArea").trim().slice(0, 1) === "(") {
+            options.set("treeFileArea", options.get("firstFileArea"));
+            options.delete("firstFileArea");
+            options.set("isFullPipeline", "false");
+        }
         getDataAsyncNeighborGenes(options);
+    }
 }
 
 function setCookie() {
