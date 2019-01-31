@@ -118,80 +118,78 @@ function checkFileAndSubmit(options, firstFile, firstInsuffSeqsMessageId, firstM
 }
 
 function checkAndSubmit(options, secondFile) {
-    getDataAsync(options);
-//	var firstAreaStatus = null, secondAreaStatus = null;
-//    if (secondFile === "alignmentFile") {
-//        if (!(options.get("firstFile") && options.get("treeFile")) || (options.get("firstFile") && !options.get("treeFile"))) {
-//            $("#partial-pipeline-message").show();
-//            return;
-//        }
-//    }
-//    if (secondFile === "secondFile") {
-//		if ($(".second-area").is(':hidden') && !options.get("firstFileArea") && !options.get("firstFile"))
-//			$("#one-area-message").show();
-//		if (!options.get("firstFile") && options.get("firstFileArea") && $(".first-area").length)
-//			firstAreaStatus = fastaIsCorrect(options.get("firstFileArea"), "malformed-fasta", "first-area-message");
-//		if (!options.get("secondFile") && options.get("secondFileArea") && $(".second-area").length)
-//			secondAreaStatus = fastaIsCorrect(options.get("secondFileArea"), "malformed-fasta-second", "second-area-message");
-//		if (!$(".second-area").is(':hidden')) {
-//			if (firstAreaStatus && secondAreaStatus) {
-//				getDataAsync(options);
-//				return;
-//			}
-//		} else {
-//			if (firstAreaStatus) {
-//				getDataAsync(options);
-//				return;
-//			}
-//		}
-//	}
-//
-//	if (options.get("firstFile")) {
-//		if (secondFile === "alignmentFile")
-//			checkFileAndSubmit(options, "firstFile", "malformed-fasta-partialP", "first-area-message-partialP",
-//				secondFile, "malformed-fasta-second-partialP", "second-area-message-partialP", null);
-//		else if (secondFile === "secondFile")
-//			checkFileAndSubmit(options, "firstFile", "malformed-fasta", "first-area-message",
-//				secondFile, "malformed-fasta-second", "second-area-message", secondAreaStatus);
-//	} else if (options.get("secondFile")) {
-//		// nulls in the argument list below because sending request with second input specified by the user and empty first input
-//		// is invalid (we are ending up in this condition only if the previous is false; but the first area can be speicified).
-//		checkFileAndSubmit(options, secondFile, "malformed-fasta-second", "second-area-message",
-//				null, null, null, firstAreaStatus);
-//	} else if (!$(".second-area").is(':hidden')) {
-//	    $("#both-areas-message").show();
-//	}
+	var firstAreaStatus = null, secondAreaStatus = null;
+    if (secondFile === "alignmentFile") {
+        if (!(options.get("firstFile") && options.get("treeFile")) || (options.get("firstFile") && !options.get("treeFile"))) {
+            $("#partial-pipeline-message").show();
+            return;
+        }
+    }
+    if (secondFile === "secondFile") {
+		if ($(".second-area").is(':hidden') && !options.get("firstFileArea") && !options.get("firstFile"))
+			$("#one-area-message").show();
+		if (!options.get("firstFile") && options.get("firstFileArea") && $(".first-area").length)
+			firstAreaStatus = fastaIsCorrect(options.get("firstFileArea"), "malformed-fasta", "first-area-message");
+		if (!options.get("secondFile") && options.get("secondFileArea") && $(".second-area").length)
+			secondAreaStatus = fastaIsCorrect(options.get("secondFileArea"), "malformed-fasta-second", "second-area-message");
+		if (!$(".second-area").is(':hidden')) {
+			if (firstAreaStatus && secondAreaStatus) {
+				getDataAsync(options);
+				return;
+			}
+		} else {
+			if (firstAreaStatus) {
+				getDataAsync(options);
+				return;
+			}
+		}
+	}
+
+	if (options.get("firstFile")) {
+		if (secondFile === "alignmentFile")
+			checkFileAndSubmit(options, "firstFile", "malformed-fasta-partialP", "first-area-message-partialP",
+				secondFile, "malformed-fasta-second-partialP", "second-area-message-partialP", null);
+		else if (secondFile === "secondFile")
+			checkFileAndSubmit(options, "firstFile", "malformed-fasta", "first-area-message",
+				secondFile, "malformed-fasta-second", "second-area-message", secondAreaStatus);
+	} else if (options.get("secondFile")) {
+		// nulls in the argument list below because sending request with second input specified by the user and empty first input
+		// is invalid (we are ending up in this condition only if the previous is false; but the first area can be speicified).
+		checkFileAndSubmit(options, secondFile, "malformed-fasta-second", "second-area-message",
+				null, null, null, firstAreaStatus);
+	} else if (!$(".second-area").is(':hidden')) {
+	    $("#both-areas-message").show();
+	}
 
 }
 
 ///////////////////
 
 function checkFileAndSendQueryNeib(options) {
-    getDataAsyncNeighborGenes(options);
-//    if (!options.get("firstFile")) {
-//        checkFileAreaAndSendQueryNeib(options);
-//        return;
-//    }
-//    var fileReader = new FileReader();
-//    fileReader.readAsText(options.get("firstFile"));
-//    fileReader.onloadend = function() {
-//        if (fileReader.result.trim().slice(0, 1) !== ">" && fileReader.result.trim().slice(0, 1) !== "(")
-//            $("#first-area-message").show();
-//        else {
-//            if (fileReader.result.trim().slice(0, 1) === "(") {
-//                var textCounter = Newick.parse(fileReader.result)[1]
-//                if (textCounter < 3) {
-//                    $("#malformed-newick").show();
-//                    return;
-//                }
-//                options.set("treeFile", options.get("firstFile"));
-//                options.delete("firstFile");
-//                options.set("isFullPipeline", "false");
-//            } else if (!fastaIsCorrect(fileReader.result, "malformed-fasta", "first-area-message"))
-//                return;
-//            getDataAsyncNeighborGenes(options);
-//        }
-//    }
+    if (!options.get("firstFile")) {
+        checkFileAreaAndSendQueryNeib(options);
+        return;
+    }
+    var fileReader = new FileReader();
+    fileReader.readAsText(options.get("firstFile"));
+    fileReader.onloadend = function() {
+        if (fileReader.result.trim().slice(0, 1) !== ">" && fileReader.result.trim().slice(0, 1) !== "(")
+            $("#first-area-message").show();
+        else {
+            if (fileReader.result.trim().slice(0, 1) === "(") {
+                var textCounter = Newick.parse(fileReader.result)[1]
+                if (textCounter < 3) {
+                    $("#malformed-newick").show();
+                    return;
+                }
+                options.set("treeFile", options.get("firstFile"));
+                options.delete("firstFile");
+                options.set("isFullPipeline", "false");
+            } else if (!fastaIsCorrect(fileReader.result, "malformed-fasta", "first-area-message"))
+                return;
+            getDataAsyncNeighborGenes(options);
+        }
+    }
 }
 
 function checkFileAreaAndSendQueryNeib(options) {

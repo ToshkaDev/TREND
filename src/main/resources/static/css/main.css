@@ -150,6 +150,10 @@ div.result-area {
 }
 
 .low-complexity {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
     display: flex;
     justify-content: space-between;
 }
@@ -159,6 +163,10 @@ div.result-area {
 }
 
 .stage-element {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
     display: flex;
     justify-content: flex-start;
     font-size: 115%;
@@ -171,7 +179,12 @@ div.result-area {
 }
 
 .navigator {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
     display: flex;
+    align-items: center;
     flex-direction: column;
     align-items: flex-start;
 }
@@ -384,3 +397,28 @@ input:checked + .slider:before {
 
 
 /*End of slider checkbox*/
+
+/*Error pages*/
+.friendly-error {
+    color: white;
+    margin-right: 2px;
+}
+
+.friendly-error-item {
+    text-align: center;
+}
+
+.error-page {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    justify-content: center;
+}
+
+.error-icon {
+    margin-top: 5px;
+    font-size: 300%;
+}
+/*End of Error pages*/
