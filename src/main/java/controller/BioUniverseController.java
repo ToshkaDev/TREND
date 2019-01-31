@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import service.StorageService;
 
+import java.util.Arrays;
+import java.util.List;
+
 
 /**
  * Created by vadim on 8/13/17.
@@ -19,6 +22,10 @@ import service.StorageService;
 public abstract class BioUniverseController {
 
     private final StorageService storageService;
+    protected final List<String> statusReady = Arrays.asList("ready");
+    protected final List<String> statusNotReady = Arrays.asList("notReady");
+    protected final List<String> statusNoSuchBioJob = Arrays.asList("noSuchBioJob");
+    protected final List<String> statusError = Arrays.asList("Error");
 
     @Autowired
     public BioUniverseController(StorageService storageService) {

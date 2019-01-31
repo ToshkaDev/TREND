@@ -146,7 +146,12 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
                 super.saveStage(protoTreeInternal, counter++, counterToStageOneInputPartial);
             else if (protoTreeInternal.isFullPipeline().equals("true"))
                 super.saveStage(protoTreeInternal, counter++, counterToStageOneInputFull);
-            super.launchProcess(commandArgument);
+            try {
+                super.launchProcess(commandArgument);
+            } catch (Exception exception) {
+                super.saveError(protoTreeInternal);
+                throw exception;
+            }
         }
         super.saveResultToDb(protoTreeInternal);
     }

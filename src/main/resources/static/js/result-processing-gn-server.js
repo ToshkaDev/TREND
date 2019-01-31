@@ -43,8 +43,11 @@ function processRetrievedDataAsync(data) {
         clearInterval(fileGetter);
         $('.wait-for-it').hide();
         $('.no-such-biojob').show();
-    }
-    else  if (data.status[0] === 'ready') {
+    } else if (data.status[0] === 'Error') {
+        clearInterval(fileGetter);
+        $('.wait-for-it').hide();
+        $('.server-error').show();
+    } else  if (data.status[0] === 'ready') {
         clearInterval(fileGetter);
         displayStage(data.stage[0], true);
 

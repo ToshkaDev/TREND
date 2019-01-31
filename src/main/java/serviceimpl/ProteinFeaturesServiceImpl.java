@@ -328,7 +328,12 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
                     super.saveStage(protoTreeInternal, counter, counterToStagePartialTwoInputs);
             }
             counter++;
-            super.launchProcess(commandArgument);
+            try {
+                super.launchProcess(commandArgument);
+            } catch (Exception exception) {
+                super.saveError(protoTreeInternal);
+                throw exception;
+            }
         }
         super.saveResultToDb(protoTreeInternal);
     }

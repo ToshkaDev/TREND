@@ -33,12 +33,7 @@ public class GeneNeighborhoodsController extends BioUniverseController {
     @Autowired
     public final GeneNeighborhoodsService geneNeighborhoodsService;
 
-
     private static final Log logger = LogFactory.getLog(GeneNeighborhoodsController.class);
-
-    private final List<String> statusReady = Arrays.asList("ready");
-    private final List<String> statusNotReady = Arrays.asList("notReady");
-    private final List<String> noSuchBioJob = Arrays.asList("noSuchBioJob");
 
 
     public GeneNeighborhoodsController(StorageService storageService, GeneNeighborhoodsService geneNeighborhoodsService) {
@@ -83,7 +78,7 @@ public class GeneNeighborhoodsController extends BioUniverseController {
         String urlPath = ServletUriComponentsBuilder.fromCurrentContextPath().path("gene-neighborhoods/univ_files/").build().toString();
 
         Map<String, List<String>> result = new HashMap<>();
-        result.put("status", noSuchBioJob);
+        result.put("status", super.statusNoSuchBioJob);
 
         List<String> listOfResultFileNames;
 
@@ -94,9 +89,11 @@ public class GeneNeighborhoodsController extends BioUniverseController {
                 if (bioJob.isFinished()) {
                     listOfResultFileNames = bioJob.getBioJobResultList().stream().map(bjResult -> urlPath + bjResult.getResultFileName()).collect(Collectors.toList());
                     result.put("result", listOfResultFileNames);
-                    result.put("status", statusReady);
+                    result.put("status", super.statusReady);
+                } else if (bioJob.getStage().equals("Error")) {
+                    result.put("status", super.statusError);
                 } else {
-                    result.put("status", statusNotReady);
+                    result.put("status", super.statusNotReady);
                 }
                 result.put("stage", new LinkedList<>(Arrays.asList(bioJob.getStage())));
             }

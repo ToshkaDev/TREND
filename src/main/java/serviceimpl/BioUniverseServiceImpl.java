@@ -223,6 +223,12 @@ public class BioUniverseServiceImpl implements BioUniverseService {
         }
     }
 
+    public void saveError(ProtoTreeInternal protoTreeInternal) {
+        BioJob bioJob = getBioJobDao().findByJobId(protoTreeInternal.getJobId());
+        bioJob.setStage("Error");
+        getBioJobDao().save(bioJob);
+    }
+
     @Override
     public Integer getLastJobId() {
         Integer lastJobId = getBioJobDao().getLastJobId();
@@ -230,7 +236,7 @@ public class BioUniverseServiceImpl implements BioUniverseService {
     }
 
     @Override
-    public void launchProcess(List<String> commandArguments) {
+    public void launchProcess(List<String> commandArguments) throws IncorrectRequestException {
         ProcessBuilder processBuilder = new ProcessBuilder(commandArguments);
         processBuilder.directory(new File(getWorkingDir()));
         try {
@@ -241,12 +247,20 @@ public class BioUniverseServiceImpl implements BioUniverseService {
             //BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
             BufferedReader br = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             String line;
+            boolean errorHappened = false;
             while ((line = br.readLine()) != null) {
+                errorHappened = true;
                 System.out.println(line);
                 System.out.println("\n");
             }
+            if (errorHappened) {
+                System.out.println("===Error in launching python scripts.===");
+                throw new IncorrectRequestException("Error happened in launchProcess(List<String> commandArguments).");
+            }
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("===Error in subprocess.===");
+            throw new IncorrectRequestException("Error happened in launchProcess(List<String> commandArguments).");
         }
     }
 }

@@ -108,7 +108,7 @@ label.error {
 #partial-pipeline-message, #second-area-message-partialP,
 #first-area-message-partialP, #malformed-fasta, #malformed-fasta-second,
 #malformed-fasta-partialP, #malformed-fasta-second-partialP, #malformed-newick {
-    color: red;
+    color: #3F7C7A;
     display: none;
 }
 
@@ -234,7 +234,7 @@ div.result-container {
     padding: 7px;
 }
 
-div.no-such-biojob {
+div.no-such-biojob, div.server-error {
     font-size: 115%;
     margin-left: 4%;
     display: none;
