@@ -4,19 +4,20 @@ $(document).ready(function (){
 
     setCookie();
     $('#GoAsync').click(function() {
-        $("#first-area-message, #second-area-message, #both-areas-message, #one-area-message").hide();
+        $("#first-area-message, #second-area-message, #both-areas-message, #one-area-message, #malformed-fasta, #malformed-fasta-second").hide();
     	options = getOptions();
-    	checkFileAndSendQuery(options, "secondFile");
+    	checkAndSubmit(options, "secondFile");
     });
 
     $('#GoAsyncPartial').click(function() {
-        $("#second-area-message-partialP, #first-area-message-partialP, #partial-pipeline-message").hide();
+        $("#second-area-message-partialP, #first-area-message-partialP, #partial-pipeline-message, #malformed-newick").hide();
+        $("#malformed-fasta-partialP, #malformed-fasta-second-partialP").hide();
         options = getOptions();
-        checkFileAndSendQuery(options, "alignmentFile");
+        checkAndSubmit(options, "alignmentFile");
     });
 
     $('#GoAsyncNeib').click(function() {
-        $("#first-area-message, #one-area-message").hide();
+        $("#first-area-message, #one-area-message, #malformed-fasta, #malformed-newick").hide();
         options = getOptions();
         checkFileAndSendQueryNeib(options);
     });
@@ -27,12 +28,15 @@ $(document).ready(function (){
     });
 
     $('#addSecondArea').click(function() {
+        $('.full-pipe, .second-area').trigger('reset');
+        $('#first-file-info, #second-file-info').empty();
+        $("#first-area-message, #second-area-message, #both-areas-message, #one-area-message, #malformed-fasta, #malformed-fasta-second").hide();
         $('.second-area').toggle();
         if ($('.second-area').css("display") !== "none") {
             $('#addSecondArea').html("Close Second Area")
         }
         else {
-            $('#addSecondArea').html("Add Second Area")
+            $('#addSecondArea').html("Add Second Area");
         }
     });
 
@@ -57,57 +61,110 @@ $(document).ready(function (){
     });
 });
 
-function checkFileAndSendQuery(options, secondFile) {
+function fastaIsCorrect(fasta, malformedMessageId,  notFastaMessageId) {
+    console.log("HERE")
+	if (fasta.trim().slice(0, 1) !== ">") {
+		$("#"+notFastaMessageId).show();
+		return false;
+	}
+    seqMatches = fasta.match(/>/g);
+    if (seqMatches.length < 3) {
+        $('#'+malformedMessageId).show();
+        return false;
+    }
+    return true;
+}
+
+function submitIfNewickTreeIsOK(newickFile, options) {
+	var fileReader = new FileReader();
+	fileReader.readAsText(newickFile);
+	fileReader.onloadend = function() {
+		var textCounter = Newick.parse(fileReader.result)[1]
+		textCounter < 3 ? $("#malformed-newick").show() : getDataAsync(options);
+	}
+}
+
+function checkFileAndSubmit(options, firstFile, firstInsuffSeqsMessageId, firstMalformedMessageId,
+							secondFile=null, secondInsuffSeqsMessageId=null, secondMalformedMessageId=null, areaStatus=null) {
+    var fileReader = new FileReader();
+    fileReader.readAsText(options.get(firstFile));
+    fileReader.onloadend = function() {
+		var firstInputStatus = fastaIsCorrect(fileReader.result, firstInsuffSeqsMessageId, firstMalformedMessageId);
+		console.log(firstInputStatus)
+        if (firstInputStatus) {
+			if (options.get(secondFile)) {
+				var secondFileReader = new FileReader();
+				secondFileReader.readAsText(options.get(secondFile));
+				secondFileReader.onloadend = function() {
+					var secondInputStatus = fastaIsCorrect(secondFileReader.result, secondInsuffSeqsMessageId, secondMalformedMessageId);
+					if (secondInputStatus && !options.get("treeFile"))
+						getDataAsync(options);
+					else if (secondInputStatus && options.get("treeFile"))
+						submitIfNewickTreeIsOK(options.get("treeFile"), options);
+				}
+			} else if (options.get("treeFile")) {
+				submitIfNewickTreeIsOK(options.get("treeFile"), options);
+			} else if (areaStatus || (areaStatus == null && firstFile === "firstFile")) {
+			    if ($(".second-area").is(':hidden'))
+				    getDataAsync(options);
+				else
+				    $("#both-areas-message").show();
+
+			} else if (areaStatus == null && firstFile !== "firstFile") {
+				$("#both-areas-message").show();
+			}
+        }
+    }
+}
+
+function checkAndSubmit(options, secondFile) {
+    console.log("SUBMITTING")
+	var firstAreaStatus = null, secondAreaStatus = null;
     if (secondFile === "alignmentFile") {
-        if (!(options.get("firstFile") && options.get("treeFile"))) {
+        if (!(options.get("firstFile") && options.get("treeFile")) || (options.get("firstFile") && !options.get("treeFile"))) {
             $("#partial-pipeline-message").show();
             return;
         }
-    } else if (secondFile === "secondFile") {
-        if ((!$(".second-area").is(':hidden') && !(options.get("secondFile") && options.get("firstFile")))
-            || ($(".second-area").is(':hidden') && !options.get("firstFile"))) {
-                checkFileAreaAndSendQuery(options);
-                return;
-        }
     }
+    if (secondFile === "secondFile") {
+		if ($(".second-area").is(':hidden') && !options.get("firstFileArea") && !options.get("firstFile"))
+			$("#one-area-message").show();
+		if (!options.get("firstFile") && options.get("firstFileArea") && $(".first-area").length)
+			firstAreaStatus = fastaIsCorrect(options.get("firstFileArea"), "malformed-fasta", "first-area-message");
+		if (!options.get("secondFile") && options.get("secondFileArea") && $(".second-area").length)
+			secondAreaStatus = fastaIsCorrect(options.get("secondFileArea"), "malformed-fasta-second", "second-area-message");
+		if (!$(".second-area").is(':hidden')) {
+			if (firstAreaStatus && secondAreaStatus) {
+				getDataAsync(options);
+				return;
+			}
+		} else {
+			if (firstAreaStatus) {
+				getDataAsync(options);
+				return;
+			}
+		}
+	}
 
-    var fileReader = new FileReader();
-    fileReader.readAsText(options.get("firstFile"));
-    fileReader.onloadend = function() {
-        if (fileReader.result.trim().slice(0, 1) !== ">") {
-            if (secondFile === "alignmentFile")
-                $("#first-area-message-partialP").show();
-            else
-                $("#first-area-message").show();
-        } else if (options.get(secondFile)) {
-            var alignmentFileReader = new FileReader();
-            alignmentFileReader.readAsText(options.get(secondFile));
-            alignmentFileReader.onloadend = function() {
-                if (alignmentFileReader.result.trim().slice(0, 1) !== ">") {
-                    if (secondFile === "alignmentFile")
-                        $("#second-area-message-partialP").show();
-                    else
-                        $("#second-area-message").show();
-                } else
-                    getDataAsync(options);
-            }
-        } else //main condition
-            getDataAsync(options);
-    }
+	if (options.get("firstFile")) {
+		if (secondFile === "alignmentFile")
+			checkFileAndSubmit(options, "firstFile", "malformed-fasta-partialP", "first-area-message-partialP",
+				secondFile, "malformed-fasta-second-partialP", "second-area-message-partialP", null);
+		else if (secondFile === "secondFile")
+			checkFileAndSubmit(options, "firstFile", "malformed-fasta", "first-area-message",
+				secondFile, "malformed-fasta-second", "second-area-message", secondAreaStatus);
+	} else if (options.get("secondFile")) {
+		// nulls in the argument list below because sending request with second input specified by the user and empty first input
+		// is invalid (we are ending up in this condition only if the previous is false; but the first area can be speicified).
+		checkFileAndSubmit(options, secondFile, "malformed-fasta-second", "second-area-message",
+				null, null, null, firstAreaStatus);
+	} else if (!$(".second-area").is(':hidden')) {
+	    $("#both-areas-message").show();
+	}
+
 }
 
-function checkFileAreaAndSendQuery(options) {
-    if ($(".second-area").length && !$(".second-area").is(':hidden') && !(options.get("secondFileArea") && options.get("firstFileArea")))
-        $("#both-areas-message").show();
-    else if ($(".second-area").is(':hidden') && !options.get("firstFileArea"))
-        $("#one-area-message").show();
-    else if (options.get("firstFileArea") && options.get("firstFileArea").trim().slice(0, 1) !== ">")
-        $("#first-area-message").show();
-    else if (options.get("secondFileArea") && options.get("secondFileArea").trim().slice(0, 1) !== ">")
-        $("#second-area-message").show();
-    else
-        getDataAsync(options);
-}
+///////////////////
 
 function checkFileAndSendQueryNeib(options) {
     if (!options.get("firstFile")) {
@@ -117,15 +174,20 @@ function checkFileAndSendQueryNeib(options) {
     var fileReader = new FileReader();
     fileReader.readAsText(options.get("firstFile"));
     fileReader.onloadend = function() {
-        console.log("fileReader.result.trim().slice(0, 1) " + fileReader.result.trim().slice(0, 2))
         if (fileReader.result.trim().slice(0, 1) !== ">" && fileReader.result.trim().slice(0, 1) !== "(")
             $("#first-area-message").show();
         else {
             if (fileReader.result.trim().slice(0, 1) === "(") {
+                var textCounter = Newick.parse(fileReader.result)[1]
+                if (textCounter < 3) {
+                    $("#malformed-newick").show();
+                    return;
+                }
                 options.set("treeFile", options.get("firstFile"));
                 options.delete("firstFile");
                 options.set("isFullPipeline", "false");
-            }
+            } else if (!fastaIsCorrect(fileReader.result, "malformed-fasta", "first-area-message"))
+                return;
             getDataAsyncNeighborGenes(options);
         }
     }
@@ -139,10 +201,16 @@ function checkFileAreaAndSendQueryNeib(options) {
         $("#first-area-message").show();
     else {
         if (options.get("firstFileArea").trim().slice(0, 1) === "(") {
+            var textCounter = Newick.parse(options.get("firstFileArea"))[1]
+            if (textCounter < 3) {
+                $("#malformed-newick").show();
+                return;
+            }
             options.set("treeFileArea", options.get("firstFileArea"));
             options.delete("firstFileArea");
             options.set("isFullPipeline", "false");
-        }
+        } else if (!fastaIsCorrect(options.get("firstFileArea"), "malformed-fasta", "first-area-message"))
+            return;
         getDataAsyncNeighborGenes(options);
     }
 }

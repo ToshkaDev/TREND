@@ -54,12 +54,15 @@ function processRetrievedDataAsync(data) {
                 $('#alignment-load').attr('href', data.result[1]);
             $('#tree-load').attr('href', data.result[0]);
             var newickTree = data.result[0];
-            $.get(newickTree, function(data, status){
-                console.log("HEREE")
-                buildGeneTree({newick: data});
+            $.get(newickTree, function(data, status) {
+                if (!buildGeneTree({newick: data})) {
+                    $('.malformed-newick').show();
+                } else {
+                     $('.result-container').show();
+                }
             });
         }
-        $('.result-container').show();
+
 	} else if (data.status[0] === 'notReady') {
 	    displayStage(data.stage[0]);
 	}

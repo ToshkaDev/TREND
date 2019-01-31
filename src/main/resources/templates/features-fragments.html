@@ -4,24 +4,7 @@
 
 <body>
     <div th:fragment="proto-tree">
-        <div class="col-md-8 my-textarea second-area">
-            <div class="row">
-                <textarea id="second-file-area" class="form-control" rows="12"> </textarea>
-            </div>
-            <br />
-            <div class="row">
-                <label class="btn btn-primary btn-md proto-tree-button">
-                    Choose file with protein sequences <input id="second-file" type="file" style="display: none" multiple/>
-                </label>
-                <span class='label label-info' id="second-file-info"></span>
-            </div>
-            <div class="row">
-                <span id="second-area-message">Wrong format. The fasta format is expected to begin with '>' sign.</span>
-            </div>
-            <br /> <br />
-        </div>
-
-        <div class="col-md-8 my-textarea full-pipe">
+        <form class="col-md-8 my-textarea full-pipe">
             <div class="row">
                 <textarea id="first-file-area" class="form-control" rows="12"> </textarea>
             </div>
@@ -40,11 +23,29 @@
             </div>
             <div class="row">
                 <span id="first-area-message">Wrong format. The fasta format is expected to begin with '>' sign.</span>
-                <span id="both-areas-message">To start the analysis you need to choose all the necessary files or paste the sequences in the areas above.</span>
+                <span id="both-areas-message">To start the analysis you need to choose all the necessary files or paste the sequences in the areas.</span>
                 <span id="one-area-message">To start the analysis you need to choose a file with protein sequences or paste the sequences in the area above.</span>
+                <span id="malformed-fasta">There should be at least 3 protein sequences to start the analysis.</span>
             </div>
             <br /> <br />
-        </div>
+        </form>
+        <form class="col-md-8 my-textarea second-area">
+            <div class="row">
+                <textarea id="second-file-area" class="form-control" rows="12"> </textarea>
+            </div>
+            <br />
+            <div class="row">
+                <label class="btn btn-primary btn-md proto-tree-button">
+                    Choose file with protein sequences <input id="second-file" type="file" style="display: none" multiple/>
+                </label>
+                <span class='label label-info' id="second-file-info"></span>
+            </div>
+            <div class="row">
+                <span id="second-area-message">Wrong format. The fasta format is expected to begin with '>' sign.</span>
+                <span id="malformed-fasta-second">There should be at least 3 protein sequences to start the analysis.</span>
+            </div>
+            <br /> <br />
+        </form>
         <div class="col-md-8 my-textarea partial-pipe">
             <div class="row partial-pipe-file">
                 <div class="partial-pipe-interior">
@@ -56,6 +57,7 @@
             </div>
             <div class="row">
                 <span id="first-area-message-partialP">Wrong format. The fasta format is expected to begin with '>' sign.</span>
+                <span id="malformed-fasta-partialP">There should be at least 3 protein sequences to start the analysis.</span>
             </div>
             <div class="row partial-pipe-file">
                 <div class="partial-pipe-interior">
@@ -67,6 +69,7 @@
             </div>
             <div class="row">
                 <span id="second-area-message-partialP">Wrong format. The fasta format is expected to begin with '>' sign.</span>
+                <span id="malformed-fasta-second-partialP">There should be at least 3 protein sequences to start the analysis.</span>
             </div>
             <div class="row">
                 <div class="partial-pipe-file">
@@ -77,12 +80,13 @@
                         <span class='label label-info' id="tree-file-info"></span>
                     </div>
                 </div>
+                <div>
+                    <span id="partial-pipeline-message">Both a file with protein sequences and a file with phylogenetic tree should be provided.</span>
+                    <span id="malformed-newick">Malformed newick tree. Please correct the tree.</span>
+                </div>
                 <button id="GoAsyncPartial" class="btn btn-primary btn-md pull-right proto-tree-button" type="button">
                     <span>SUBMIT</span>
                 </button>
-            </div>
-            <div class="row">
-                <span id="partial-pipeline-message">Both a file with protein sequences and a file with phylogenetic tree should be provided.</span>
             </div>
         </div>
 

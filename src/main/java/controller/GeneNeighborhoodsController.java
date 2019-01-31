@@ -126,7 +126,6 @@ public class GeneNeighborhoodsController extends BioUniverseController {
     @Override
     void addToModelCommon(Model model) {
         model.addAttribute("mainTab", "gene-neighborhoods");
-        model.addAttribute("newickJs", "/js/vendor/newick_modified.js");
         model.addAttribute("getFieldsValues", "/js/get-fields-values.js");
         model.addAttribute("subnavigationTab", BioPrograms.PROTO_TREE.getProgramName());
     }

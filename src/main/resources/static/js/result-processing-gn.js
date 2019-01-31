@@ -42,8 +42,10 @@ clusterOffsetLeft = 0.05;
 clusterOffsetRight = 0.084;
 
 function buildGeneTree(dataObject) {
-    createZoomableBox();
     var textCounter = Newick.parse(dataObject.newick)[1]
+    if (textCounter < 3)
+        return false;
+    createZoomableBox();
     phylocanvas = new Smits.PhyloCanvas(
         dataObject,
         'treeContainer',
@@ -77,6 +79,7 @@ function buildGeneTree(dataObject) {
                 processed = false;
         });
     getGenesAndDraw(refSeqs, refSeqsAndYCoords, longestXCoord, longestXCoordText);
+    return true;
 }
 
 function createZoomableBox() {

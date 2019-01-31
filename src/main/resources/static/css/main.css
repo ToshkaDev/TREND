@@ -106,7 +106,8 @@ label.error {
 #first-area-message, #second-area-message,
 #both-areas-message, #one-area-message,
 #partial-pipeline-message, #second-area-message-partialP,
-#first-area-message-partialP {
+#first-area-message-partialP, #malformed-fasta, #malformed-fasta-second,
+#malformed-fasta-partialP, #malformed-fasta-second-partialP, #malformed-newick {
     color: red;
     display: none;
 }
@@ -234,6 +235,8 @@ div.result-container {
 }
 
 div.no-such-biojob {
+    font-size: 115%;
+    margin-left: 4%;
     display: none;
 }
 

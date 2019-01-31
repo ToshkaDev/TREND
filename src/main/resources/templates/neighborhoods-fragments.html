@@ -14,15 +14,14 @@
                     Choose file <input id="first-file" type="file" style="display: none" multiple/>
                 </label>
                 <span class='label label-info' id="first-file-info"></span>
-                <div class="btn-group">
-
-                </div>
                 <button id="GoAsyncNeib" style="margin-right: 2px" class="btn btn-primary btn-md pull-right proto-tree-button" type="button">
                     <span>SUBMIT</span>
                 </button>
-                <div class="row">
-                    <span id="first-area-message">&nbsp;&nbsp; Wrong format. Expected sequences in fasta format or tree in newick format.</span>
-                    <span id="one-area-message">&nbsp;&nbsp; To start the analysis you need to choose a file or paste its content in the area above.</span>
+                <div>
+                    <span id="first-area-message">Wrong format. Expected sequences in fasta format or tree in newick format.</span>
+                    <span id="one-area-message">To start the analysis you need to choose a file or paste its content in the area above.</span>
+                    <span id="malformed-fasta">There should be at least 3 protein sequences to start the analysis.</span>
+                    <span id="malformed-newick">Malformed newick tree. Please correct the tree.</span>
                 </div>
             </div> <br /> <br />
         </div>

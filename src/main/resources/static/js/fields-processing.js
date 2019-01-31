@@ -42,21 +42,26 @@ function takeCareOfFields() {
 	$('#first-file').change(function() {
 	    $('#first-file-info').html(this.files[0].name);
 	    $('#first-file-area').val('');
+	    $('#first-area-message, #one-area-message, #malformed-fasta').hide();
 	});
 
     $('#second-file').change(function() {
 	    $('#second-file-info').html(this.files[0].name);
 	    $('#second-file-area').val('');
+	    $('#second-area-message, #malformed-fasta-second').hide();
+
 	});
 
     $('#first-file-area').keyup(function() {
         $('#first-file-info').empty();
         $('#first-file').val('');
+        $('#first-area-message, #one-area-message, #malformed-fasta').hide();
     });
 
 	$('#second-file-area').keyup(function() {
 	    $('#second-file-info').empty();
 	    $('#second-file').val('');
+	    $('#second-area-message, #malformed-fasta-second').hide();
 	});
 
     $('#sequence-file').change(function() {
