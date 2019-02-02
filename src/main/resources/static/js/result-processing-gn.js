@@ -43,6 +43,7 @@ clusterOffsetRight = 0.084;
 
 function buildGeneTree(dataObject) {
     createZoomableBox();
+    var textCounter = Newick.parse(dataObject.newick)[1]
     phylocanvas = new Smits.PhyloCanvas(
         dataObject,
         'treeContainer',

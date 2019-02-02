@@ -407,7 +407,7 @@ def processFileWithSeqs():
 				ALIGNED_PROTEIN_NAME_TO_SEQ[sequence.description.strip()] = str(sequence.seq)                   #
 
 def layout(node):
-    if node.is_leaf():
+	if node.is_leaf():
 		if node.name in PROTEIN_TO_DOMAINS:
 			seq = PROTEIN_NAME_TO_SEQ[node.name]
 			protDomains = PROTEIN_TO_DOMAINS[node.name]
@@ -439,9 +439,9 @@ def writeSeqsAndTree():
 						featureName = PROCESSED_TO_FEATURE_NAMES[processedName]
 						PROTEIN_DOMAINS[terminals[i].name] = PROTEIN_DOMAINS[featureName]
 						indexToName[i].append(featureName)
-					proteinSeqName = PROCESSED_TO_PROTEIN_NAMES[processedName] 
-					PROTEIN_NAME_TO_SEQ[terminals[i].name] = PROTEIN_NAME_TO_SEQ[proteinSeqName]
-					indexToName[i].append(proteinSeqName)
+						proteinSeqName = PROCESSED_TO_PROTEIN_NAMES[processedName]
+						PROTEIN_NAME_TO_SEQ[terminals[i].name] = PROTEIN_NAME_TO_SEQ[proteinSeqName]
+						indexToName[i].append(proteinSeqName)
 					alignedName = PROCESSED_TO_ALIGNED_NAMES[processedName]					
 					ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name] = ALIGNED_PROTEIN_NAME_TO_SEQ[alignedName]
 					indexToName[i].append(alignedName)
@@ -504,4 +504,3 @@ def main(argv):
 
 if __name__ == "__main__":
 	main(sys.argv)
-		

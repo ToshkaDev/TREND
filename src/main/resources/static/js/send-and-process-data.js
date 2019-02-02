@@ -62,7 +62,6 @@ $(document).ready(function (){
 });
 
 function fastaIsCorrect(fasta, malformedMessageId,  notFastaMessageId) {
-    console.log("HERE")
 	if (fasta.trim().slice(0, 1) !== ">") {
 		$("#"+notFastaMessageId).show();
 		return false;
@@ -104,13 +103,15 @@ function checkFileAndSubmit(options, firstFile, firstInsuffSeqsMessageId, firstM
 				}
 			} else if (options.get("treeFile")) {
 				submitIfNewickTreeIsOK(options.get("treeFile"), options);
-			} else if (areaStatus || (areaStatus == null && firstFile === "firstFile")) {
-			    if ($(".second-area").is(':hidden'))
-				    getDataAsync(options);
-				else
-				    $("#both-areas-message").show();
-
-			} else if (areaStatus == null && firstFile !== "firstFile") {
+			} else if (areaStatus) { // if areaStatus is true, then !$(".second-area").is(':hidden') for sure.
+			    //it's taken care of by a function  which clears pasted inputs of files selected when clicking 'Add Second Area' button
+                getDataAsync(options);
+            } else if (areaStatus == null && firstFile === "firstFile") {
+                if ($(".second-area").is(':hidden'))
+                    getDataAsync(options);
+                else
+                    $("#both-areas-message").show();
+            } else if (areaStatus == null && firstFile !== "firstFile") {
 				$("#both-areas-message").show();
 			}
         }
@@ -126,12 +127,17 @@ function checkAndSubmit(options, secondFile) {
         }
     }
     if (secondFile === "secondFile") {
-		if ($(".second-area").is(':hidden') && !options.get("firstFileArea") && !options.get("firstFile"))
-			$("#one-area-message").show();
-		if (!options.get("firstFile") && options.get("firstFileArea") && $(".first-area").length)
+		if ($(".second-area").is(':hidden') && !options.get("firstFileArea") && !options.get("firstFile")) {
+		    $("#one-area-message").show();
+		}
+
+		if (!options.get("firstFile") && options.get("firstFileArea") && options.get("firstFileArea").length) {
 			firstAreaStatus = fastaIsCorrect(options.get("firstFileArea"), "malformed-fasta", "first-area-message");
-		if (!options.get("secondFile") && options.get("secondFileArea") && $(".second-area").length)
-			secondAreaStatus = fastaIsCorrect(options.get("secondFileArea"), "malformed-fasta-second", "second-area-message");
+		}
+		if (!options.get("secondFile") && options.get("secondFileArea") && options.get("secondFileArea").length) {
+		    secondAreaStatus = fastaIsCorrect(options.get("secondFileArea"), "malformed-fasta-second", "second-area-message");
+		}
+
 		if (!$(".second-area").is(':hidden')) {
 			if (firstAreaStatus && secondAreaStatus) {
 				getDataAsync(options);
@@ -157,7 +163,7 @@ function checkAndSubmit(options, secondFile) {
 		// is invalid (we are ending up in this condition only if the previous is false; but the first area can be speicified).
 		checkFileAndSubmit(options, secondFile, "malformed-fasta-second", "second-area-message",
 				null, null, null, firstAreaStatus);
-	} else if (!$(".second-area").is(':hidden')) {
+	} else if (!$(".second-area").is(':hidden') && firstAreaStatus === null && secondAreaStatus === null) {
 	    $("#both-areas-message").show();
 	}
 

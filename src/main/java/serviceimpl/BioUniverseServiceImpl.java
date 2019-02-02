@@ -249,7 +249,8 @@ public class BioUniverseServiceImpl implements BioUniverseService {
             String line;
             boolean errorHappened = false;
             while ((line = br.readLine()) != null) {
-                errorHappened = true;
+                if (line.toLowerCase().contains("error".toLowerCase()) || line.contains("Traceback"))
+                    errorHappened = true;
                 System.out.println(line);
                 System.out.println("\n");
             }
