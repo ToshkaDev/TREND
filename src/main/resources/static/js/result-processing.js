@@ -10,7 +10,6 @@ $(document).ready(function (){
     entityToButton = {"domainOrganizedData": buttonIds[0], 'tmOrganizedData': buttonIds[1],
     "lcrOrganized": buttonIds[2], "sequenceData": buttonIds[3], "additionalOrganizedData": buttonIds[4]};
     getIfReady(jobId);
-
 });
 
 function getIfReady(jobId) {
@@ -72,14 +71,14 @@ function processRetrievedDataAsync(data) {
             // Add corresponding links to download buttons
             $('#results-load').attr('href', data.result[1]);
             $('#tree-load').attr('href', data.result[0]);
-            var featureData;
+            featureData = null;
             // if all the files were provided for the pipeline
             if (data.result.length == 4) {
                 $('#alignment-load').attr('href', data.result[2]);
                 $('#features-load').attr('href', data.result[3]);
 
                 featureData = data.result[3];
-                // if alignement file was not provided for the pipeline (the partial one)
+                // if alignment file was not provided for the pipeline (the partial one)
             } else if (data.result.length == 3) {
                 $('#alignment-load').hide();
                 $('#features-load').attr('href', data.result[2]);
@@ -87,7 +86,16 @@ function processRetrievedDataAsync(data) {
             }
             prepareTreeContainer();
             d3.xml(data.result[1]).then(function(xml) {
-                document.getElementById("treeContainer").appendChild(xml.documentElement);
+                svgPicture = xml.documentElement
+                document.getElementById("treeContainer").appendChild(svgPicture);
+                $.get(featureData, function(data, status){
+                    addEventListeners(data);
+                });
+            });
+            $(window).resize(function() {
+                d3.select('#svgContainer>svg').remove();
+                prepareTreeContainer();
+                document.getElementById("treeContainer").appendChild(svgPicture);
                 $.get(featureData, function(data, status){
                     addEventListeners(data);
                 });
@@ -129,6 +137,10 @@ function processStageMessage(stage) {
 }
 
 function addEventListeners(data) {
+    //remove title and description
+    d3.select('#treeContainer>svg').select('title').text("");
+    d3.select('#treeContainer>svg').select('desc').text("");
+
     featureJSON = JSON.parse(data)
     var domStart, domStop;
 	var re = /^\d{1,}_/;
@@ -174,14 +186,13 @@ function addEventListeners(data) {
                             $("#Sequence").click();
                             $("." + "protein-sequence").html(seq);
                         }
-
 					});
 				d3.select(this).selectAll('*').on("click", function(){
-						checkTableAndDisplay(d3.event, d3.select(this).attr("class"), proteinIdToRendered);
-//                        var proteinName = d3.select(this).attr("class");
-//                        var seq = getNotHighlightedSequence(proteinName);
-//                        $("#Sequence").click();
-//                        $("." + "protein-sequence").html(seq);
+				        // stopping event propagation so that it will not be handled by the handler
+				        // specified above. Commented out checkTableAndDisplay because we don't need to create a table
+				        // for tree branches and branch names.
+				        event.stopPropagation();
+						//checkTableAndDisplay(d3.event, d3.select(this).attr("class"), proteinIdToRendered);
 					});
 			}
 	  });

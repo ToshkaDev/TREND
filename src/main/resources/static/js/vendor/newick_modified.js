@@ -59,8 +59,8 @@
  */
  
 (function(exports) {
-  var counter = 0	
   exports.parse = function(s) {
+    var counter = 0
     var ancestors = [];
     var tree = {};
     var tokens = s.split(/\s*(;|\(|\)|,|:)\s*/);

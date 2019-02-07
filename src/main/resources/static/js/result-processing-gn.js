@@ -42,8 +42,12 @@ clusterOffsetLeft = 0.05;
 clusterOffsetRight = 0.084;
 
 function buildGeneTree(dataObject) {
-    createZoomableBox();
     var textCounter = Newick.parse(dataObject.newick)[1]
+    console.log("textCounter " + textCounter)
+    if (textCounter < 3)
+        return false;
+    createZoomableBox();
+    console.log("textCounter " + textCounter)
     phylocanvas = new Smits.PhyloCanvas(
         dataObject,
         'treeContainer',
@@ -87,6 +91,8 @@ function createZoomableBox() {
     var width = window.innerWidth*widthShrinkageFactor;
     var height = window.innerHeight*heightShrinkageFactor;
     var tree = d3.select('#svgContainer')
+        .style("width", width)
+        .style("height", height)
         .style("border", "1.4px solid #9494b8")
         .append("svg")
         .attr("width", width)
@@ -105,7 +111,6 @@ function getGenesAndDraw(refSeqs, refSeqsAndYCoords, xCoordinate, xCoordinateTex
     var refSeqCounter = 0;
 
     function getFetchSettings(gene, type) {
-        console.log("Fetching")
         var geneUrl = `https://api.mistdb.caltech.edu/v1/genes?search=${gene}`;
         var geneNeighborsUrl = `https://api.mistdb.caltech.edu/v1/genes/${gene}/neighbors`;
         var geneFetchSettings = {

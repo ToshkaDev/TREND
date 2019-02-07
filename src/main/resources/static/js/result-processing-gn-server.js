@@ -58,10 +58,12 @@ function processRetrievedDataAsync(data) {
             $('#tree-load').attr('href', data.result[0]);
             var newickTree = data.result[0];
             $.get(newickTree, function(data, status) {
-                if (!buildGeneTree({newick: data})) {
+                nwkObject = {newick: data};
+                if (!buildGeneTree(nwkObject)) {
                     $('.malformed-newick').show();
                 } else {
                      $('.result-container').show();
+                     onResize();
                 }
             });
         }
@@ -69,6 +71,13 @@ function processRetrievedDataAsync(data) {
 	} else if (data.status[0] === 'notReady') {
 	    displayStage(data.stage[0]);
 	}
+}
+
+function onResize() {
+    $(window).resize(function() {
+        d3.select('#svgContainer>svg').remove();
+        buildGeneTree(nwkObject);
+    });
 }
 
 function displayStage(dataStage, statusReady=false) {
