@@ -55,8 +55,10 @@ function buildGeneTree(dataObject) {
     );
     var processed = false;
     textCounter = 0;
-    var refSeqsAndYCoords = {};
-    var refSeqs = [];
+    var protIdsToYCoords = {};
+    var protIds1 = [];
+    var protIds2 = [];
+    var protIds3 = [];
     var longestXCoord = 0;
     var longestXCoordText;
     d3.select('#treeContainer>svg').selectAll('*')
@@ -69,9 +71,15 @@ function buildGeneTree(dataObject) {
                 var yCoord = +d3.select(this).attr('y');
                 var xCoord = +d3.select(this).attr('x');
                 var text = d3.select(this).text().replace(/^\d+_/, "");
+                text = text.split("_").slice(0, 3).join("_").trim();
+                protIdsToYCoords[text] = yCoord-yShiftOfClusterRegardingLeafeYCoord;
+                protIds1.push(text);
                 text = text.split("_").slice(0, 2).join("_").trim();
-                refSeqsAndYCoords[text] = yCoord-yShiftOfClusterRegardingLeafeYCoord;
-                refSeqs.push(text);
+                protIdsToYCoords[text] = yCoord-yShiftOfClusterRegardingLeafeYCoord;
+                protIds2.push(text);
+                text = text.split("_")[0].trim();
+                protIdsToYCoords[text] = yCoord-yShiftOfClusterRegardingLeafeYCoord;
+                protIds3.push(text);
                 if (xCoord > longestXCoord) {
                     longestXCoord = xCoord;
                     longestXCoordText = d3.select(this).text();
@@ -80,7 +88,8 @@ function buildGeneTree(dataObject) {
             } else
                 processed = false;
         });
-    getGenesAndDraw(refSeqs, refSeqsAndYCoords, longestXCoord, longestXCoordText);
+
+    getGenesAndDraw([protIds1, protIds2, protIds3], protIdsToYCoords, longestXCoord, longestXCoordText);
     return true;
 }
 
@@ -106,7 +115,7 @@ function createZoomableBox() {
         .attr("id", "treeContainer");
 }
 
-function getGenesAndDraw(refSeqs, refSeqsAndYCoords, xCoordinate, xCoordinateText) {
+function getGenesAndDraw(protIdsList, protIdsToYCoords, xCoordinate, xCoordinateText) {
     xCoordinate = xCoordinate + xCoordinateText.length*6.5;
     var refSeqCounter = 0;
 
@@ -126,33 +135,46 @@ function getGenesAndDraw(refSeqs, refSeqsAndYCoords, xCoordinate, xCoordinateTex
 
     // don't show while not all neoghbor genes are loaded
     //$('#svgContainer').hide();
-    fetchGene(refSeqs[0], refSeqCounter);
+    fetchGene(protIdsList[0][0], protIdsList[1][0], protIdsList[2][0], refSeqCounter);
     //recursive function
-    function fetchGene(refSeq, refSeqCounter) {
-        $.ajax(getFetchSettings(refSeq)).done(function (gene) {
-            fetchNeighborGenes(gene, refSeqsAndYCoords, xCoordinate, refSeq, refSeqs, refSeqCounter);
+    //first 3 several ajax requests using different protein ids.
+    function fetchGene(protId1, protId2, protId3, refSeqCounter) {
+        $.ajax(getFetchSettings(protId1)).done(function (gene) {
+            if (gene[0])
+                fetchNeighborGenes(gene, protIdsToYCoords, xCoordinate, protId1, protIdsList, refSeqCounter);
+            else {
+                $.ajax(getFetchSettings(protId2)).done(function (gene) {
+                    if (gene[0])
+                        fetchNeighborGenes(gene, protIdsToYCoords, xCoordinate, protId2, protIdsList, refSeqCounter);
+                     else {
+                        $.ajax(getFetchSettings(protId3)).done(function (gene) {
+                            if (gene[0])
+                                fetchNeighborGenes(gene, protIdsToYCoords, xCoordinate, protId3, protIdsList, refSeqCounter);
+                             else
+                                fetchNext(protIdsList, refSeqCounter);
+                        });
+                     }
+                });
+            }
         }).fail(function(jqXHR, textStatus, errorThrown) {
-            fetchNext(refSeqs, refSeqCounter);
+            fetchNext(protIdsList, refSeqCounter);
         });
     }
 
-    function fetchNeighborGenes(gene, refSeqsAndYCoords, xCoordinate, refSeq, refSeqs, refSeqCounter) {
-        if (gene[0]) {
+    function fetchNeighborGenes(gene, protIdsToYCoords, xCoordinate, protId, protIdsList, refSeqCounter) {
             $.ajax(getFetchSettings(gene[0].stable_id, "neighbors")).done(function (neighbGenes) {
                 if (neighbGenes.length == 10)
                     drawNeighborGenes(d3.select('#treeContainer>svg'), gene[0], neighbGenes,
-                        refSeqsAndYCoords[refSeq], xCoordinate);
-                fetchNext(refSeqs, refSeqCounter);
+                        protIdsToYCoords[protId], xCoordinate);
+                fetchNext(protIdsList, refSeqCounter);
             }).fail(function(jqXHR, textStatus, errorThrown) {
-                fetchNext(refSeqs, refSeqCounter);
+                fetchNext(protIdsList, refSeqCounter);
             });
-        } else
-            fetchNext(refSeqs, refSeqCounter);
     }
 
-    function fetchNext(refSeqs, refSeqCounter) {
-        if (++refSeqCounter < refSeqs.length)
-            fetchGene(refSeqs[refSeqCounter], refSeqCounter);
+    function fetchNext(protIdsList, refSeqCounter) {
+        if (++refSeqCounter < protIdsList[0].length)
+            fetchGene(protIdsList[0][refSeqCounter], protIdsList[1][refSeqCounter], protIdsList[2][refSeqCounter], refSeqCounter);
         else {
             //$('#svgContainer').show();
         }
