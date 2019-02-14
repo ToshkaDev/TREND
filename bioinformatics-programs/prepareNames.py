@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import sys, getopt
 import re
+from ete2 import Tree
 
 INPUT_FILE = None
 OUTPUT_FILE = None
@@ -70,6 +71,8 @@ def getChangedNameForTree():
 
 	for match in iterObject2:
 		tree = tree.replace(match.group()[1:-1], getChangedName(match.group()[1:-1]))
+	#check if we can read the tree
+	treeObject = Tree(tree)
 	with open(OUTPUT_FILE_TREE, "w") as outputFile:
 		outputFile.write(tree)
 

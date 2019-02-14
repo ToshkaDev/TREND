@@ -55,6 +55,8 @@ function processRetrievedDataAsync(data) {
             // Add corresponding links to download buttons
             if (data.result.length == 2)
                 $('#alignment-load').attr('href', data.result[1]);
+            else
+                $('#alignment-load').hide();
             $('#tree-load').attr('href', data.result[0]);
             var newickTree = data.result[0];
             $.get(newickTree, function(data, status) {
@@ -63,7 +65,7 @@ function processRetrievedDataAsync(data) {
                     $('.malformed-newick').show();
                 } else {
                      $('.result-container').show();
-                     onResize();
+                     onDownload();
                 }
             });
         }
@@ -73,10 +75,11 @@ function processRetrievedDataAsync(data) {
 	}
 }
 
-function onResize() {
-    $(window).resize(function() {
-        d3.select('#svgContainer>svg').remove();
-        buildGeneTree(nwkObject);
+function onDownload() {
+    d3.select("#results-load").on("click", function() {
+      d3.select(this)
+        .attr("href", 'data:application/octet-stream;base64,' + btoa(d3.select("#svgContainer>svg>#treeContainer").html()))
+        .attr("download", "ProtoTree.svg")
     });
 }
 

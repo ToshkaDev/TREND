@@ -79,7 +79,8 @@ function submitIfNewickTreeIsOK(newickFile, options) {
 	fileReader.readAsText(newickFile);
 	fileReader.onloadend = function() {
 		var textCounter = Newick.parse(fileReader.result)[1]
-		textCounter < 3 ? $("#malformed-newick").show() : getDataAsync(options);
+		var newickEndIsOK = fileReader.result.trim().slice(-1) == ";"
+		textCounter < 3 || !newickEndIsOK ? $("#malformed-newick").show() : getDataAsync(options);
 	}
 }
 
@@ -184,7 +185,7 @@ function checkFileAndSendQueryNeib(options) {
         else {
             if (fileReader.result.trim().slice(0, 1) === "(") {
                 var textCounter = Newick.parse(fileReader.result)[1]
-                if (textCounter < 3) {
+                if (textCounter < 3 || fileReader.result.trim().slice(-1) !== ";") {
                     $("#malformed-newick").show();
                     return;
                 }
@@ -207,7 +208,7 @@ function checkFileAreaAndSendQueryNeib(options) {
     else {
         if (options.get("firstFileArea").trim().slice(0, 1) === "(") {
             var textCounter = Newick.parse(options.get("firstFileArea"))[1]
-            if (textCounter < 3) {
+            if (textCounter < 3 || options.get("firstFileArea").trim().slice(-1) !== ";") {
                 $("#malformed-newick").show();
                 return;
             }

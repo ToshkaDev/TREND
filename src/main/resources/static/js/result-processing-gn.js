@@ -43,16 +43,15 @@ clusterOffsetRight = 0.084;
 
 function buildGeneTree(dataObject) {
     var textCounter = Newick.parse(dataObject.newick)[1]
-    console.log("textCounter " + textCounter)
     if (textCounter < 3)
         return false;
     createZoomableBox();
-    console.log("textCounter " + textCounter)
     phylocanvas = new Smits.PhyloCanvas(
         dataObject,
         'treeContainer',
         2000, 1300*textCounter/21
     );
+    d3.select('#treeContainer>svg').select('desc').text("ProtoTree");
     var processed = false;
     textCounter = 0;
     var protIdsToYCoords = {};

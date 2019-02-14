@@ -4,47 +4,88 @@
 
 <div th:fragment="help">
     <div class="col-md-12 help-div">
+        <h2 style="font-weight: bold">Domains</h2>
         <div>
             <h3 class="text-head3" style="font-weight: bold"> Full pipeline mode. </h3>
             <p> There are two ways the pipeline can be used in this mode:</p>
             <h4 class="text-head4" style="font-weight: bold">
-                1) Predicting protein features and building phylogenetic tree using full-length sequences.
+                1. Predicting protein features and building phylogenetic tree using full-length sequences.
             </h4>
-            <p>
-                If you want to use this option just paste your sequences or upload a file and click 'SUBMIT' button.
+            <p class="indented-text">
+                If you want to use this option just paste your sequences or upload a file and click <span class="proto-tree-text"> SUBMIT </span> button.
             </p>
             <h4  class="text-head4" style="font-weight: bold">
-                2) Building phylogenetic tree using fragments of protein sequences and predicting protein features using full-length sequences.
+                2. Building phylogenetic tree using fragments of protein sequences and predicting protein features using full-length sequences.
             </h4>
-            <p>
-                If you want to use this option:
-            </p>
-            <p>
-                a) Click "Add second area" button. New query area will appear.
-            </p>
-            <p>
-                b) Put full-length sequences into the first area (or choose a file). Protein sequences in this area will be used to predict features.
-            </p>
-            <p>
-                c) Put fragments of sequences into the second area (or choose a file). Protein sequences in this area will be used for alignment and building a tree.
-            </p>
+            <div class="indented-text">
+                <p>
+                    If you want to use this option:
+                </p>
+                <p>
+                    a) Click <span class="proto-tree-text">Add second area </span>button. New query area will appear.
+                </p>
+                <p>
+                    b) Put fragments of sequences into the first area (or choose a file). Protein sequences in this area will be used for alignment and building phylogentic tree.
+                </p>
+                <p>
+                    c) Put full-length sequences into the second area (or choose a file). Protein features will be predicted using these sequences.
+                </p>
+            </div>
         </div>
-        <hr/>
+
         <div>
             <h3 class="text-head3" style="font-weight: bold"> Partial pipeline mode. </h3>
             <p>
-                If you have your own phylogenetic tree and the protein sequences used to produce the tree use this mode:
+                If you have your own phylogenetic tree and protein sequences used to produce the tree use this mode:
             </p>
             <p>
-                a) Upload protein sequences used to build the tree ("Choose file with protein sequences" button).
+                a) In <span class="proto-tree-text">Domains</span> section click <span class="proto-tree-text">Partial Pipeline</span> button.
             </p>
             <p>
-                b) Optional, if you want the alignment to be ordered and enumerated according to the tree branches order, upload your alignment ("Choose file with alignment (optional)" button).
+                b) Upload protein sequences used to build the tree (<span class="proto-tree-text">Choose file with protein sequences</span> button).
             </p>
             <p>
-                c) Upload the tree in newick format ("Choose file with tree (Newick)" button).
+                c) Optional, if you want the alignment to be ordered and enumerated according to the tree branches order, upload your alignment (<span class="proto-tree-text">Choose file with alignment (optional)</span> button).
+            </p>
+            <p>
+                d) Upload the tree in <a href="https://en.wikipedia.org/wiki/Newick_format" target="_blank">newick</a> format (<span class="proto-tree-text">Choose file with tree (Newick)</span> button).
             </p>
         </div>
     </div>
+
+    <div class="col-md-12 help-div">
+        <hr/>
+        <div>
+            <h2 style="font-weight: bold">Neighborhoods</h2>
+            <p>
+                You can easily visualize gene neighborhoods on the phylogenetic tree running our neighborhoods analyzer.
+            </p>
+            <p>
+                Protein names in the file with the sequences or the tree should start with protein identifiers.
+            </p>
+                <p>
+                    Suitable identifiers:
+                </p>
+                <p class="indented-text">
+                    a) <a href="https://www.ncbi.nlm.nih.gov/refseq/about/nonredundantproteins/" target="_blank">RefSeq Id</a>
+                </p>
+                <p class="indented-text">
+                    b) <a href="https://www.ncbi.nlm.nih.gov/genomes/locustag/Proposal.pdf" target="_blank">Locus tag</a>, either old or new
+                </p>
+                <p class="indented-text">
+                    b) <a href="https://mistdb.com/" target="_blank">MiST Id</a>
+                </p>
+            <p>
+                The analyzer can be run in two ways:
+            </p>
+            <p>
+                1) by pasting protein sequences (or uploading corresponding file)
+            </p>
+            <p>
+                2) by pasting phylogenetic tree in newick format (or uploading corresponding file)
+            </p>
+        </div>
+    </div>
+
 
 </div>

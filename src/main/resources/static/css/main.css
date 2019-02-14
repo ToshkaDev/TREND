@@ -422,3 +422,16 @@ input:checked + .slider:before {
     font-size: 300%;
 }
 /*End of Error pages*/
+
+h2 {
+    color: #666699;
+}
+
+.indented-text {
+    padding-left: 20px;
+}
+
+.proto-tree-text {
+    color: #666699;
+    font-weight: bold;
+}
