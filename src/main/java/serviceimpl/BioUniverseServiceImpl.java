@@ -4,7 +4,6 @@ package serviceimpl;
 import biojobs.BioJob;
 import biojobs.BioJobResult;
 import biojobs.BioJobResultDao;
-import enums.BioPrograms;
 import exceptions.IncorrectRequestException;
 import model.internal.ProtoTreeInternal;
 import model.request.ProtoTreeRequest;
@@ -35,7 +34,6 @@ public class BioUniverseServiceImpl implements BioUniverseService {
     private final StorageService storageService;
     private final BioJobResultDao bioJobResultDao;
     private final BioJobDao bioJobDao;
-    private final Map<String, String> programs = new HashMap<>();
 
     @Autowired
     public BioUniverseServiceImpl(StorageService storageService, AppProperties properties, BioJobResultDao bioJobResultDao, BioJobDao bioJobDao) {
@@ -43,7 +41,6 @@ public class BioUniverseServiceImpl implements BioUniverseService {
         this.properties = properties;
         this.bioJobResultDao = bioJobResultDao;
         this.bioJobDao = bioJobDao;
-        programs.put(BioPrograms.PROTO_TREE.getProgramName(), properties.getProtoTreeProgram());
     }
 
     @Override
@@ -81,10 +78,6 @@ public class BioUniverseServiceImpl implements BioUniverseService {
     @Override
     public String getPathToMainDirFromBioProgs() {
         return properties.getPathToMainDirFromBioProgs();
-    }
-    @Override
-    public String getProgram(String programName) {
-        return programs.get(programName);
     }
     @Override
     public BioJobDao getBioJobDao() {
@@ -162,10 +155,11 @@ public class BioUniverseServiceImpl implements BioUniverseService {
         int jobId = getLastJobId();
 
         BioJob bioJob = new BioJob();
-        bioJob.setProgramNameName(getProgram(protoTreeInternal.getCommandToBeProcessedBy()));
+        bioJob.setProgramNameName(protoTreeInternal.getCommandToBeProcessedBy());
         bioJob.setJobId(jobId);
         bioJob.setJobDate(LocalDateTime.now());
         bioJob.setFinished(false);
+        bioJob.setCookieId(protoTreeInternal.getProtoTreeCookies());
         for (String filename : protoTreeInternal.getOutputFilesNames()) {
             BioJobResult bioJobResult = new BioJobResult();
             bioJobResult.setResultFile("placeholder");

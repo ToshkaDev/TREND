@@ -33,6 +33,7 @@ public class ProtoTreeInternal {
 
     private String  commandToBeProcessedBy;
     private String isFullPipeline;
+    private String protoTreeCookies;
     private List<List<String>> commandsAndArguments;
     private List<String> outputFilesNames = new LinkedList<>();
 
@@ -262,5 +263,13 @@ public class ProtoTreeInternal {
 
     public void setFullPipeline(String fullPipeline) {
         isFullPipeline = fullPipeline;
+    }
+
+    public String getProtoTreeCookies() {
+        return protoTreeCookies;
+    }
+
+    public void setProtoTreeCookies(String protoTreeCookies) {
+        this.protoTreeCookies = protoTreeCookies;
     }
 }

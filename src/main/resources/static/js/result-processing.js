@@ -1,5 +1,6 @@
 $(document).ready(function (){
     var jobId = $('#jobId').text();
+    console.log("jobId  " + jobId)
     renderedClass = null;
     infoPostfix = "_table";
     stageList = [];
@@ -13,10 +14,8 @@ $(document).ready(function (){
 });
 
 function getIfReady(jobId) {
-    console.log('Checking if ready ');
-    console.log('jobId ' + jobId + " " + Cookies.get('protoTree'));
     fileGetter = setInterval(function() {
-        tryToGetFileName(jobId + "-" + Cookies.get('protoTree'))
+        tryToGetFileName(jobId)
     }, 2000);
 }
 

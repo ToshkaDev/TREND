@@ -121,20 +121,18 @@ function takeCareOfFields() {
     });
 
     $("#ml-phylo-test, #nj_me-phylo-test").change(function() {
+        console.log("Triggered")
         var treeMethod = $('#tree-method').val();
         var prefix = treeMethodToPrefix[treeMethod];
         var phylogenyTest = $("#" + prefix + "-phylo-test").val();
         phylogenyTest != "none" ? $(".number-of-replicates").show() : $(".number-of-replicates").hide();
     });
 
-
-    $('#first').on({
-        keyup: function() {
-            $('.result-container').hide();
-        },
-        change: function() {
-            $('.result-container').hide();
-        }
+    $('#filter-clear').click(function() {
+        $('#first, #second').trigger('reset');
+        $('#lc-value').removeAttr('checked');
+        $('#tree-method, #ml-phylo-test, #nj_me-phylo-test, #gaps-missing').trigger('change');
+        $('input[name="dom-prediction-program"]').trigger('change')
     });
 
     lcrStates = {"checked": true, "undefined": false};

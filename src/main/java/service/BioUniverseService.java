@@ -38,8 +38,6 @@ public interface BioUniverseService {
 
     String getPathToMainDirFromBioProgs();
 
-    String getProgram(String programName);
-
     BioJobDao getBioJobDao();
 
     BioJobResultDao getBioJobResultDao();

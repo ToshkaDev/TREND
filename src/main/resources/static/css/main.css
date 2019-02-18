@@ -112,6 +112,11 @@ label.error {
     display: none;
 }
 
+#filter-clear {
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
  /*End of Activity associated elements: buttons and so on*/
 
 /*Main area and Filter options styles*/
@@ -425,6 +430,15 @@ input:checked + .slider:before {
 
 h2 {
     color: #666699;
+    /*font-weight: bold;*/
+}
+
+.chevron-info {
+    font-size: 0.7em;
+}
+
+.info-href:hover, .info-href:focus {
+    text-decoration: none;
 }
 
 .indented-text {
@@ -435,3 +449,8 @@ h2 {
     color: #666699;
     font-weight: bold;
 }
+
+.info {
+  margin: 10px 0;
+}
+

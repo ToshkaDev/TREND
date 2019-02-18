@@ -194,7 +194,7 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         listOfPrograms.addAll(Arrays.asList(
                 super.getProperties().getCalculateProteinFeatures(),
                 super.getProperties().getAlignAndBuildTree(),
-                super.getProgram(protoTreeInternal.getCommandToBeProcessedBy())
+                super.getProperties().getProtoTreeProgram()
         ));
 
         String[] arrayOfInterpreters = super.prepareInterpreters(listOfPrograms.size());
@@ -297,7 +297,7 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
 
         listOfPrograms.addAll(Arrays.asList(
                 super.getProperties().getCalculateProteinFeatures(),
-                super.getProgram(protoTreeInternal.getCommandToBeProcessedBy())
+                super.getProperties().getProtoTreeProgram()
         ));
 
         String[] arrayOfInterpreters = super.prepareInterpreters(listOfPrograms.size());

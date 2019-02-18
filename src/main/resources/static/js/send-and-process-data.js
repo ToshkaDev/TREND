@@ -2,7 +2,6 @@ $(document).ready(function (){
 	takeCareOfValidators();
 	takeCareOfFields();
 
-    setCookie();
     $('#GoAsync').click(function() {
         $("#first-area-message, #second-area-message, #both-areas-message, #one-area-message, #malformed-fasta, #malformed-fasta-second").hide();
     	options = getOptions();
@@ -221,16 +220,10 @@ function checkFileAreaAndSendQueryNeib(options) {
     }
 }
 
-function setCookie() {
-    typeof Cookies.get('protoTree') == 'undefined'
-        ? Cookies.set('protoTree', ''+Math.random(), { expires: 1 })
-        : null;
-}
-
 function getDataAsync(options) {
 	$.ajax({
 	      type: 'POST',
-	      url: 'process-request',
+	      url: 'domains/process-request',
 	      data : options,
 	      success: redirect,
 	      error: error,
@@ -256,7 +249,7 @@ function getDataAsyncNeighborGenes(options) {
 }
 
 function redirect(jobId) {
-    window.location.replace("tree/" + jobId);
+    window.location.replace("domains/tree/" + jobId);
 }
 
 function redirectNeighborGenes(jobId) {

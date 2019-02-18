@@ -1,23 +1,14 @@
 $(document).ready(function(){
 	takeCareOfValidators();
 	takeCareOfFields();
-    setCookie();
     var jobId = $('#jobId').text();
     stageList = [];
     getIfReady(jobId);
 });
 
-function setCookie() {
-    typeof Cookies.get('protoTree') == 'undefined'
-        ? Cookies.set('protoTree', ''+Math.random(), { expires: 1 })
-        : null;
-}
-
 function getIfReady(jobId) {
-    console.log('Checking if ready ');
-    console.log('jobId ' + jobId + " " + Cookies.get('protoTree'));
     fileGetter = setInterval(function() {
-        tryToGetFileName(jobId + "-" + Cookies.get('protoTree'))
+        tryToGetFileName(jobId)
     }, 2000);
 }
 

@@ -2,7 +2,6 @@ package controller;
 
 import biojobs.BioJob;
 import biojobs.BioJobResult;
-import enums.BioPrograms;
 import exceptions.IncorrectRequestException;
 import model.internal.ProtoTreeInternal;
 import model.request.ProtoTreeRequest;
@@ -51,7 +50,7 @@ public class GeneNeighborhoodsController extends BioUniverseController {
     }
 
     @GetMapping(value={"tree/{jobId:.+}"})
-    public String geneNeighborhoodsResult(@PathVariable Integer jobId, Model model) {
+    public String geneNeighborhoodsResult(@PathVariable String jobId, Model model) {
         model.addAttribute("sendOrGiveResult","/js/result-processing-gn.js");
         model.addAttribute("specificJs", "/js/result-processing-gn-server.js");
         model.addAttribute("jobId", jobId);
@@ -65,10 +64,11 @@ public class GeneNeighborhoodsController extends BioUniverseController {
     public String processTreeRequest(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException, ExecutionException, InterruptedException {
         //Split it to several functions because 'PROTO_TREE' method is asynchronous
         //and files in 'listOfFiles' field of evolutionRequest are got cleared at the end of request processing.
+        protoTreeRequest.setCommandToBeProcessedBy("gene-neighborhoods");
         ProtoTreeInternal protoTreeInternal = geneNeighborhoodsService.storeFilesAndPrepareCommandArguments(protoTreeRequest);
-        Integer jobId = protoTreeInternal.getJobId();
+        String jobId = protoTreeInternal.getJobId() + "-" + protoTreeInternal.getProtoTreeCookies();
         geneNeighborhoodsService.runMainProgram(protoTreeInternal);
-        return String.valueOf(jobId);
+        return jobId;
     }
 
     @GetMapping(value="tree/get-filename", produces="application/json")
@@ -83,9 +83,11 @@ public class GeneNeighborhoodsController extends BioUniverseController {
         List<String> listOfResultFileNames;
 
         if (jobId != null ) {
-            int id = Integer.valueOf(jobId.split("-")[0]);
+            String jobIdSplitted[] = jobId.split("-");
+            int id = Integer.valueOf(jobIdSplitted[0]);
+            String cookieId = jobIdSplitted[1];
             bioJob = geneNeighborhoodsService.getBioJob(id);
-            if (bioJob != null) {
+            if (bioJob != null && bioJob.getCookieId().equals(cookieId)) {
                 if (bioJob.isFinished()) {
                     listOfResultFileNames = bioJob.getBioJobResultList().stream().map(bjResult -> urlPath + bjResult.getResultFileName()).collect(Collectors.toList());
                     result.put("result", listOfResultFileNames);
@@ -124,6 +126,5 @@ public class GeneNeighborhoodsController extends BioUniverseController {
     void addToModelCommon(Model model) {
         model.addAttribute("mainTab", "gene-neighborhoods");
         model.addAttribute("getFieldsValues", "/js/get-fields-values.js");
-        model.addAttribute("subnavigationTab", BioPrograms.PROTO_TREE.getProgramName());
     }
 }

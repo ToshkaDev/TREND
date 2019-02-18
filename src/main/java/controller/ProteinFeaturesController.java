@@ -19,7 +19,6 @@ import service.BioUniverseService;
 import service.ProtoTreeService;
 import service.StorageService;
 import exceptions.IncorrectRequestException;
-import enums.BioPrograms;
 
 
 import javax.servlet.http.HttpServletResponse;
@@ -36,7 +35,7 @@ import java.util.stream.Collectors;
  */
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("/domains")
 public class ProteinFeaturesController extends BioUniverseController {
 
     @Autowired
@@ -50,14 +49,8 @@ public class ProteinFeaturesController extends BioUniverseController {
     	this.proteinFeaturesService = proteinFeaturesService;
     }
 
-    @GetMapping(value={"/help"})
-    public String help(Model model) {
-        model.addAttribute("mainTab", "help");
-        return "main-view  :: addContent(" +
-                "fragmentsMain='about', help='help')";
-    }
 
-    @GetMapping(value={"", "/home"})
+    @GetMapping(value={""})
     public String protoTree(Model model) {
         model.addAttribute("sendOrGiveResult", "/js/send-and-process-data.js");
         addToModelCommon(model);
@@ -67,7 +60,7 @@ public class ProteinFeaturesController extends BioUniverseController {
     }
 
     @GetMapping(value={"tree/{jobId:.+}"})
-    public String result(@PathVariable Integer jobId, Model model) {
+    public String result(@PathVariable String jobId, Model model) {
         model.addAttribute("sendOrGiveResult", "/js/result-processing.js");
         model.addAttribute("jobId", jobId);
         addToModelCommon(model);
@@ -80,19 +73,19 @@ public class ProteinFeaturesController extends BioUniverseController {
 	    ProtoTreeInternal protoTreeInternal = null;
         //Split it to several functions because 'PROTO_TREE' method is asynchronous
         //and files in 'listOfFiles' field of evolutionRequest are got cleared at the end of request processing.
-        if (protoTreeRequest.getCommandToBeProcessedBy().equals(BioPrograms.PROTO_TREE.getProgramName()))
-            protoTreeInternal = proteinFeaturesService.storeFilesAndPrepareCommandArguments(protoTreeRequest);
-        Integer jobId = protoTreeInternal.getJobId();
+        protoTreeRequest.setCommandToBeProcessedBy("domains");
+        protoTreeInternal = proteinFeaturesService.storeFilesAndPrepareCommandArguments(protoTreeRequest);
+        String jobId = protoTreeInternal.getJobId() + "-" + protoTreeInternal.getProtoTreeCookies();
         proteinFeaturesService.runMainProgram(protoTreeInternal);
 
-        return String.valueOf(jobId);
+        return jobId;
     }
 
     @GetMapping(value="tree/get-filename", produces="application/json")
     @ResponseBody
     public Map<String, List<String>> getFileNameIfReady(@RequestParam("jobId") String jobId) {
         BioJob bioJob;
-        String urlPath = ServletUriComponentsBuilder.fromCurrentContextPath().path("univ_files/").build().toString();
+        String urlPath = ServletUriComponentsBuilder.fromCurrentContextPath().path("domains/univ_files/").build().toString();
 
         Map<String, List<String>> result = new HashMap<>();
         result.put("status", super.statusNoSuchBioJob);
@@ -100,9 +93,11 @@ public class ProteinFeaturesController extends BioUniverseController {
         List<String> listOfResultFileNames;
 
 	     if (jobId != null ) {
-	        int id = Integer.valueOf(jobId.split("-")[0]);
+	        String jobIdSplitted[] = jobId.split("-");
+	        int id = Integer.valueOf(jobIdSplitted[0]);
+	        String cookieId = jobIdSplitted[1];
             bioJob = proteinFeaturesService.getBioJob(id);
-	        if (bioJob != null) {
+	        if (bioJob != null && bioJob.getCookieId().equals(cookieId)) {
 	            if (bioJob.isFinished()) {
                     listOfResultFileNames = bioJob.getBioJobResultList().stream().map(bjResult -> urlPath + bjResult.getResultFileName()).collect(Collectors.toList());
                     result.put("result", listOfResultFileNames);
@@ -140,9 +135,8 @@ public class ProteinFeaturesController extends BioUniverseController {
 
     @Override
     void addToModelCommon(Model model) {
-        model.addAttribute("mainTab", "home");
+        model.addAttribute("mainTab", "domains");
         model.addAttribute("getFieldsValues", "/js/get-fields-values.js");
-        model.addAttribute("subnavigationTab", BioPrograms.PROTO_TREE.getProgramName());
     }
 
 }

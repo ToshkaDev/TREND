@@ -27,6 +27,7 @@ public class ProtoTreeRequest {
 
     private String commandToBeProcessedBy;
     private String isFullPipeline;
+    private String protoTreeCookies;
 
     public MultipartFile getFirstFile() {
         return firstFile;
@@ -206,6 +207,14 @@ public class ProtoTreeRequest {
 
     public void setIsFullPipeline(String fullPipeline) {
         isFullPipeline = fullPipeline;
+    }
+
+    public String getProtoTreeCookies() {
+        return protoTreeCookies;
+    }
+
+    public void setProtoTreeCookies(String protoTreeCookies) {
+        this.protoTreeCookies = protoTreeCookies;
     }
 }
 

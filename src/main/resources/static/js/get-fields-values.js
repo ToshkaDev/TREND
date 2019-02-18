@@ -30,9 +30,10 @@ function getOptions() {
 
     var lcrPrediction = $("#lc-value").attr("checked");
 
-    Cookies.set('HEYE', 'This');
-    console.log("cookie.get('HEYE') " + Cookies.get('HEYE'))
+    var protoTreeCookies = setOrGetCookies();
+
     var optionToOptionName = {
+        "protoTreeCookies": protoTreeCookies,
         "isFullPipeline": isFullPipeline,
         "firstFile": firstFile,
         "secondFile": secondFile,
@@ -50,12 +51,20 @@ function getOptions() {
         "siteCovCutOff": siteCovCutOff,
         "numberOrReplicates": numberOrReplicates,
         "domainPredictionProgram": domainPredictionProgram,
-        "lcrPrediction": lcrPrediction,
-        "commandToBeProcessedBy": $('#subnavigation-tab').text()
+        "lcrPrediction": lcrPrediction
     }
     var options = new FormData();
     setOptions(options, optionToOptionName);
 	return options;
+}
+
+function setOrGetCookies() {
+    var cookies = Cookies.get('ProtoTree_@BioUniverse_');
+    if (typeof cookies == 'undefined') {
+        cookies = Math.random().toString(36).substring(6);
+        Cookies.set('ProtoTree_@BioUniverse_', cookies, { expires: 30 });
+    }
+    return cookies;
 }
 
 function getOption(option) {

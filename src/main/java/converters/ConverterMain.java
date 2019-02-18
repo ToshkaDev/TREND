@@ -36,6 +36,7 @@ public class ConverterMain {
 		protoTreeInternal.setProbability(checkProbabilityAndGet(ParamPrefixes.PROBABILITY.getPrefix(), protoTreeRequest.getProbability()));
 		protoTreeInternal.setLcrPrediction(checkLcrPredictionAndGet(ParamPrefixes.RUN_SEGMASKER.getPrefix(), protoTreeRequest.getLcrPrediction()));
 		protoTreeInternal.setFullPipeline(protoTreeRequest.isFullPipeline());
+		protoTreeInternal.setProtoTreeCookies(protoTreeRequest.getProtoTreeCookies());
 		return protoTreeInternal;
 	}
 
