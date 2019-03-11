@@ -1,0 +1,328 @@
+#!/usr/bin/python
+import sys, getopt
+import re
+import urllib
+import json
+import random
+
+
+USAGE = "\n\nThe script cluster genes in gene neighborhoods json file based on the shared domains.\n\n" + \
+	"It also determines operons. \n\n" + \
+	"python 	" + sys.argv[0] + '''
+	-h || --help           - help
+	-i || --ifile          - input file with sequences
+	[-n || --tolerance]    - NOT_SHARED_DOMAIN_NUMBER_TOLERANCE parameter
+	[-f || --first_color]  - first color threshold; default is 100
+	[-s || --second_color] - first color threshold; default is 1000
+	[-r || --random_seed]  - random color generator seed 
+	-o || --ofile          - output file with sequences with changed names
+	'''
+	
+OPERON_COLOR_DICT = ["#ff4d4d", "#1a75ff", "#cc33ff", "#00cc00", "#ff9900", "#993333", "#000099", "#00b3b3", "#660033", "#00b386"]
+SELECTED_COLORS = set()
+NUMBER_OF_GENERATED_COLORS = 0
+FIRST_COLOR_THRESHOLD = 100
+SECOND_COLOR_THRESHOLD = 1000
+#random seed for color generation
+RANDOM_SEED = 5
+RANDOM_STATE = random.getstate()
+
+
+	
+INPUT_FILE = None
+NOT_SHARED_DOMAIN_NUMBER_TOLERANCE = 0
+OPERON_TOLERANCE = 150
+OUTPUT_FILE = None
+
+BASE_URL = "https://api.mistdb.caltech.edu/v1/genes"
+GENE_FIELDS = "id,stable_id,version,locus,strand,start,stop,length,pseudo,product"
+PFAM = "pfam31"
+
+GENE_TO_NEIGHBORS = dict()
+
+def initialize(argv):
+	global INPUT_FILE, NOT_SHARED_DOMAIN_NUMBER_TOLERANCE, OUTPUT_FILE, FIRST_COLOR_THRESHOLD, SECOND_COLOR_THRESHOLD, RANDOM_SEED, RANDOM_STATE
+	try:
+		opts, args = getopt.getopt(argv[1:],"hi:n:f:s:r:o:",["help", "ifile=", "tolerance=", "first_color=", "second_color=", "random_seed=", "ofile="])
+		if len(opts) == 0:
+			raise getopt.GetoptError("Options are required\n")
+	except getopt.GetoptError as e:
+		print "===========ERROR==========\n " + str(e) + USAGE
+		sys.exit(2)
+	try:
+		for opt, arg in opts:
+			if opt in ("-h", "--help"):
+				print USAGE
+				sys.exit()
+			elif opt in ("-i", "--ifile"):
+				INPUT_FILE = str(arg).strip()
+			elif opt in ("-n", "--tolerance"):
+				NOT_SHARED_DOMAIN_NUMBER_TOLERANCE = str(arg).strip()
+			elif opt in ("-f", "--first_color"):
+				FIRST_COLOR_THRESHOLD = int(arg)
+			elif opt in ("-s", "--second_color"):
+				SECOND_COLOR_THRESHOLD = int(arg)
+			elif opt in ("-r", "--random_seed"):
+				RANDOM_SEED = int(arg)
+			elif opt in ("-o", "--ofile"):
+				OUTPUT_FILE = str(arg).strip()
+	except Exception as e:
+		print "===========ERROR==========\n " + str(e) + USAGE
+		sys.exit(2)
+	
+	random.seed(RANDOM_SEED)
+	RANDOM_STATE = random.getstate()
+
+address = "https://api.mistdb.caltech.edu/v1/genes/GCF_000302455.1-A994_RS01845/neighbors?fields=id,stable_id,version,locus,strand,start,stop,length,pseudo,product&fields.Aseq=pfam31"
+
+
+def findGene(geneNameOrId):
+	params = urllib.urlencode({'search': geneNameOrId, 'fields': GENE_FIELDS, 'fields.Aseq': PFAM})
+	result = urllib.urlopen(BASE_URL + "?%s" % params)
+	return json.loads(result.read())
+	
+def getGeneNeighborsAndPrepareDomains(geneStableIdList):
+	duplicateCounter = 1
+	for gene in geneStableIdList:
+		mainGeneDict = findGene(gene)[0]
+		if mainGeneDict['Aseq'] and len(mainGeneDict['Aseq']['pfam31']) > 0:
+			mainGeneSortedDomains = sorted(mainGeneDict['Aseq']['pfam31'], key=lambda x: x['ali_from'], reverse=False)
+			mainGeneDomainsWithNoOverlaps, mainGeneDomainWithNoOverlapsNamesOnly = removeOverlapps(mainGeneSortedDomains)		
+			mainGeneDict['Aseq']['pfam31'] = mainGeneDomainsWithNoOverlaps
+			mainGeneDict['Aseq']['pfam31NamesOnly'] = mainGeneDomainWithNoOverlapsNamesOnly
+		params = urllib.urlencode({'fields': GENE_FIELDS, 'fields.Aseq': PFAM})
+		result = urllib.urlopen(BASE_URL + "/" + mainGeneDict["stable_id"] + "/neighbors?%s" % params)
+		genesList = json.loads(result.read())
+		
+		previousGene = None
+		wasStrandChanegd = False
+		middleGeneProcessed = False
+		operonCounter = 0
+		for eachGene in genesList:
+			if eachGene['Aseq'] and len(eachGene['Aseq']['pfam31']) > 0:
+				sortedDomains = sorted(eachGene['Aseq']['pfam31'], key=lambda x: x['ali_from'], reverse=False)
+				domainsWithNoOverlaps, domainWithNoOverlapsNamesOnly = removeOverlapps(sortedDomains)
+				eachGene['Aseq']['pfam31'] = domainsWithNoOverlaps
+				eachGene['Aseq']['pfam31NamesOnly'] = domainWithNoOverlapsNamesOnly
+			if int(eachGene["id"]) < int(mainGeneDict["id"]):
+				if previousGene:
+					operonCounter = identifyIfBelongToOperon(previousGene, eachGene, operonCounter)
+			else:
+				if not middleGeneProcessed:
+					operonCounter = identifyIfBelongToOperon(previousGene, mainGeneDict, operonCounter)
+					operonCounter = identifyIfBelongToOperon(mainGeneDict, eachGene, operonCounter)
+					middleGeneProcessed = True					
+				else:
+					operonCounter = identifyIfBelongToOperon(previousGene, eachGene, operonCounter)
+			previousGene = eachGene
+			 
+		genesList.append(mainGeneDict)
+		if mainGeneDict["stable_id"] not in GENE_TO_NEIGHBORS:
+			GENE_TO_NEIGHBORS[mainGeneDict["stable_id"]] = genesList
+		else:
+			GENE_TO_NEIGHBORS[mainGeneDict["stable_id"] + "@" + str(duplicateCounter)] = genesList
+			duplicateCounter+=1 
+
+def identifyIfBelongToOperon(previousGene, currentGene, operonCounter):
+	if previousGene["strand"] == currentGene["strand"]:
+		distance = currentGene["start"] - previousGene["stop"]
+		if distance > 0:
+			if distance <= OPERON_TOLERANCE:
+				previousGene["operon"] = OPERON_COLOR_DICT[operonCounter]
+				currentGene["operon"] = OPERON_COLOR_DICT[operonCounter]
+			else:
+				operonCounter+=1
+		else:
+			previousGene["operon"] = OPERON_COLOR_DICT[operonCounter]
+			currentGene["operon"] = OPERON_COLOR_DICT[operonCounter]
+	else:
+		operonCounter+=1
+	return operonCounter
+
+def clusterGenesBasedOnSharedDomains():
+	gene1ClusterId = None
+	mainGene1ClusterId = 0
+	gene1ClusterColor = None 
+	for mainGene1StableId, allNeighborGenes1 in GENE_TO_NEIGHBORS.items():
+		mainGene1ClusterId+=1
+		for gene1Index in xrange(len(allNeighborGenes1)):
+			gene1 = allNeighborGenes1[gene1Index]
+			if  gene1['Aseq'] and 'pfam31NamesOnly' in gene1['Aseq']:
+				numberOfDomainsInGene1 = len(set(gene1['Aseq']['pfam31NamesOnly']))
+				numberOfMaxDomains = numberOfDomainsInGene1
+				if 'clusterId' in gene1 and gene1['clusterId']:
+					gene1ClusterId = gene1['clusterId']
+					gene1ClusterColor = gene1['clusterColor']
+				else:
+					gene1ClusterId = None
+					gene1ClusterColor = None
+				for gene2 in allNeighborGenes1:
+					if gene2['Aseq'] and gene1['stable_id'] != gene2['stable_id']:
+						if not 'clusterId' in gene2 and 'pfam31NamesOnly' in gene2['Aseq']:
+							numberOfSharedDomains = len(set(gene1['Aseq']['pfam31NamesOnly']) & set(gene2['Aseq']['pfam31NamesOnly']))
+							numberOfMaxDomains = getNumberOfMaxDomains(gene2, numberOfDomainsInGene1)
+							if numberOfSharedDomains > 0 and abs(numberOfMaxDomains - numberOfSharedDomains) <= NOT_SHARED_DOMAIN_NUMBER_TOLERANCE:
+								if gene1ClusterId:
+									gene2['clusterId'] = gene1ClusterId
+									gene2['clusterColor'] = gene1ClusterColor
+								else:
+									gene1ClusterId = str(mainGene1ClusterId) + str(gene1Index)
+									gene1ClusterColor = getNextColour()
+									gene1['clusterId'] = gene1ClusterId
+									gene2['clusterId'] = gene1ClusterId
+									gene1['clusterColor'] = gene1ClusterColor
+									gene2['clusterColor'] = gene1ClusterColor
+																	
+									
+				for mainGene2StableId, allNeighborGenes2 in GENE_TO_NEIGHBORS.items():
+					if mainGene1StableId != mainGene2StableId:
+						for gene3 in allNeighborGenes2:
+							#we shouldn't check if gene3 is diffenre than gene1 because this is another gene set
+							if gene3['Aseq']:
+								if not 'clusterId' in gene3 and 'pfam31NamesOnly' in gene3['Aseq']:
+									numberOfSharedDomains = len(set(gene1['Aseq']['pfam31NamesOnly']) & set(gene3['Aseq']['pfam31NamesOnly']))
+									numberOfMaxDomains = getNumberOfMaxDomains(gene3, numberOfDomainsInGene1)
+									if numberOfSharedDomains > 0 and abs(numberOfMaxDomains - numberOfSharedDomains) <= NOT_SHARED_DOMAIN_NUMBER_TOLERANCE:
+										if gene1ClusterId:
+											gene3['clusterId'] = gene1ClusterId
+											gene3['clusterColor'] = gene1ClusterColor
+										else:
+											gene1ClusterId = str(mainGene1ClusterId) + str(gene1Index)
+											gene1ClusterColor = getNextColour()
+											gene1['clusterId'] = gene1ClusterId
+											gene3['clusterId'] = gene1ClusterId
+											gene1['clusterColor'] = gene1ClusterColor
+											gene3['clusterColor'] = gene1ClusterColor
+								
+def removeOverlapps(domainsSorted):
+	if (len(domainsSorted)) > 0:			
+		tolerance = 10
+		pfam31Final = []
+		pfam31FinalNamesOnly = list()
+		pfam1 = domainsSorted[0]
+		significantPfam = pfam1
+		overlapLength = None
+		lastAdded = pfam1
+		pfam31Final.append(pfam1)
+		pfam31FinalNamesOnly.append(pfam1['name'])
+		for pfam2 in domainsSorted[1:]:
+			if pfam1['ali_to'] > pfam2['ali_from']:
+				overlapLength = pfam1['ali_to'] - pfam2['ali_from']
+				if overlapLength > tolerance:
+					significantPfam = compareEvalues(pfam1, pfam2)  
+					# if the previously added is pfam1 and it's less significant than pfam 2
+					# then remove this previously added and add pfam 2 
+					if lastAdded == pfam1 and lastAdded != significantPfam:
+						pfam31Final.remove(lastAdded)
+						pfam31Final.append(significantPfam)
+						pfam31FinalNamesOnly.remove(lastAdded['name'])
+						pfam31FinalNamesOnly.append(significantPfam['name'])
+					lastAdded = significantPfam
+				else:
+					pfam31Final.append(pfam2)
+					pfam31FinalNamesOnly.append(pfam2['name'])
+					lastAdded = pfam2
+					significantPfam = pfam2
+				pfam1 = significantPfam
+			else:
+				pfam31Final.append(pfam2)
+				pfam31FinalNamesOnly.append(pfam2['name'])
+				lastAdded = pfam2
+				significantPfam = pfam2
+				pfam1 = significantPfam
+		return (pfam31Final, pfam31FinalNamesOnly)	
+	return (None, None)			
+
+def compareEvalues(pfam1, pfam2):
+	eval1 = pfam1['i_evalue']
+	eval2 = pfam2['i_evalue']
+	significantPfam = None
+	if eval1 < eval2:
+		significantPfam = pfam1
+	elif eval1 > eval2:
+		significantPfam = pfam2
+	elif eval1 == eval2:
+		if (pfam1['ali_to'] - pfam1['ali_from']) >= (pfam2['ali_to'] - pfam2['ali_from']):
+			significantPfam = pfam1
+		else:
+			significantPfam = pfam2
+	return significantPfam
+
+def getNumberOfMaxDomains(gene, numberOfDomainsInGene1):
+	numberOfDomainsInThisGene = len(set(gene['Aseq']['pfam31NamesOnly']))
+	if numberOfDomainsInGene1 < numberOfDomainsInThisGene:
+		return numberOfDomainsInThisGene
+	return numberOfDomainsInGene1
+	
+#get next predictabel color (random seed was set at the beginnig of the file)
+def getNextColour():
+	global NUMBER_OF_GENERATED_COLORS
+	global RANDOM_STATE
+	random.setstate(RANDOM_STATE)
+	h = random.random()
+	
+	if NUMBER_OF_GENERATED_COLORS <= FIRST_COLOR_THRESHOLD:
+		s = 0.5
+		v = 0.95
+	elif NUMBER_OF_GENERATED_COLORS > FIRST_COLOR_THRESHOLD and NUMBER_OF_GENERATED_COLORS <= SECOND_COLOR_THRESHOLD:
+		s = random.random()
+		v = 0.95
+	else:
+		s = random.random()
+		v = random.random()
+		
+	NUMBER_OF_GENERATED_COLORS+=1
+	newColor = hsv_to_rgb(h, s, v)
+	print newColor
+	while newColor in SELECTED_COLORS:
+		newColor = hsv_to_rgb(h, s, v)
+	SELECTED_COLORS.add(newColor)
+	
+	RANDOM_STATE = random.getstate()	
+	return newColor
+
+#convert hsv to rgb	
+def hsv_to_rgb(h, s, v):
+	# use golden ratio
+	golden_ratio_conjugate = 0.618033988749895
+	h += golden_ratio_conjugate
+	h %= 1
+	h_i = int(h*6)
+	f = h*6 - h_i
+	p = v * (1 - s)
+	q = v * (1 - f*s)
+	t = v * (1 - (1 - f) * s)
+	if h_i == 0:
+		r, g, b = v, t, p
+	elif h_i == 1:
+		r, g, b = q, v, p
+	elif h_i == 2:
+		r, g, b = p, v, t
+	elif h_i == 3:
+		r, g, b = p, q, v
+	elif h_i == 4:
+		r, g, b = t, p, v
+	elif h_i == 5:
+		r, g, b = v, p, q
+	return "rgb" + str((int(r*256), int(g*256), int(b*256)))
+  
+def main(argv):
+	initialize(argv)
+	listOfIds = []
+	with open(INPUT_FILE, "r") as inputFile:
+		for line in inputFile:
+			listOfIds.append(line.strip())
+	getGeneNeighborsAndPrepareDomains(listOfIds)
+	clusterGenesBasedOnSharedDomains()
+	with open(OUTPUT_FILE, "w") as outputFile:
+		json.dump(GENE_TO_NEIGHBORS, outputFile, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+		
+
+if __name__ == "__main__":
+	main(sys.argv)
+	
+	
+	
+	
+	
+	
