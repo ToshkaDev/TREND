@@ -4,6 +4,7 @@ import re
 import urllib
 import json
 import random
+from ete2 import Tree
 
 
 USAGE = "\n\nThe script cluster genes in gene neighborhoods json file based on the shared domains.\n\n" + \
@@ -11,13 +12,14 @@ USAGE = "\n\nThe script cluster genes in gene neighborhoods json file based on t
 	"python 	" + sys.argv[0] + '''
 	-h || --help           - help
 	-i || --ifile          - input file with sequences
-	[-n || --tolerance]    - NOT_SHARED_DOMAIN_NUMBER_TOLERANCE parameter
+	-t || --tree           - input file with phylogenetic tree in newick format
+ 	[-n || --tolerance]    - NOT_SHARED_DOMAIN_NUMBER_TOLERANCE parameter
 	[-f || --first_color]  - first color threshold; default is 100
 	[-s || --second_color] - first color threshold; default is 1000
-	[-r || --random_seed]  - random color generator seed 
+	[-r || --random_seed]  - random color generator seed
 	-o || --ofile          - output file with sequences with changed names
 	'''
-	
+
 OPERON_COLOR_DICT = ["#ff4d4d", "#1a75ff", "#cc33ff", "#00cc00", "#ff9900", "#993333", "#000099", "#00b3b3", "#660033", "#00b386"]
 SELECTED_COLORS = set()
 NUMBER_OF_GENERATED_COLORS = 0
@@ -28,8 +30,9 @@ RANDOM_SEED = 5
 RANDOM_STATE = random.getstate()
 
 
-	
+
 INPUT_FILE = None
+TREE_FILE = None
 NOT_SHARED_DOMAIN_NUMBER_TOLERANCE = 0
 OPERON_TOLERANCE = 150
 OUTPUT_FILE = None
@@ -39,11 +42,12 @@ GENE_FIELDS = "id,stable_id,version,locus,strand,start,stop,length,pseudo,produc
 PFAM = "pfam31"
 
 GENE_TO_NEIGHBORS = dict()
+REGEX_NUMBER_UNDERSCORE = re.compile(r"\d+_")
 
 def initialize(argv):
-	global INPUT_FILE, NOT_SHARED_DOMAIN_NUMBER_TOLERANCE, OUTPUT_FILE, FIRST_COLOR_THRESHOLD, SECOND_COLOR_THRESHOLD, RANDOM_SEED, RANDOM_STATE
+	global INPUT_FILE, TREE_FILE, NOT_SHARED_DOMAIN_NUMBER_TOLERANCE, OUTPUT_FILE, FIRST_COLOR_THRESHOLD, SECOND_COLOR_THRESHOLD, RANDOM_SEED, RANDOM_STATE
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:n:f:s:r:o:",["help", "ifile=", "tolerance=", "first_color=", "second_color=", "random_seed=", "ofile="])
+		opts, args = getopt.getopt(argv[1:],"hi:t:n:f:s:r:o:",["help", "ifile=", "tree=", "tolerance=", "first_color=", "second_color=", "random_seed=", "ofile="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
@@ -58,6 +62,8 @@ def initialize(argv):
 				INPUT_FILE = str(arg).strip()
 			elif opt in ("-n", "--tolerance"):
 				NOT_SHARED_DOMAIN_NUMBER_TOLERANCE = str(arg).strip()
+			elif opt in ("-t", "--tree"):
+				TREE_FILE = str(arg).strip()
 			elif opt in ("-f", "--first_color"):
 				FIRST_COLOR_THRESHOLD = int(arg)
 			elif opt in ("-s", "--second_color"):
@@ -69,7 +75,7 @@ def initialize(argv):
 	except Exception as e:
 		print "===========ERROR==========\n " + str(e) + USAGE
 		sys.exit(2)
-	
+
 	random.seed(RANDOM_SEED)
 	RANDOM_STATE = random.getstate()
 
@@ -80,48 +86,68 @@ def findGene(geneNameOrId):
 	params = urllib.urlencode({'search': geneNameOrId, 'fields': GENE_FIELDS, 'fields.Aseq': PFAM})
 	result = urllib.urlopen(BASE_URL + "?%s" % params)
 	return json.loads(result.read())
-	
-def getGeneNeighborsAndPrepareDomains(geneStableIdList):
+
+def getGeneAndProcessGeneNeighbors(geneStableIdList):
 	duplicateCounter = 1
-	for gene in geneStableIdList:
-		mainGeneDict = findGene(gene)[0]
-		if mainGeneDict['Aseq'] and len(mainGeneDict['Aseq']['pfam31']) > 0:
-			mainGeneSortedDomains = sorted(mainGeneDict['Aseq']['pfam31'], key=lambda x: x['ali_from'], reverse=False)
-			mainGeneDomainsWithNoOverlaps, mainGeneDomainWithNoOverlapsNamesOnly = removeOverlapps(mainGeneSortedDomains)		
-			mainGeneDict['Aseq']['pfam31'] = mainGeneDomainsWithNoOverlaps
-			mainGeneDict['Aseq']['pfam31NamesOnly'] = mainGeneDomainWithNoOverlapsNamesOnly
-		params = urllib.urlencode({'fields': GENE_FIELDS, 'fields.Aseq': PFAM})
-		result = urllib.urlopen(BASE_URL + "/" + mainGeneDict["stable_id"] + "/neighbors?%s" % params)
-		genesList = json.loads(result.read())
-		
-		previousGene = None
-		wasStrandChanegd = False
-		middleGeneProcessed = False
-		operonCounter = 0
-		for eachGene in genesList:
-			if eachGene['Aseq'] and len(eachGene['Aseq']['pfam31']) > 0:
-				sortedDomains = sorted(eachGene['Aseq']['pfam31'], key=lambda x: x['ali_from'], reverse=False)
-				domainsWithNoOverlaps, domainWithNoOverlapsNamesOnly = removeOverlapps(sortedDomains)
-				eachGene['Aseq']['pfam31'] = domainsWithNoOverlaps
-				eachGene['Aseq']['pfam31NamesOnly'] = domainWithNoOverlapsNamesOnly
-			if int(eachGene["id"]) < int(mainGeneDict["id"]):
-				if previousGene:
-					operonCounter = identifyIfBelongToOperon(previousGene, eachGene, operonCounter)
-			else:
-				if not middleGeneProcessed:
-					operonCounter = identifyIfBelongToOperon(previousGene, mainGeneDict, operonCounter)
-					operonCounter = identifyIfBelongToOperon(mainGeneDict, eachGene, operonCounter)
-					middleGeneProcessed = True					
-				else:
-					operonCounter = identifyIfBelongToOperon(previousGene, eachGene, operonCounter)
-			previousGene = eachGene
-			 
-		genesList.append(mainGeneDict)
-		if mainGeneDict["stable_id"] not in GENE_TO_NEIGHBORS:
-			GENE_TO_NEIGHBORS[mainGeneDict["stable_id"]] = genesList
+	for geneIndex in xrange(len(geneStableIdList[0])):
+		gene = geneStableIdList[0][geneIndex]
+		mainGeneDict = findGene(gene)
+		print mainGeneDict
+		if mainGeneDict and len(mainGeneDict):
+			duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter)
 		else:
-			GENE_TO_NEIGHBORS[mainGeneDict["stable_id"] + "@" + str(duplicateCounter)] = genesList
-			duplicateCounter+=1 
+			gene = geneStableIdList[1][geneIndex]
+			mainGeneDict = findGene(gene)
+			print mainGeneDict
+			if mainGeneDict and len(mainGeneDict):
+				duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter)
+			else:
+				gene = geneStableIdList[2][geneIndex]
+				mainGeneDict = findGene(gene)
+				print mainGeneDict
+				if mainGeneDict and len(mainGeneDict):
+					duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter)
+
+def getGeneNeighborsAndPrepareDomains(mainGeneDict, duplicateCounter):
+	if mainGeneDict['Aseq'] and mainGeneDict['Aseq']['pfam31'] and len(mainGeneDict['Aseq']['pfam31']):
+		mainGeneSortedDomains = sorted(mainGeneDict['Aseq']['pfam31'], key=lambda x: x['ali_from'], reverse=False)
+		mainGeneDomainsWithNoOverlaps, mainGeneDomainWithNoOverlapsNamesOnly = removeOverlapps(mainGeneSortedDomains)
+		mainGeneDict['Aseq']['pfam31'] = mainGeneDomainsWithNoOverlaps
+		mainGeneDict['Aseq']['pfam31NamesOnly'] = mainGeneDomainWithNoOverlapsNamesOnly
+	params = urllib.urlencode({'fields': GENE_FIELDS, 'fields.Aseq': PFAM})
+	result = urllib.urlopen(BASE_URL + "/" + mainGeneDict["stable_id"] + "/neighbors?%s" % params)
+	genesList = json.loads(result.read())
+
+	previousGene = None
+	wasStrandChanegd = False
+	middleGeneProcessed = False
+	operonCounter = 0
+	for eachGene in genesList:
+		if eachGene['Aseq'] and eachGene['Aseq']['pfam31'] and len(eachGene['Aseq']['pfam31']):
+			sortedDomains = sorted(eachGene['Aseq']['pfam31'], key=lambda x: x['ali_from'], reverse=False)
+			domainsWithNoOverlaps, domainWithNoOverlapsNamesOnly = removeOverlapps(sortedDomains)
+			eachGene['Aseq']['pfam31'] = domainsWithNoOverlaps
+			eachGene['Aseq']['pfam31NamesOnly'] = domainWithNoOverlapsNamesOnly
+		if int(eachGene["id"]) < int(mainGeneDict["id"]):
+			if previousGene:
+				operonCounter = identifyIfBelongToOperon(previousGene, eachGene, operonCounter)
+		else:
+			if not middleGeneProcessed:
+				operonCounter = identifyIfBelongToOperon(previousGene, mainGeneDict, operonCounter)
+				operonCounter = identifyIfBelongToOperon(mainGeneDict, eachGene, operonCounter)
+				middleGeneProcessed = True
+			else:
+				operonCounter = identifyIfBelongToOperon(previousGene, eachGene, operonCounter)
+		previousGene = eachGene
+
+	genesList.append(mainGeneDict)
+	if mainGeneDict["stable_id"] not in GENE_TO_NEIGHBORS:
+		GENE_TO_NEIGHBORS[mainGeneDict["stable_id"]] = genesList
+	else:
+		GENE_TO_NEIGHBORS[mainGeneDict["stable_id"] + "@" + str(duplicateCounter)] = genesList
+		duplicateCounter+=1
+
+	return duplicateCounter
 
 def identifyIfBelongToOperon(previousGene, currentGene, operonCounter):
 	if previousGene["strand"] == currentGene["strand"]:
@@ -142,7 +168,7 @@ def identifyIfBelongToOperon(previousGene, currentGene, operonCounter):
 def clusterGenesBasedOnSharedDomains():
 	gene1ClusterId = None
 	mainGene1ClusterId = 0
-	gene1ClusterColor = None 
+	gene1ClusterColor = None
 	for mainGene1StableId, allNeighborGenes1 in GENE_TO_NEIGHBORS.items():
 		mainGene1ClusterId+=1
 		for gene1Index in xrange(len(allNeighborGenes1)):
@@ -172,8 +198,8 @@ def clusterGenesBasedOnSharedDomains():
 									gene2['clusterId'] = gene1ClusterId
 									gene1['clusterColor'] = gene1ClusterColor
 									gene2['clusterColor'] = gene1ClusterColor
-																	
-									
+
+
 				for mainGene2StableId, allNeighborGenes2 in GENE_TO_NEIGHBORS.items():
 					if mainGene1StableId != mainGene2StableId:
 						for gene3 in allNeighborGenes2:
@@ -193,9 +219,9 @@ def clusterGenesBasedOnSharedDomains():
 											gene3['clusterId'] = gene1ClusterId
 											gene1['clusterColor'] = gene1ClusterColor
 											gene3['clusterColor'] = gene1ClusterColor
-								
+
 def removeOverlapps(domainsSorted):
-	if (len(domainsSorted)) > 0:			
+	if (len(domainsSorted)) > 0:
 		tolerance = 10
 		pfam31Final = []
 		pfam31FinalNamesOnly = list()
@@ -209,9 +235,9 @@ def removeOverlapps(domainsSorted):
 			if pfam1['ali_to'] > pfam2['ali_from']:
 				overlapLength = pfam1['ali_to'] - pfam2['ali_from']
 				if overlapLength > tolerance:
-					significantPfam = compareEvalues(pfam1, pfam2)  
+					significantPfam = compareEvalues(pfam1, pfam2)
 					# if the previously added is pfam1 and it's less significant than pfam 2
-					# then remove this previously added and add pfam 2 
+					# then remove this previously added and add pfam 2
 					if lastAdded == pfam1 and lastAdded != significantPfam:
 						pfam31Final.remove(lastAdded)
 						pfam31Final.append(significantPfam)
@@ -230,8 +256,8 @@ def removeOverlapps(domainsSorted):
 				lastAdded = pfam2
 				significantPfam = pfam2
 				pfam1 = significantPfam
-		return (pfam31Final, pfam31FinalNamesOnly)	
-	return (None, None)			
+		return (pfam31Final, pfam31FinalNamesOnly)
+	return (None, None)
 
 def compareEvalues(pfam1, pfam2):
 	eval1 = pfam1['i_evalue']
@@ -253,14 +279,14 @@ def getNumberOfMaxDomains(gene, numberOfDomainsInGene1):
 	if numberOfDomainsInGene1 < numberOfDomainsInThisGene:
 		return numberOfDomainsInThisGene
 	return numberOfDomainsInGene1
-	
+
 #get next predictabel color (random seed was set at the beginnig of the file)
 def getNextColour():
 	global NUMBER_OF_GENERATED_COLORS
 	global RANDOM_STATE
 	random.setstate(RANDOM_STATE)
 	h = random.random()
-	
+
 	if NUMBER_OF_GENERATED_COLORS <= FIRST_COLOR_THRESHOLD:
 		s = 0.5
 		v = 0.95
@@ -270,18 +296,18 @@ def getNextColour():
 	else:
 		s = random.random()
 		v = random.random()
-		
+
 	NUMBER_OF_GENERATED_COLORS+=1
 	newColor = hsv_to_rgb(h, s, v)
 	print newColor
 	while newColor in SELECTED_COLORS:
 		newColor = hsv_to_rgb(h, s, v)
 	SELECTED_COLORS.add(newColor)
-	
-	RANDOM_STATE = random.getstate()	
+
+	RANDOM_STATE = random.getstate()
 	return newColor
 
-#convert hsv to rgb	
+#convert hsv to rgb
 def hsv_to_rgb(h, s, v):
 	# use golden ratio
 	golden_ratio_conjugate = 0.618033988749895
@@ -305,24 +331,40 @@ def hsv_to_rgb(h, s, v):
 	elif h_i == 5:
 		r, g, b = v, p, q
 	return "rgb" + str((int(r*256), int(g*256), int(b*256)))
-  
+
+
+def readTreeAndStartProcess():
+	proteinIds1 = []
+	proteinIds2 = []
+	proteinIds3 = []
+	proteinIdsAll = []
+	with open(TREE_FILE, "r") as inputFile:
+		treeObject = Tree(inputFile.read())
+
+	terminals = treeObject.get_leaves()
+	for protein in terminals:
+		protein = protein.name.strip("'")
+		fullProteinName = REGEX_NUMBER_UNDERSCORE.sub("", protein, 1)
+		poteinName = "_".join(fullProteinName.split("_")[0:3]).strip()
+		proteinIds1.append(poteinName)
+		poteinName = "_".join(fullProteinName.split("_")[0:2]).strip()
+		proteinIds2.append(poteinName)
+ 		poteinName = fullProteinName.split("_")[0].strip()
+		proteinIds3.append(poteinName)
+	getGeneAndProcessGeneNeighbors([proteinIds1, proteinIds2, proteinIds3])
+
+
 def main(argv):
 	initialize(argv)
-	listOfIds = []
-	with open(INPUT_FILE, "r") as inputFile:
-		for line in inputFile:
-			listOfIds.append(line.strip())
-	getGeneNeighborsAndPrepareDomains(listOfIds)
+	#listOfIds = []
+	#~ with open(INPUT_FILE, "r") as inputFile:
+		#~ for line in inputFile:
+			#~ listOfIds.append(line.strip())
+	readTreeAndStartProcess()
 	clusterGenesBasedOnSharedDomains()
 	with open(OUTPUT_FILE, "w") as outputFile:
 		json.dump(GENE_TO_NEIGHBORS, outputFile, default=lambda o: o.__dict__, sort_keys=True, indent=4)
-		
+
 
 if __name__ == "__main__":
 	main(sys.argv)
-	
-	
-	
-	
-	
-	
