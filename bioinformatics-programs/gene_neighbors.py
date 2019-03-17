@@ -10,14 +10,15 @@ from ete2 import Tree
 USAGE = "\n\nThe script cluster genes in gene neighborhoods json file based on the shared domains.\n\n" + \
 	"It also determines operons. \n\n" + \
 	"python 	" + sys.argv[0] + '''
-	-h || --help           - help
-	-i || --ifile          - input file with sequences
-	-t || --tree           - input file with phylogenetic tree in newick format
- 	[-n || --tolerance]    - NOT_SHARED_DOMAIN_NUMBER_TOLERANCE parameter
-	[-f || --first_color]  - first color threshold; default is 100
-	[-s || --second_color] - first color threshold; default is 1000
-	[-r || --random_seed]  - random color generator seed
-	-o || --ofile          - output file with sequences with changed names
+	-h || --help               - help
+	-i || --itree              - input file with phylogenetic tree in newick format
+	-s || --ilist              - input file with a list of ids
+ 	[-n || --tolerance]        - NOT_SHARED_DOMAIN_NUMBER_TOLERANCE parameter
+	[-f || --first_color]      - first color threshold; default is 100
+	[-s || --second_color]     - first color threshold; default is 1000
+	[-r || --random_seed]      - random color generator seed
+	[-p || --operon_tolerance] - allowed distance between genes in operons, default is 150
+	-o || --ofile              - output file with sequences with changed names
 	'''
 
 OPERON_COLOR_DICT = ["#ff4d4d", "#1a75ff", "#cc33ff", "#00cc00", "#ff9900", "#993333", "#000099", "#00b3b3", "#660033", "#00b386"]
@@ -26,7 +27,7 @@ NUMBER_OF_GENERATED_COLORS = 0
 FIRST_COLOR_THRESHOLD = 100
 SECOND_COLOR_THRESHOLD = 1000
 #random seed for color generation
-RANDOM_SEED = 5
+RANDOM_SEED = 3
 RANDOM_STATE = random.getstate()
 
 
@@ -45,9 +46,9 @@ GENE_TO_NEIGHBORS = dict()
 REGEX_NUMBER_UNDERSCORE = re.compile(r"\d+_")
 
 def initialize(argv):
-	global INPUT_FILE, TREE_FILE, NOT_SHARED_DOMAIN_NUMBER_TOLERANCE, OUTPUT_FILE, FIRST_COLOR_THRESHOLD, SECOND_COLOR_THRESHOLD, RANDOM_SEED, RANDOM_STATE
+	global INPUT_FILE, TREE_FILE, NOT_SHARED_DOMAIN_NUMBER_TOLERANCE, OPERON_TOLERANCE, OUTPUT_FILE, FIRST_COLOR_THRESHOLD, SECOND_COLOR_THRESHOLD, RANDOM_SEED, RANDOM_STATE
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:t:n:f:s:r:o:",["help", "ifile=", "tree=", "tolerance=", "first_color=", "second_color=", "random_seed=", "ofile="])
+		opts, args = getopt.getopt(argv[1:],"hi:s:n:f:s:r:p:o:",["help", "itree=", "ilist=", "tolerance=", "first_color=", "second_color=", "random_seed=", "operon_tolerance=", "ofile="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
@@ -58,18 +59,20 @@ def initialize(argv):
 			if opt in ("-h", "--help"):
 				print USAGE
 				sys.exit()
-			elif opt in ("-i", "--ifile"):
-				INPUT_FILE = str(arg).strip()
+			elif opt in ("-i", "--itree"):
+				TREE_FILE = str(arg).strip()
 			elif opt in ("-n", "--tolerance"):
 				NOT_SHARED_DOMAIN_NUMBER_TOLERANCE = str(arg).strip()
-			elif opt in ("-t", "--tree"):
-				TREE_FILE = str(arg).strip()
+			elif opt in ("-s", "--ilist"):
+				INPUT_FILE = str(arg).strip()
 			elif opt in ("-f", "--first_color"):
 				FIRST_COLOR_THRESHOLD = int(arg)
 			elif opt in ("-s", "--second_color"):
 				SECOND_COLOR_THRESHOLD = int(arg)
 			elif opt in ("-r", "--random_seed"):
 				RANDOM_SEED = int(arg)
+			elif opt in ("-p", "--operon_tolerance"):
+				OPERON_TOLERANCE = int(arg)
 			elif opt in ("-o", "--ofile"):
 				OUTPUT_FILE = str(arg).strip()
 	except Exception as e:
@@ -92,23 +95,23 @@ def getGeneAndProcessGeneNeighbors(geneStableIdList):
 	for geneIndex in xrange(len(geneStableIdList[0])):
 		gene = geneStableIdList[0][geneIndex]
 		mainGeneDict = findGene(gene)
-		print mainGeneDict
+		fullProteinName = geneStableIdList[3][geneIndex]
 		if mainGeneDict and len(mainGeneDict):
-			duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter)
+			duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter, fullProteinName)
 		else:
 			gene = geneStableIdList[1][geneIndex]
 			mainGeneDict = findGene(gene)
 			print mainGeneDict
 			if mainGeneDict and len(mainGeneDict):
-				duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter)
+				duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter, fullProteinName)
 			else:
 				gene = geneStableIdList[2][geneIndex]
 				mainGeneDict = findGene(gene)
 				print mainGeneDict
 				if mainGeneDict and len(mainGeneDict):
-					duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter)
+					duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter, fullProteinName)
 
-def getGeneNeighborsAndPrepareDomains(mainGeneDict, duplicateCounter):
+def getGeneNeighborsAndPrepareDomains(mainGeneDict, duplicateCounter, fullProteinName):
 	if mainGeneDict['Aseq'] and mainGeneDict['Aseq']['pfam31'] and len(mainGeneDict['Aseq']['pfam31']):
 		mainGeneSortedDomains = sorted(mainGeneDict['Aseq']['pfam31'], key=lambda x: x['ali_from'], reverse=False)
 		mainGeneDomainsWithNoOverlaps, mainGeneDomainWithNoOverlapsNamesOnly = removeOverlapps(mainGeneSortedDomains)
@@ -142,9 +145,9 @@ def getGeneNeighborsAndPrepareDomains(mainGeneDict, duplicateCounter):
 
 	genesList.append(mainGeneDict)
 	if mainGeneDict["stable_id"] not in GENE_TO_NEIGHBORS:
-		GENE_TO_NEIGHBORS[mainGeneDict["stable_id"]] = genesList
+		GENE_TO_NEIGHBORS[fullProteinName] = genesList
 	else:
-		GENE_TO_NEIGHBORS[mainGeneDict["stable_id"] + "@" + str(duplicateCounter)] = genesList
+		GENE_TO_NEIGHBORS[fullProteinName + "@" + str(duplicateCounter)] = genesList
 		duplicateCounter+=1
 
 	return duplicateCounter
@@ -288,7 +291,7 @@ def getNextColour():
 	h = random.random()
 
 	if NUMBER_OF_GENERATED_COLORS <= FIRST_COLOR_THRESHOLD:
-		s = 0.5
+		s = random.random()
 		v = 0.95
 	elif NUMBER_OF_GENERATED_COLORS > FIRST_COLOR_THRESHOLD and NUMBER_OF_GENERATED_COLORS <= SECOND_COLOR_THRESHOLD:
 		s = random.random()
@@ -337,21 +340,23 @@ def readTreeAndStartProcess():
 	proteinIds1 = []
 	proteinIds2 = []
 	proteinIds3 = []
+	originalNames = []
 	proteinIdsAll = []
 	with open(TREE_FILE, "r") as inputFile:
 		treeObject = Tree(inputFile.read())
 
 	terminals = treeObject.get_leaves()
 	for protein in terminals:
-		protein = protein.name.strip("'")
-		fullProteinName = REGEX_NUMBER_UNDERSCORE.sub("", protein, 1)
-		poteinName = "_".join(fullProteinName.split("_")[0:3]).strip()
-		proteinIds1.append(poteinName)
-		poteinName = "_".join(fullProteinName.split("_")[0:2]).strip()
-		proteinIds2.append(poteinName)
- 		poteinName = fullProteinName.split("_")[0].strip()
-		proteinIds3.append(poteinName)
-	getGeneAndProcessGeneNeighbors([proteinIds1, proteinIds2, proteinIds3])
+		originalProteinName = protein.name.strip("'")
+		fullProteinName = REGEX_NUMBER_UNDERSCORE.sub("", originalProteinName, 1)
+		partProteinName = "_".join(fullProteinName.split("_")[0:3]).strip()
+		proteinIds1.append(partProteinName)
+		partProteinName = "_".join(fullProteinName.split("_")[0:2]).strip()
+		proteinIds2.append(partProteinName)
+ 		partProteinName = fullProteinName.split("_")[0].strip()
+		proteinIds3.append(partProteinName)
+		originalNames.append(originalProteinName)
+	getGeneAndProcessGeneNeighbors([proteinIds1, proteinIds2, proteinIds3, originalNames])
 
 
 def main(argv):

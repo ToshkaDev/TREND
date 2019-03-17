@@ -31,6 +31,9 @@ public class ProtoTreeInternal {
     private String probability;
     private String lcrPrediction;
 
+    private String domainTolerance;
+    private String operonTolerance;
+
     private String  commandToBeProcessedBy;
     private String isFullPipeline;
     private String protoTreeCookies;
@@ -39,6 +42,7 @@ public class ProtoTreeInternal {
 
     private List<String> fieldsForAlignmentAndTreeBuild = new LinkedList<>();
     private List<String> fieldsForFeaturesPrediction = new LinkedList<>();
+    private List<String> fieldsForGeneNeighbors = new LinkedList<>();
 
     public int getJobId() {
         return jobId;
@@ -247,6 +251,9 @@ public class ProtoTreeInternal {
             fieldsForFeaturesPrediction.add(getLcrPrediction());
         }
         fieldsForFeaturesPrediction.add(getDomainPredictionProgram());
+
+        fieldsForGeneNeighbors.add(getDomainTolerance());
+        fieldsForGeneNeighbors.add(getOperonTolerance());
     }
 
     public List<String> getFieldsForAlignmentAndTreeBuild() {
@@ -255,6 +262,10 @@ public class ProtoTreeInternal {
 
     public List<String> getFieldsForFeaturesPrediction() {
         return fieldsForFeaturesPrediction;
+    }
+
+    public List<String> getFieldsForGeneNeighbors() {
+        return fieldsForGeneNeighbors;
     }
 
     public String isFullPipeline() {
@@ -271,5 +282,21 @@ public class ProtoTreeInternal {
 
     public void setProtoTreeCookies(String protoTreeCookies) {
         this.protoTreeCookies = protoTreeCookies;
+    }
+
+    public String getDomainTolerance() {
+        return domainTolerance;
+    }
+
+    public void setDomainTolerance(String domainTolerance) {
+        this.domainTolerance = domainTolerance;
+    }
+
+    public String getOperonTolerance() {
+        return operonTolerance;
+    }
+
+    public void setOperonTolerance(String operonTolerance) {
+        this.operonTolerance = operonTolerance;
     }
 }

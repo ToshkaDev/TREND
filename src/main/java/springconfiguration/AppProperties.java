@@ -18,6 +18,7 @@ public class AppProperties {
     private String alignAndBuildTree = bioProgramsDir + "/alignAndCunstructTree.py";
     private String addProtFeaturesToTree = bioProgramsDir + "/orderSequencesBasedOnTree_andAddDomains.py";
     private String enumerate = bioProgramsDir + "/orderSequencesBasedOnTree.py";
+    private String geneNeighbors = bioProgramsDir + "/gene_neighbors.py";
 
     public String getProtoTreeProgram() {
         return getAddProtFeaturesToTree();
@@ -157,6 +158,14 @@ public class AppProperties {
 
     public void setEnumerate(String enumerate) {
         this.enumerate = enumerate;
+    }
+
+    public String getGeneNeighbors() {
+        return geneNeighbors;
+    }
+
+    public void setGeneNeighbors(String geneNeighbors) {
+        this.geneNeighbors = geneNeighbors;
     }
 
     public String getHmmscanDbPath() {

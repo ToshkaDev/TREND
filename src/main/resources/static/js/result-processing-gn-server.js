@@ -44,20 +44,25 @@ function processRetrievedDataAsync(data) {
 
         if (data.result.length >= 1) {
             // Add corresponding links to download buttons
-            if (data.result.length == 2)
-                $('#alignment-load').attr('href', data.result[1]);
+            if (data.result.length == 3)
+                $('#alignment-load').attr('href', data.result[2]);
             else
                 $('#alignment-load').hide();
             $('#tree-load').attr('href', data.result[0]);
+            $('#json-load').attr('href', data.result[1]);
             var newickTree = data.result[0];
+            var jsonDomainsAndGenes = data.result[1];
             $.get(newickTree, function(data, status) {
                 nwkObject = {newick: data};
-                if (!buildGeneTree(nwkObject)) {
-                    $('.malformed-newick').show();
-                } else {
-                     $('.result-container').show();
-                     onDownload();
-                }
+                $.get(jsonDomainsAndGenes, function(data, status) {
+                    jsonDomainsAndGenesData = data
+                    if (!buildGeneTree(nwkObject, jsonDomainsAndGenesData)) {
+                        $('.malformed-newick').show();
+                    } else {
+                        $('.result-container').show();
+                        onDownload();
+                    }
+                });
             });
         }
 

@@ -25,6 +25,9 @@ public class ProtoTreeRequest {
     private String probability;
     private String lcrPrediction;
 
+    private String domainTolerance;
+    private String operonTolerance;
+
     private String commandToBeProcessedBy;
     private String isFullPipeline;
     private String protoTreeCookies;
@@ -215,6 +218,22 @@ public class ProtoTreeRequest {
 
     public void setProtoTreeCookies(String protoTreeCookies) {
         this.protoTreeCookies = protoTreeCookies;
+    }
+
+    public String getDomainTolerance() {
+        return domainTolerance;
+    }
+
+    public void setDomainTolerance(String domainTolerance) {
+        this.domainTolerance = domainTolerance;
+    }
+
+    public String getOperonTolerance() {
+        return operonTolerance;
+    }
+
+    public void setOperonTolerance(String operonTolerance) {
+        this.operonTolerance = operonTolerance;
     }
 }
 

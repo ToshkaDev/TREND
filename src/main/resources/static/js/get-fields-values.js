@@ -30,9 +30,14 @@ function getOptions() {
 
     var lcrPrediction = $("#lc-value").attr("checked");
 
+    var operonTolerance = $('#operon-tolerance').val();
+    var domainTolerance = $('#domain-tolerance').val();
+
     var protoTreeCookies = setOrGetCookies();
 
     var optionToOptionName = {
+        "operonTolerance": operonTolerance,
+        "domainTolerance": domainTolerance,
         "protoTreeCookies": protoTreeCookies,
         "isFullPipeline": isFullPipeline,
         "firstFile": firstFile,

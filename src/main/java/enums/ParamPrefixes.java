@@ -8,10 +8,12 @@ public enum  ParamPrefixes {
     OUTPUT("-o "),
     EVAL_THRESH("-e "),
 
+    //alignment specific parameters
     ALGORITHM("-a "),
     THREAD_ALGN("-t "),
-
     MAFFT_PATH("-f "),
+
+    //tree building specific parameters
     MEGACC_PATH("-k "),
     THREAD("-u "),
     TREE_BUILD_METHOD("-m "),
@@ -22,12 +24,12 @@ public enum  ParamPrefixes {
     SITE_COV_CUTOFF("-c "),
     PHYLOGENY_TEST("-p "),
     NUMBER_OF_REPLICATES("-b "),
-    DOMAINS_PREDICTION_PROGRAM("-p "),
-    DOMAINS_PREDICTION_DB("-D "),
     OUTPUT_PARAMS("-x "),
     OUTPUT_TREE("-z "),
 
     //protein features prediction specific parameters
+    DOMAINS_PREDICTION_PROGRAM("-p "),
+    DOMAINS_PREDICTION_DB("-D "),
     OUTPUT_SECOND("-n "),
     OUTPUT_THIRD("-b "),
     OUTPUT_FOURTH("-r "),
@@ -44,7 +46,11 @@ public enum  ParamPrefixes {
     RPSBPROC_PATH("-P "),
     TMHMM_PATH("-T "),
     SEGMASKER_PATH("-S "),
-    RUN_SEGMASKER("-E ");
+    RUN_SEGMASKER("-E "),
+
+    //gene_neighbors.py specific parameters
+    NOT_SHARED_DOMAIN_TOLERANCE("-n "),
+    OPERON_TOLERANCE("-p ");
 
     private String paramPrefix;
 

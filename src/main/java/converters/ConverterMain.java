@@ -35,6 +35,9 @@ public class ConverterMain {
 		protoTreeInternal.seteValue(checkEvalueAndGet(ParamPrefixes.EVAL_THRESH.getPrefix(), protoTreeRequest.geteValue()));
 		protoTreeInternal.setProbability(checkProbabilityAndGet(ParamPrefixes.PROBABILITY.getPrefix(), protoTreeRequest.getProbability()));
 		protoTreeInternal.setLcrPrediction(checkLcrPredictionAndGet(ParamPrefixes.RUN_SEGMASKER.getPrefix(), protoTreeRequest.getLcrPrediction()));
+
+		protoTreeInternal.setDomainTolerance(checkForNullAndGet(ParamPrefixes.NOT_SHARED_DOMAIN_TOLERANCE.getPrefix(), protoTreeRequest.getDomainTolerance()));
+		protoTreeInternal.setOperonTolerance(checkForNullAndGet(ParamPrefixes.OPERON_TOLERANCE.getPrefix(), protoTreeRequest.getOperonTolerance()));
 		protoTreeInternal.setFullPipeline(protoTreeRequest.isFullPipeline());
 		protoTreeInternal.setProtoTreeCookies(protoTreeRequest.getProtoTreeCookies());
 		return protoTreeInternal;

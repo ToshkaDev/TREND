@@ -138,6 +138,15 @@
                             <span>Number of replicates:</span>
                             <input value="100" id="number-of-replicates" name="number-of-replicates" type="text" class="form-control input-md"/>
                         </div>
+                        <h4 class="text-info">Gene neighbors processing:</h4>
+                        <div class="operon-tolerance">
+                            <span>Operon tolerance:</span>
+                            <input type="number" min="0" max="500" step="10" value="150" id="operon-tolerance" name="operon-tolerance" class="form-control input-md"/>
+                        </div>
+                        <div class="domain-tolerance">
+                            <span>Domain tolerance:</span>
+                            <input type="number" min="0" max="3" step="1" value="0" id="domain-tolerance" name="operon-tolerance" class="form-control input-md"/>
+                        </div>
                     </form>
                     <button id="filter-clear" class="btn btn-primary btn-md pull-right proto-tree-button" type="button">
                         <span>RESET</span>
@@ -178,6 +187,9 @@
                 <div class="secondary-buttons">
                     <a id="tree-load" class="btn btn-info btn-md proto-tree-button" href="#">
                         Download Tree (Newick) <span class="glyphicon glyphicon-download-alt"> </span>
+                    </a>
+                    <a id="json-load" class="btn btn-info btn-md proto-tree-button" href="#">
+                        Download Alignment <span class="glyphicon glyphicon-download-alt"> </span>
                     </a>
                     <a id="alignment-load" class="btn btn-info btn-md proto-tree-button" href="#">
                         Download Alignment <span class="glyphicon glyphicon-download-alt"> </span>

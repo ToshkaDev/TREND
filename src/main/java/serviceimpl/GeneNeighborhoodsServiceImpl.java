@@ -23,9 +23,12 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
 
     public GeneNeighborhoodsServiceImpl(final StorageService storageService, final AppProperties properties, final BioJobDao bioJobDao, final BioJobResultDao bioJobResultDao) {
         super(storageService, properties, bioJobResultDao, bioJobDao);
-        counterToStageOneInputPartial.put(0, "['Processing input.-last']");
+        counterToStageOneInputPartial.put(0, "['Processing input.']");
+        counterToStageOneInputPartial.put(1, "['Processing input.', 'Identifying operons and clustering genes.-last']");
         counterToStageOneInputFull.put(0, "['Processing input.']");
-        counterToStageOneInputFull.put(1, "['Processing input.', 'Aligning sequences and building phylogenetic tree.-last']");
+        counterToStageOneInputFull.put(1, "['Processing input.', 'Aligning sequences and building phylogenetic tree.']");
+        counterToStageOneInputFull.put(2, "['Processing input.', 'Aligning sequences and building phylogenetic tree.'," +
+                "'Identifying operons and clustering genes.-last']");
     }
 
     @Override
@@ -33,7 +36,7 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
         System.out.println("========================");
         System.out.println(protoTreeRequest.isFullPipeline());
         if (protoTreeRequest.isFullPipeline().equals("false"))
-            return prepareNewick(protoTreeRequest);
+            return pipelineProcessingPartial(protoTreeRequest);
         else
             return pipelineProcessing(protoTreeRequest);
     }
@@ -43,17 +46,28 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
         return super.getBioJobDao().findByJobId(jobId);
     }
 
-    private ProtoTreeInternal prepareNewick(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
+    private ProtoTreeInternal pipelineProcessingPartial(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
         ProtoTreeInternal protoTreeInternal = storeFileAndGetInternalRepresentation(protoTreeRequest);
         List<String> listOfPrograms = new LinkedList<>();
         List<List<String>> listOfArgumentLists = new LinkedList<>();
         List<String> argsForPrepareNames = new LinkedList<>();
+        List<String> argsForGeneNeighbors = new LinkedList<>();
 
-        String preparedFile = initArgsForPrepareNames(protoTreeInternal, argsForPrepareNames, listOfPrograms, listOfArgumentLists);
-        protoTreeInternal.setOutputFilesNames(Arrays.asList(preparedFile));
+        String outNewickFile = initArgsForPrepareNames(protoTreeInternal, argsForPrepareNames, listOfPrograms, listOfArgumentLists);
+        protoTreeInternal.setFields();
+        String outJsonFile = super.getRandomFileName(".json");
+        argsForGeneNeighbors.addAll(protoTreeInternal.getFieldsForGeneNeighbors());
+        argsForGeneNeighbors.addAll(Arrays.asList(
+                ParamPrefixes.INPUT.getPrefix() + outNewickFile,
+                ParamPrefixes.OUTPUT.getPrefix() + outJsonFile
+        ));
 
+        protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outJsonFile));
+
+        listOfPrograms.add(super.getProperties().getGeneNeighbors());
         String[] arrayOfInterpreters = super.prepareInterpreters(listOfPrograms.size());
         String[] arrayOfPrograms = listOfPrograms.toArray(new String[listOfPrograms.size()]);
+        listOfArgumentLists.add(argsForGeneNeighbors);
         super.prepareCommandArgumentsCommon(protoTreeInternal, arrayOfInterpreters, arrayOfPrograms, listOfArgumentLists);
 
         return protoTreeInternal;
@@ -67,6 +81,7 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
         List<String> argsForPrepareNames = new LinkedList<>();
         List<String> argsForAlignmentAndTree = new LinkedList<>();
         List<String> argsForTreeEnumerate = new LinkedList<>();
+        List<String> argsForGeneNeighbors = new LinkedList<>();
 
         initArgsForPrepareNames(protoTreeInternal, argsForPrepareNames, listOfPrograms, listOfArgumentLists);
 
@@ -102,11 +117,19 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
                 ParamPrefixes.OUTPUT_THIRD.getPrefix() + outNewickFile
         ));
 
-        protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outOrderedAlgnFile));
+        String outJsonFile = super.getRandomFileName(".json");
+        argsForGeneNeighbors.addAll(protoTreeInternal.getFieldsForGeneNeighbors());
+        argsForGeneNeighbors.addAll(Arrays.asList(
+                ParamPrefixes.INPUT.getPrefix() + outNewickFile,
+                ParamPrefixes.OUTPUT.getPrefix() + outJsonFile
+        ));
+
+        protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outJsonFile, outOrderedAlgnFile));
 
         listOfPrograms.addAll(Arrays.asList(
                 super.getProperties().getAlignAndBuildTree(),
-                super.getProperties().getEnumerate()
+                super.getProperties().getEnumerate(),
+                super.getProperties().getGeneNeighbors()
         ));
 
         String[] arrayOfInterpreters = super.prepareInterpreters(listOfPrograms.size());
@@ -114,7 +137,8 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
 
         listOfArgumentLists.addAll(Arrays.asList(
                 argsForAlignmentAndTree,
-                argsForTreeEnumerate
+                argsForTreeEnumerate,
+                argsForGeneNeighbors
         ));
 
         super.prepareCommandArgumentsCommon(protoTreeInternal, arrayOfInterpreters, arrayOfPrograms, listOfArgumentLists);
