@@ -238,8 +238,8 @@ public class BioUniverseServiceImpl implements BioUniverseService {
             System.out.println(processBuilder.command());
 
             Process process = processBuilder.start();
-            //BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            BufferedReader br = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            //BufferedReader br = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             String line;
             boolean errorHappened = false;
             while ((line = br.readLine()) != null) {

@@ -101,13 +101,11 @@ def getGeneAndProcessGeneNeighbors(geneStableIdList):
 		else:
 			gene = geneStableIdList[1][geneIndex]
 			mainGeneDict = findGene(gene)
-			print mainGeneDict
 			if mainGeneDict and len(mainGeneDict):
 				duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter, fullProteinName)
 			else:
 				gene = geneStableIdList[2][geneIndex]
 				mainGeneDict = findGene(gene)
-				print mainGeneDict
 				if mainGeneDict and len(mainGeneDict):
 					duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter, fullProteinName)
 
@@ -153,19 +151,20 @@ def getGeneNeighborsAndPrepareDomains(mainGeneDict, duplicateCounter, fullProtei
 	return duplicateCounter
 
 def identifyIfBelongToOperon(previousGene, currentGene, operonCounter):
-	if previousGene["strand"] == currentGene["strand"]:
-		distance = currentGene["start"] - previousGene["stop"]
-		if distance > 0:
-			if distance <= OPERON_TOLERANCE:
-				previousGene["operon"] = OPERON_COLOR_DICT[operonCounter]
-				currentGene["operon"] = OPERON_COLOR_DICT[operonCounter]
-			else:
-				operonCounter+=1
+	if previousGene and currentGene:
+		if previousGene["strand"] == currentGene["strand"]:
+		    distance = currentGene["start"] - previousGene["stop"]
+		    if distance > 0:
+		        if distance <= OPERON_TOLERANCE:
+		            previousGene["operon"] = OPERON_COLOR_DICT[operonCounter]
+		            currentGene["operon"] = OPERON_COLOR_DICT[operonCounter]
+		        else:
+		            operonCounter+=1
+		    else:
+		        previousGene["operon"] = OPERON_COLOR_DICT[operonCounter]
+		        currentGene["operon"] = OPERON_COLOR_DICT[operonCounter]
 		else:
-			previousGene["operon"] = OPERON_COLOR_DICT[operonCounter]
-			currentGene["operon"] = OPERON_COLOR_DICT[operonCounter]
-	else:
-		operonCounter+=1
+		    operonCounter+=1
 	return operonCounter
 
 def clusterGenesBasedOnSharedDomains():
