@@ -43,7 +43,7 @@ GENE_FIELDS = "id,stable_id,version,locus,strand,start,stop,length,pseudo,produc
 PFAM = "pfam31"
 
 GENE_TO_NEIGHBORS = dict()
-REGEX_NUMBER_UNDERSCORE = re.compile(r"\d+_")
+REGEX_NUMBER_UNDERSCORE = re.compile(r"^\d+_")
 
 def initialize(argv):
 	global INPUT_FILE, TREE_FILE, NOT_SHARED_DOMAIN_NUMBER_TOLERANCE, OPERON_TOLERANCE, OUTPUT_FILE, FIRST_COLOR_THRESHOLD, SECOND_COLOR_THRESHOLD, RANDOM_SEED, RANDOM_STATE
@@ -347,7 +347,7 @@ def readTreeAndStartProcess():
 	terminals = treeObject.get_leaves()
 	for protein in terminals:
 		originalProteinName = protein.name.strip("'")
-		fullProteinName = REGEX_NUMBER_UNDERSCORE.sub("", originalProteinName, 1)
+		fullProteinName = REGEX_NUMBER_UNDERSCORE.sub("", originalProteinName)
 		partProteinName = "_".join(fullProteinName.split("_")[0:3]).strip()
 		proteinIds1.append(partProteinName)
 		partProteinName = "_".join(fullProteinName.split("_")[0:2]).strip()

@@ -30,6 +30,7 @@ public class ProtoTreeInternal {
 	private String eValue;
     private String probability;
     private String lcrPrediction;
+    private String enumerate;
 
     private String domainTolerance;
     private String operonTolerance;
@@ -43,6 +44,7 @@ public class ProtoTreeInternal {
     private List<String> fieldsForAlignmentAndTreeBuild = new LinkedList<>();
     private List<String> fieldsForFeaturesPrediction = new LinkedList<>();
     private List<String> fieldsForGeneNeighbors = new LinkedList<>();
+    private List<String> fieldsForTreeAndDomains = new LinkedList<>();
 
     public int getJobId() {
         return jobId;
@@ -229,10 +231,8 @@ public class ProtoTreeInternal {
     }
 
     public void setFields() {
-        String reorderOrNot = getReorderOrNot();
-        String lcrPrediction = getLcrPrediction();
-        if (reorderOrNot != null) {
-            fieldsForAlignmentAndTreeBuild.add(reorderOrNot);
+        if (getReorderOrNot() != null) {
+            fieldsForAlignmentAndTreeBuild.add(getReorderOrNot());
         }
         fieldsForAlignmentAndTreeBuild.add(getFirstFileName());
         fieldsForAlignmentAndTreeBuild.add(getAlignmentAlg());
@@ -247,13 +247,17 @@ public class ProtoTreeInternal {
 
         fieldsForFeaturesPrediction.add(geteValue());
         fieldsForFeaturesPrediction.add(getProbability());
-        if (lcrPrediction != null) {
+        if (getLcrPrediction() != null) {
             fieldsForFeaturesPrediction.add(getLcrPrediction());
         }
         fieldsForFeaturesPrediction.add(getDomainPredictionProgram());
 
         fieldsForGeneNeighbors.add(getDomainTolerance());
         fieldsForGeneNeighbors.add(getOperonTolerance());
+
+        if (getEnumerate() != null) {
+            fieldsForTreeAndDomains.add(getEnumerate());
+        }
     }
 
     public List<String> getFieldsForAlignmentAndTreeBuild() {
@@ -266,6 +270,10 @@ public class ProtoTreeInternal {
 
     public List<String> getFieldsForGeneNeighbors() {
         return fieldsForGeneNeighbors;
+    }
+
+    public List<String> getFieldsForTreeAndDomains() {
+        return fieldsForTreeAndDomains;
     }
 
     public String isFullPipeline() {
@@ -298,5 +306,13 @@ public class ProtoTreeInternal {
 
     public void setOperonTolerance(String operonTolerance) {
         this.operonTolerance = operonTolerance;
+    }
+
+    public String getEnumerate() {
+        return enumerate;
+    }
+
+    public void setEnumerate(String enumerate) {
+        this.enumerate = enumerate;
     }
 }

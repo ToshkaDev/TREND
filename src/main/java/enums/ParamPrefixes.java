@@ -47,6 +47,7 @@ public enum  ParamPrefixes {
     TMHMM_PATH("-T "),
     SEGMASKER_PATH("-S "),
     RUN_SEGMASKER("-E "),
+    ENUMERATE("-e "),
 
     //gene_neighbors.py specific parameters
     NOT_SHARED_DOMAIN_TOLERANCE("-n "),

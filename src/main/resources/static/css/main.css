@@ -154,7 +154,7 @@ div.result-area {
     min-height: calc(100vh - 387px);
 }
 
-.low-complexity {
+.switcher {
     display: -webkit-box;
     display: -moz-box;
     display: -ms-flexbox;
@@ -163,7 +163,7 @@ div.result-area {
     justify-content: space-between;
 }
 
-#lc-text {
+.switch-text {
     padding-top: 7px;
 }
 

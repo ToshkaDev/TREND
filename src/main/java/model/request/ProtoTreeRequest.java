@@ -24,6 +24,7 @@ public class ProtoTreeRequest {
     private String eValue;
     private String probability;
     private String lcrPrediction;
+    private String enumerate;
 
     private String domainTolerance;
     private String operonTolerance;
@@ -234,6 +235,14 @@ public class ProtoTreeRequest {
 
     public void setOperonTolerance(String operonTolerance) {
         this.operonTolerance = operonTolerance;
+    }
+
+    public String getEnumerate() {
+        return enumerate;
+    }
+
+    public void setEnumerate(String enumerate) {
+        this.enumerate = enumerate;
     }
 }
 

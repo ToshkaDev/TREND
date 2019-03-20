@@ -11,6 +11,7 @@ USAGE = "\nThis script enumerates protein sequence names on the provided phyloge
 -d || --itree              -input file with phylogenetic tree  
 [-o || --oaligned]         -output file with aligned sequences with changed protein names
 [-b || --othird]           -output file with prepared tree with changed protein and no domains in newick format
+[-e || --enumerate]        -should the sequence names and leaf names be enumerated: "true" or "false"; default is 'false';
 '''
 
 # Specified via program arguments
@@ -23,11 +24,12 @@ OUTPUT_TREE_NEWICK_FILENAME = "newTree.newick"       #file with prepared tree wi
 ALIGNED_PROTEIN_NAME_TO_SEQ = dict()
 ALIGNED_NAMES_TO_PROCESSED = dict()
 PROCESSED_TO_ALIGNED_NAMES = dict()
+ENUMERATE = False
 
 def initialyze(argv):
-	global SEQS_ALIGNED, TREE_FILE, OUTPUT_ALIGNED_FILENAME, OUTPUT_TREE_NEWICK_FILENAME
+	global SEQS_ALIGNED, TREE_FILE, OUTPUT_ALIGNED_FILENAME, OUTPUT_TREE_NEWICK_FILENAME, ENUMERATE
 	try:
-		opts, args = getopt.getopt(argv[1:],"hs:d:o:b:",["ialigned=", "itree=", "oaligned=", "otree="])
+		opts, args = getopt.getopt(argv[1:],"hs:d:o:b:e:",["ialigned=", "itree=", "oaligned=", "otree=", "enumerate="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
@@ -45,8 +47,12 @@ def initialyze(argv):
 			OUTPUT_ALIGNED_FILENAME = str(arg).strip()
 		elif opt in ("-b", "--otree"):
 			OUTPUT_TREE_NEWICK_FILENAME = str(arg).strip()
-								
-def processFileWithSeqs():		
+		elif opt in ("-e", "--enumerate"):
+			if str(arg).strip() == "true":
+				ENUMERATE = True
+
+
+def processFileWithSeqs():
 	with open(SEQS_ALIGNED, "r") as alignedSeqs:
 		for sequence in SeqIO.parse(alignedSeqs, "fasta"):
 			ALIGNED_PROTEIN_NAME_TO_SEQ[sequence.description.strip()] = str(sequence.seq)                   #
@@ -55,31 +61,34 @@ def writeSeqsAndTree():
 	prepareNameDict()
 	tree = Tree(TREE_FILE)
 	terminals = tree.get_leaves()
-	# Change protein names in datas sctrucuters and write protein sequences with changed names to file 					
+	# Change protein names in datas sctrucuters and write protein sequences with changed names to file
 	with open(OUTPUT_ALIGNED_FILENAME, "w") as outputFile:
 		for i in xrange(len(terminals)):
 			proteinName = terminals[i].name.strip("'")
 			processedName = prepareName(proteinName)
 			if processedName in PROCESSED_TO_ALIGNED_NAMES:
-				terminals[i].name = str(i+1) + "_" + proteinName
-				alignedName = PROCESSED_TO_ALIGNED_NAMES[processedName]					
-				ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name] = ALIGNED_PROTEIN_NAME_TO_SEQ[alignedName]
-				del ALIGNED_PROTEIN_NAME_TO_SEQ[alignedName]
+				if ENUMERATE:
+					terminals[i].name = str(i+1) + "_" + proteinName
+					alignedName = PROCESSED_TO_ALIGNED_NAMES[processedName]
+					ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name] = ALIGNED_PROTEIN_NAME_TO_SEQ[alignedName]
+					del ALIGNED_PROTEIN_NAME_TO_SEQ[alignedName]
+				else:
+					terminals[i].name = proteinName
 				outputFile.write(">" + terminals[i].name + "\n")
-				outputFile.write(str(ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name]) + "\n")		
+				outputFile.write(str(ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name]) + "\n")
 	tree.write(outfile=OUTPUT_TREE_NEWICK_FILENAME)
 
 def prepareNameDict():
 	for protein in ALIGNED_PROTEIN_NAME_TO_SEQ:
-		processdName = prepareName(protein)		
-		PROCESSED_TO_ALIGNED_NAMES[processdName] = protein		
-		
+		processdName = prepareName(protein)
+		PROCESSED_TO_ALIGNED_NAMES[processdName] = protein
+
 REGEX_UNDERSCORE = re.compile(r"(\W|_)")
 REGEX_UNDERSCORE_SUBST = ""
 
 def prepareName(line):
 	return REGEX_UNDERSCORE.sub(REGEX_UNDERSCORE_SUBST, line)
-	
+
 def main(argv):
 	initialyze(argv)
 	processFileWithSeqs()
@@ -87,4 +96,3 @@ def main(argv):
 
 if __name__ == "__main__":
 	main(sys.argv)
-		

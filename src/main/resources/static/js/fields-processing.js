@@ -140,4 +140,10 @@ function takeCareOfFields() {
         var lcValue = $('#lc-value').attr("checked");
         $('#lc-value').attr('checked', !lcrStates[lcValue]);
     })
+
+    enumerateStates = {"checked": true, "undefined": false};
+    $('#enumerate-value').click(function() {
+        var enumerateValue = $('#enumerate-value').attr("checked");
+        $('#enumerate-value').attr('checked', !enumerateStates[enumerateValue]);
+    })
 }

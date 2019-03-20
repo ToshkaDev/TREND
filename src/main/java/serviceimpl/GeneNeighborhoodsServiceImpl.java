@@ -110,6 +110,7 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
         String outNewickFile = super.getRandomFileName(".newick");
         String outOrderedAlgnFile = super.getRandomFileName(".fa");
 
+        argsForTreeEnumerate.addAll(protoTreeInternal.getFieldsForTreeAndDomains());
         argsForTreeEnumerate.addAll(Arrays.asList(
                 ParamPrefixes.INPUT_SECOND.getPrefix() + outAlgnFile,
                 ParamPrefixes.INPUT_THIRD.getPrefix() + outNewickTree + ".nwk",

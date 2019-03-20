@@ -29,6 +29,7 @@ function getOptions() {
     var domainPredictionProgram = $('input[name="dom-prediction-program"]:checked').val();
 
     var lcrPrediction = $("#lc-value").attr("checked");
+    var enumerate = $("#enumerate-value").attr("checked");
 
     var operonTolerance = $('#operon-tolerance').val();
     var domainTolerance = $('#domain-tolerance').val();
@@ -36,6 +37,7 @@ function getOptions() {
     var protoTreeCookies = setOrGetCookies();
 
     var optionToOptionName = {
+        "enumerate": enumerate,
         "operonTolerance": operonTolerance,
         "domainTolerance": domainTolerance,
         "protoTreeCookies": protoTreeCookies,

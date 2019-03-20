@@ -16,6 +16,7 @@ USAGE = "\nThis script enumerates protein sequence names on the provided phyloge
 [-b || --othird]           -output file with prepared tree with changed protein and no domains in newick format
 [-r || --ojson]            -output fiel with json, unchenaged or with not overallped domains if --removeOverlaps is "yes"
 [-v || --removeOverlaps]   -remove overlaps: "yes" or "no"
+[-e || --enumerate]        -should the sequence names and leaf names be enumerated: "true" or "false"; default is 'false';
 
 '''
 
@@ -46,7 +47,7 @@ PROCESSED_TO_FEATURE_NAMES = dict()
 PROCESSED_TO_ALIGNED_NAMES = dict()
 PROCESSED_TO_PROTEIN_NAMES = dict()
 REMOVE_OVERLAPS = True
-
+ENUMERATE = False
 # Maximum number of domains in then merged domain syt to be displayed
 MAX_DOMAIN_COUNT = 6
 # Allowed overlap between adjacent domains. If the overlap precentage is bigger than this value the domains will be merged together 
@@ -64,10 +65,10 @@ DOMAIN_BORDER_COLOR="steelblue"
 
 def initialyze(argv):
 	global SEQS, SEQS_ALIGNED, TREE_FILE, DOMAINS, OUTPUT_ALIGNED_FILENAME, OUTPUT_TREE_SVG_FILENAME, OUTPUT_TREE_NEWICK_FILENAME
-	global OUTPUT_PROTEIN_DOMAINS_JSON, REMOVE_OVERLAPS
+	global OUTPUT_PROTEIN_DOMAINS_JSON, REMOVE_OVERLAPS, ENUMERATE
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:s:d:f:o:n:b:r:v",["isequence=", "ialigned=", "ithird=", "ifourth=", "oaligned=", \
-		 "osecond=", "othird=", "ojson", "removeOverlaps"])
+		opts, args = getopt.getopt(argv[1:],"hi:s:d:f:o:n:b:r:v:e:",["isequence=", "ialigned=", "ithird=", "ifourth=", "oaligned=", \
+		 "osecond=", "othird=", "ojson=", "removeOverlaps=", "enumerate="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
@@ -96,10 +97,12 @@ def initialyze(argv):
 		elif opt in ("-v", "--removeOverlaps"):
 			val = str(arg).strip()
 			if val == "yes" or val == "y":
-				REMOVE_OVERLAPS = TruedomainsWithNoOverlaps
+				REMOVE_OVERLAPS = True
 			else:
 				REMOVE_OVERLAPS = False
-			
+		elif opt in ("-e", "--enumerate"):
+			if str(arg).strip() == "true":
+				ENUMERATE = True
 						
 def prepareProteinToDomainsDict():
 	for proteinName, proteinData in PROTEIN_DOMAINS.items():
@@ -434,42 +437,51 @@ def writeSeqsAndTree():
 				proteinName = terminals[i].name.strip("'")
 				processedName = prepareName(proteinName)
 				if processedName in PROCESSED_TO_ALIGNED_NAMES:
-					terminals[i].name = str(i+1) + "_" + proteinName
-					if processedName in PROCESSED_TO_FEATURE_NAMES:
-						featureName = PROCESSED_TO_FEATURE_NAMES[processedName]
-						PROTEIN_DOMAINS[terminals[i].name] = PROTEIN_DOMAINS[featureName]
-						indexToName[i].append(featureName)
-						proteinSeqName = PROCESSED_TO_PROTEIN_NAMES[processedName]
-						PROTEIN_NAME_TO_SEQ[terminals[i].name] = PROTEIN_NAME_TO_SEQ[proteinSeqName]
-						indexToName[i].append(proteinSeqName)
-					alignedName = PROCESSED_TO_ALIGNED_NAMES[processedName]					
+					if ENUMERATE:
+						terminals[i].name = str(i+1) + "_" + proteinName
+						if processedName in PROCESSED_TO_FEATURE_NAMES:
+							featureName = PROCESSED_TO_FEATURE_NAMES[processedName]
+							PROTEIN_DOMAINS[terminals[i].name] = PROTEIN_DOMAINS[featureName]
+							indexToName[i].append(featureName)
+							proteinSeqName = PROCESSED_TO_PROTEIN_NAMES[processedName]
+							PROTEIN_NAME_TO_SEQ[terminals[i].name] = PROTEIN_NAME_TO_SEQ[proteinSeqName]
+							indexToName[i].append(proteinSeqName)
+					else:
+						terminals[i].name = proteinName
+
+					alignedName = PROCESSED_TO_ALIGNED_NAMES[processedName]
 					ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name] = ALIGNED_PROTEIN_NAME_TO_SEQ[alignedName]
 					indexToName[i].append(alignedName)
 					outputFile.write(">" + terminals[i].name + "\n")
-					outputFile.write(str(ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name]) + "\n")		
+					outputFile.write(str(ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name]) + "\n")
 	else:
 		for i in xrange(len(terminals)):
 			proteinName = terminals[i].name.strip("'")
 			processedName = prepareName(proteinName)
-			terminals[i].name = str(i+1) + "_" + proteinName
-			if processedName in PROCESSED_TO_FEATURE_NAMES:
-				featureName = PROCESSED_TO_FEATURE_NAMES[processedName]
-				PROTEIN_DOMAINS[terminals[i].name] = PROTEIN_DOMAINS[featureName]
-				indexToName[i].append(featureName)
-				proteinSeqName = PROCESSED_TO_PROTEIN_NAMES[processedName]
-				PROTEIN_NAME_TO_SEQ[terminals[i].name] = PROTEIN_NAME_TO_SEQ[proteinSeqName]
-				indexToName[i].append(proteinSeqName)
+			if ENUMERATE:
+				terminals[i].name = str(i+1) + "_" + proteinName
+				if processedName in PROCESSED_TO_FEATURE_NAMES:
+					featureName = PROCESSED_TO_FEATURE_NAMES[processedName]
+					PROTEIN_DOMAINS[terminals[i].name] = PROTEIN_DOMAINS[featureName]
+					indexToName[i].append(featureName)
+					proteinSeqName = PROCESSED_TO_PROTEIN_NAMES[processedName]
+					PROTEIN_NAME_TO_SEQ[terminals[i].name] = PROTEIN_NAME_TO_SEQ[proteinSeqName]
+					indexToName[i].append(proteinSeqName)
+			else:
+				terminals[i].name = proteinName
+
 
 	#Delete old names
-	for key, val in indexToName.items():
-		if val[0] in PROTEIN_DOMAINS:
-			del PROTEIN_DOMAINS[val[0]]
-			del PROTEIN_NAME_TO_SEQ[val[1]]
-			if len(PROCESSED_TO_ALIGNED_NAMES):
-				del ALIGNED_PROTEIN_NAME_TO_SEQ[val[2]]
+	if ENUMERATE:
+		for key, val in indexToName.items():
+			if val[0] in PROTEIN_DOMAINS:
+				del PROTEIN_DOMAINS[val[0]]
+				del PROTEIN_NAME_TO_SEQ[val[1]]
+				if len(PROCESSED_TO_ALIGNED_NAMES):
+					del ALIGNED_PROTEIN_NAME_TO_SEQ[val[2]]
 	#clear memory
 	indexToName = None
-	global PROTEIN_DOMAINS_FINAL											
+	global PROTEIN_DOMAINS_FINAL
 	PROTEIN_DOMAINS_FINAL = copy.deepcopy(PROTEIN_DOMAINS)
 	prepareProteinToDomainsDict()
 	tree.write(outfile=OUTPUT_TREE_NEWICK_FILENAME)
@@ -483,18 +495,18 @@ def prepareNameDict():
 		processdName = prepareName(protein)
 		PROCESSED_TO_FEATURE_NAMES[processdName] = protein
 	for protein in ALIGNED_PROTEIN_NAME_TO_SEQ:
-		processdName = prepareName(protein)		
-		PROCESSED_TO_ALIGNED_NAMES[processdName] = protein		
+		processdName = prepareName(protein)
+		PROCESSED_TO_ALIGNED_NAMES[processdName] = protein
 	for protein in PROTEIN_NAME_TO_SEQ:
-		processdName = prepareName(protein)		
+		processdName = prepareName(protein)
 		PROCESSED_TO_PROTEIN_NAMES[processdName] = protein
-		
+
 REGEX_UNDERSCORE = re.compile(r"(\W|_)")
 REGEX_UNDERSCORE_SUBST = ""
 
 def prepareName(line):
 	return REGEX_UNDERSCORE.sub(REGEX_UNDERSCORE_SUBST, line)
-	
+
 def main(argv):
 	initialyze(argv)
 	processFileWithDomains()

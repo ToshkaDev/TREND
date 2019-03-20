@@ -34,7 +34,8 @@ public class ConverterMain {
 		protoTreeInternal.setDomainPredictionDb(checkForNullAndGet(ParamPrefixes.DOMAINS_PREDICTION_DB.getPrefix(), protoTreeRequest.getDomainPredictionDb()));
 		protoTreeInternal.seteValue(checkEvalueAndGet(ParamPrefixes.EVAL_THRESH.getPrefix(), protoTreeRequest.geteValue()));
 		protoTreeInternal.setProbability(checkProbabilityAndGet(ParamPrefixes.PROBABILITY.getPrefix(), protoTreeRequest.getProbability()));
-		protoTreeInternal.setLcrPrediction(checkLcrPredictionAndGet(ParamPrefixes.RUN_SEGMASKER.getPrefix(), protoTreeRequest.getLcrPrediction()));
+		protoTreeInternal.setLcrPrediction(checkLcrPredictOrEnumerateAndGet(ParamPrefixes.RUN_SEGMASKER.getPrefix(), protoTreeRequest.getLcrPrediction()));
+		protoTreeInternal.setEnumerate(checkLcrPredictOrEnumerateAndGet(ParamPrefixes.ENUMERATE.getPrefix(), protoTreeRequest.getEnumerate()));
 
 		protoTreeInternal.setDomainTolerance(checkForNullAndGet(ParamPrefixes.NOT_SHARED_DOMAIN_TOLERANCE.getPrefix(), protoTreeRequest.getDomainTolerance()));
 		protoTreeInternal.setOperonTolerance(checkForNullAndGet(ParamPrefixes.OPERON_TOLERANCE.getPrefix(), protoTreeRequest.getOperonTolerance()));
@@ -72,8 +73,8 @@ public class ConverterMain {
 		return null;
 	}
 
-	private static String checkLcrPredictionAndGet(String paramPrefix, String lcrPrediction) {
-		if (lcrPrediction != null && lcrPrediction.equals("checked")) {
+	private static String checkLcrPredictOrEnumerateAndGet(String paramPrefix, String lcrPredictionOrEnum) {
+		if (lcrPredictionOrEnum != null && lcrPredictionOrEnum.equals("checked")) {
 			return paramPrefix + "true";
 		}
 		return null;

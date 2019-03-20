@@ -178,6 +178,7 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         String outOrderedAlgnFile = super.getRandomFileName(".fa");
 
         String proteinFeaturesChangedOutFile = super.getRandomFileName(null);
+        argsForTreeWithDomains.addAll(protoTreeInternal.getFieldsForTreeAndDomains());
         argsForTreeWithDomains.addAll(Arrays.asList(
                 inputFileNameForProtFeatures,
                 ParamPrefixes.INPUT_SECOND.getPrefix() + outAlgnFile,
@@ -276,6 +277,7 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         String outNewickFile = super.getRandomFileName(".newick");
         String outSvgFile = super.getRandomFileName(".svg");
         String proteinFeaturesChangedOutFile = super.getRandomFileName(null);
+        argsForTreeWithDomains.addAll(protoTreeInternal.getFieldsForTreeAndDomains());
         argsForTreeWithDomains.addAll(Arrays.asList(
                 protoTreeInternal.getFirstFileName(),
                 protoTreeInternal.getTreeFile(),
