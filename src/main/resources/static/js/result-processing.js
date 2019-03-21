@@ -142,7 +142,6 @@ function addEventListeners(data) {
 
     featureJSON = JSON.parse(data)
     var domStart, domStop;
-	var re = /^\d{1,}_/;
 	var notAllowedClassCharacters = /(\W|_)/g;
 	var currentClassName;
 	var proteinIdToRendered = {};
@@ -152,7 +151,7 @@ function addEventListeners(data) {
 	var domainCount;
 	d3.select('#treeContainer>svg').selectAll('*')
 	  .attr("dummy", function(){
-			if (d3.select(this).text().length > 0 && re.test(d3.select(this).text())) {
+			if (d3.select(this).text().length > 0 && d3.select(this).text() in featureJSON) {
 			    classNameForJson = d3.select(this).text();
 				currentClassName = classNameForJson.replace(notAllowedClassCharacters, '');
 				trueClassNameToChanged[currentClassName] = classNameForJson;

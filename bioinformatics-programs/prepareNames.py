@@ -46,6 +46,7 @@ def initialize(argv):
 
 REGEX_VOID = re.compile(r"(\(|\)|:|,|}|{|'|/|]|\[|\\)")
 REGEX_UNDERSCORE = re.compile(r"( |\|)")
+REGEX_UNDERSCORE_MULTIPLE = re.compile(r"_{2,}")
 REGEX_VOID_SUBST = ""
 REGEX_UNDERSCORE_SUBST = "_"
 REGEX_LEAF_NAME_1 = re.compile(r"(\('[^\(].+?':|,'[^\(].+?':)")
@@ -54,7 +55,8 @@ REGEX_LEAF_NAME_2 = re.compile(r"(\([^\(].+?:|,[^\(].+?:)")
 
 def getChangedName(line):
 	line = REGEX_VOID.sub(REGEX_VOID_SUBST, line)
-	return REGEX_UNDERSCORE.sub(REGEX_UNDERSCORE_SUBST, line)
+	line = REGEX_UNDERSCORE.sub(REGEX_UNDERSCORE_SUBST, line)
+	return REGEX_UNDERSCORE_MULTIPLE.sub(REGEX_UNDERSCORE_SUBST, line)
 
 def getChangedNameForTree():
 	if not INPUT_FILE_TREE or not OUTPUT_FILE_TREE:
