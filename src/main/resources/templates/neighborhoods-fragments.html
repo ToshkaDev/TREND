@@ -25,18 +25,6 @@
                 </div>
             </div> <br /> <br />
         </div>
-        <div class="col-md-12 wait-for-it">
-            <div id="result-stage"></div>
-        </div>
-        <div class="col-md-12 no-such-biojob">
-            No such job found
-        </div>
-        <div class="col-md-12 my-result">
-            <div style="display: inline">
-                <span id="jobId" th:text="${jobId}"></span>
-            </div>
-            <div id="svgContainer"></div>
-        </div>
     </div>
 
     <div th:fragment="proto-tree-filter">
@@ -166,13 +154,13 @@
     </div>
 
     <div th:fragment="result">
-        <div class="col-md-12 wait-for-it">
+        <div class="col-md-11 wait-for-it">
             <div id="result-stage"></div>
         </div>
-        <div class="col-md-12 no-such-biojob">
+        <div class="col-md-11 no-such-biojob">
             No such job found
         </div>
-        <div class="col-md-12 server-error">
+        <div class="col-md-11 server-error">
             Error happened while processing your input. Please check the input and try again.
             <br/>
             If you are sure your input is correct please contact us providing the details of your analysis and the input.

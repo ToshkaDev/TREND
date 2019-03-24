@@ -4,6 +4,7 @@ package serviceimpl;
 import biojobs.BioJob;
 import biojobs.BioJobResult;
 import biojobs.BioJobResultDao;
+import enums.Status;
 import exceptions.IncorrectRequestException;
 import model.internal.ProtoTreeInternal;
 import model.request.ProtoTreeRequest;
@@ -217,9 +218,12 @@ public class BioUniverseServiceImpl implements BioUniverseService {
         }
     }
 
-    public void saveError(ProtoTreeInternal protoTreeInternal) {
+    public void saveError(ProtoTreeInternal protoTreeInternal, String errorMessage) {
         BioJob bioJob = getBioJobDao().findByJobId(protoTreeInternal.getJobId());
-        bioJob.setStage("Error");
+        if (errorMessage != null)
+            bioJob.setStage(errorMessage);
+        else
+            bioJob.setStage(Status.error.getStatusEnum());
         getBioJobDao().save(bioJob);
     }
 
@@ -238,23 +242,33 @@ public class BioUniverseServiceImpl implements BioUniverseService {
             System.out.println(processBuilder.command());
 
             Process process = processBuilder.start();
-            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            //BufferedReader br = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            BufferedReader ibr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            BufferedReader ebr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             String line;
+            String megaErrorMessage = null;
             boolean errorHappened = false;
-            while ((line = br.readLine()) != null) {
-                if (line.toLowerCase().contains("error".toLowerCase()) || line.contains("Traceback"))
+            while ((line = ebr.readLine()) != null) {
+                if (line.toLowerCase().contains("error") || line.contains("Traceback"))
                     errorHappened = true;
                 System.out.println(line);
                 System.out.println("\n");
             }
-            if (errorHappened) {
-                System.out.println("===Error in launching python scripts.===");
-                throw new IncorrectRequestException("Error happened in launchProcess(List<String> commandArguments).");
+            while ((line = ibr.readLine()) != null) {
+                if (line.contains("Error") && line.contains("Message"))
+                    megaErrorMessage = line;
+                System.out.println(line);
+                System.out.println("\n");
+            }
+
+            if (errorHappened || megaErrorMessage != null) {
+                if (megaErrorMessage != null)
+                    throw new IncorrectRequestException(Status.megaError.getStatusEnum() + ": " + megaErrorMessage.split("=")[1]);
+                else
+                    throw new IncorrectRequestException("Error happened in launchProcess(List<String> commandArguments).");
             }
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("===Error in subprocess.===");
+            System.out.println("===IOException in subprocess.===");
             throw new IncorrectRequestException("Error happened in launchProcess(List<String> commandArguments).");
         }
     }

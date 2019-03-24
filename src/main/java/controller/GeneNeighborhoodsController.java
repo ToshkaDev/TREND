@@ -2,6 +2,7 @@ package controller;
 
 import biojobs.BioJob;
 import biojobs.BioJobResult;
+import enums.Status;
 import exceptions.IncorrectRequestException;
 import model.internal.ProtoTreeInternal;
 import model.request.ProtoTreeRequest;
@@ -78,7 +79,7 @@ public class GeneNeighborhoodsController extends BioUniverseController {
         String urlPath = ServletUriComponentsBuilder.fromCurrentContextPath().path("gene-neighborhoods/univ_files/").build().toString();
 
         Map<String, List<String>> result = new HashMap<>();
-        result.put("status", super.statusNoSuchBioJob);
+        result.put(Status.status.getStatusEnum(), super.statusNoSuchBioJob);
 
         List<String> listOfResultFileNames;
 
@@ -90,14 +91,17 @@ public class GeneNeighborhoodsController extends BioUniverseController {
             if (bioJob != null && bioJob.getCookieId().equals(cookieId)) {
                 if (bioJob.isFinished()) {
                     listOfResultFileNames = bioJob.getBioJobResultList().stream().map(bjResult -> urlPath + bjResult.getResultFileName()).collect(Collectors.toList());
-                    result.put("result", listOfResultFileNames);
-                    result.put("status", super.statusReady);
-                } else if (bioJob.getStage().equals("Error")) {
-                    result.put("status", super.statusError);
+                    result.put(Status.result.getStatusEnum(), listOfResultFileNames);
+                    result.put(Status.status.getStatusEnum(), super.statusReady);
+                } else if (bioJob.getStage().contains(Status.error.getStatusEnum())) {
+                    List<String> statusError = new ArrayList<>(Arrays.asList(Status.error.getStatusEnum()));
+                    if (bioJob.getStage().contains(Status.megaError.getStatusEnum()))
+                        statusError.add(bioJob.getStage());
+                    result.put(Status.status.getStatusEnum(), statusError);
                 } else {
-                    result.put("status", super.statusNotReady);
+                    result.put(Status.status.getStatusEnum(), super.statusNotReady);
                 }
-                result.put("stage", new LinkedList<>(Arrays.asList(bioJob.getStage())));
+                result.put(Status.stage.getStatusEnum(), new LinkedList<>(Arrays.asList(bioJob.getStage())));
             }
         }
         return result;

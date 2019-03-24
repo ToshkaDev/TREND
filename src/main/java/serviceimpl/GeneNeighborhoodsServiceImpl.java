@@ -3,6 +3,7 @@ package serviceimpl;
 import biojobs.BioJob;
 import biojobs.BioJobDao;
 import biojobs.BioJobResultDao;
+import enums.Status;
 import enums.ParamPrefixes;
 import exceptions.IncorrectRequestException;
 import model.internal.ProtoTreeInternal;
@@ -174,7 +175,10 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
             try {
                 super.launchProcess(commandArgument);
             } catch (Exception exception) {
-                super.saveError(protoTreeInternal);
+                if (exception.getMessage().contains(Status.megaError.getStatusEnum()))
+                    super.saveError(protoTreeInternal, exception.getMessage());
+                else
+                    super.saveError(protoTreeInternal, null);
                 throw exception;
             }
         }

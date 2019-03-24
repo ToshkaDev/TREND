@@ -58,6 +58,8 @@ function processRetrievedDataAsync(data) {
     } else if (data.status[0] === 'Error') {
         clearInterval(fileGetter);
         $('.wait-for-it').hide();
+        if (data.status.length > 1)
+            $('.server-error').html(data.status[1]);
         $('.server-error').show();
     } else  if (data.status[0] === 'ready') {
         clearInterval(fileGetter);

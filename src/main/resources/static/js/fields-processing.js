@@ -131,6 +131,7 @@ function takeCareOfFields() {
     $('#filter-clear').click(function() {
         $('#first, #second').trigger('reset');
         $('#lc-value').removeAttr('checked');
+        $('#enumerate-value').removeAttr('checked');
         $('#tree-method, #ml-phylo-test, #nj_me-phylo-test, #gaps-missing').trigger('change');
         $('input[name="dom-prediction-program"]').trigger('change')
     });
