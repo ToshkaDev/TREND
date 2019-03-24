@@ -16,11 +16,13 @@ reverseGeneFigureBottomY = reverseGeneFigureTopY + geneFigureWidth;
 reverseGeneFigureMiddlePointY = reverseGeneFigureTopY + geneFigureWidth*0.5;
 geneFigureArrowLen = 10;
 fillColour = 'white';
-borderColour = '#a3a3c2';
+borderColour = '#68686b';
 currentGeneColour = "#7FB9AB";
 lastGeneStop = null;
 yShiftOfClusterRegardingLeafeYCoord = 25;
 axisYTranslation = 25;
+thisGeneStroke = 4;
+neighborGeneStroke = 2;
 
 //Gene info box
 //Need to make textPositionFactorDirect, textPositionFactorReverse,
@@ -202,7 +204,10 @@ function createGenePaths(geneCluster, thisgene, geneScale) {
             return gene.clusterColor ? gene.clusterColor : fillColour;
         })
         .attr("stroke", function(gene) {
-            return gene.operon ? gene.operon : borderColour;
+            return gene.operonColour ? gene.operonColour : borderColour;
+        })
+        .attr("stroke-width", function(gene){
+            return gene.id === thisgene.id ? thisGeneStroke : neighborGeneStroke;
         })
         .attr("class", "gene-path");
 }

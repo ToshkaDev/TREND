@@ -27,7 +27,7 @@ NUMBER_OF_GENERATED_COLORS = 0
 FIRST_COLOR_THRESHOLD = 100
 SECOND_COLOR_THRESHOLD = 1000
 #random seed for color generation
-RANDOM_SEED = 3
+RANDOM_SEED = 1
 RANDOM_STATE = random.getstate()
 
 
@@ -82,9 +82,6 @@ def initialize(argv):
 	random.seed(RANDOM_SEED)
 	RANDOM_STATE = random.getstate()
 
-address = "https://api.mistdb.caltech.edu/v1/genes/GCF_000302455.1-A994_RS01845/neighbors?fields=id,stable_id,version,locus,strand,start,stop,length,pseudo,product&fields.Aseq=pfam31"
-
-
 def findGene(geneNameOrId):
 	params = urllib.urlencode({'search': geneNameOrId, 'fields': GENE_FIELDS, 'fields.Aseq': PFAM})
 	result = urllib.urlopen(BASE_URL + "?%s" % params)
@@ -123,6 +120,7 @@ def getGeneNeighborsAndPrepareDomains(mainGeneDict, duplicateCounter, fullProtei
 	wasStrandChanegd = False
 	middleGeneProcessed = False
 	operonCounter = 0
+	usedAsColourIndex = False
 	for eachGene in genesList:
 		if eachGene['Aseq'] and eachGene['Aseq']['pfam31'] and len(eachGene['Aseq']['pfam31']):
 			sortedDomains = sorted(eachGene['Aseq']['pfam31'], key=lambda x: x['ali_from'], reverse=False)
@@ -131,14 +129,14 @@ def getGeneNeighborsAndPrepareDomains(mainGeneDict, duplicateCounter, fullProtei
 			eachGene['Aseq']['pfam31NamesOnly'] = domainWithNoOverlapsNamesOnly
 		if int(eachGene["id"]) < int(mainGeneDict["id"]):
 			if previousGene:
-				operonCounter = identifyIfBelongToOperon(previousGene, eachGene, operonCounter)
+				operonCounter, usedAsColourIndex = identifyIfBelongToOperon(previousGene, eachGene, operonCounter, usedAsColourIndex)
 		else:
 			if not middleGeneProcessed:
-				operonCounter = identifyIfBelongToOperon(previousGene, mainGeneDict, operonCounter)
-				operonCounter = identifyIfBelongToOperon(mainGeneDict, eachGene, operonCounter)
+				operonCounter, usedAsColourIndex = identifyIfBelongToOperon(previousGene, mainGeneDict, operonCounter, usedAsColourIndex)
+				operonCounter, usedAsColourIndex = identifyIfBelongToOperon(mainGeneDict, eachGene, operonCounter, usedAsColourIndex)
 				middleGeneProcessed = True
 			else:
-				operonCounter = identifyIfBelongToOperon(previousGene, eachGene, operonCounter)
+				operonCounter, usedAsColourIndex = identifyIfBelongToOperon(previousGene, eachGene, operonCounter, usedAsColourIndex)
 		previousGene = eachGene
 
 	genesList.append(mainGeneDict)
@@ -150,22 +148,32 @@ def getGeneNeighborsAndPrepareDomains(mainGeneDict, duplicateCounter, fullProtei
 
 	return duplicateCounter
 
-def identifyIfBelongToOperon(previousGene, currentGene, operonCounter):
+def identifyIfBelongToOperon(previousGene, currentGene, operonCounter, usedAsColourIndex):
 	if previousGene and currentGene:
 		if previousGene["strand"] == currentGene["strand"]:
 		    distance = currentGene["start"] - previousGene["stop"]
 		    if distance > 0:
 		        if distance <= OPERON_TOLERANCE:
-		            previousGene["operon"] = OPERON_COLOR_DICT[operonCounter]
-		            currentGene["operon"] = OPERON_COLOR_DICT[operonCounter]
+		            previousGene["operon"] = operonCounter
+		            currentGene["operon"] = operonCounter
+		            previousGene["operonColour"] = OPERON_COLOR_DICT[operonCounter]
+		            currentGene["operonColour"] = OPERON_COLOR_DICT[operonCounter]
+		            usedAsColourIndex = True
 		        else:
-		            operonCounter+=1
+					if usedAsColourIndex:
+						operonCounter+=1
+						usedAsColourIndex = False
 		    else:
-		        previousGene["operon"] = OPERON_COLOR_DICT[operonCounter]
-		        currentGene["operon"] = OPERON_COLOR_DICT[operonCounter]
+				previousGene["operon"] = operonCounter
+				currentGene["operon"] = operonCounter
+				previousGene["operonColour"] = OPERON_COLOR_DICT[operonCounter]
+				currentGene["operonColour"] = OPERON_COLOR_DICT[operonCounter]
+				usedAsColourIndex = True
 		else:
-		    operonCounter+=1
-	return operonCounter
+			if usedAsColourIndex:
+				operonCounter+=1
+				usedAsColourIndex = False
+	return (operonCounter, usedAsColourIndex)
 
 def clusterGenesBasedOnSharedDomains():
 	gene1ClusterId = None
