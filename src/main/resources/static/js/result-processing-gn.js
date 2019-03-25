@@ -21,8 +21,8 @@ currentGeneColour = "#7FB9AB";
 lastGeneStop = null;
 yShiftOfClusterRegardingLeafeYCoord = 25;
 axisYTranslation = 25;
-thisGeneStroke = 4;
-neighborGeneStroke = 2;
+thisGeneStroke = 3;
+neighborGeneStroke = 1;
 
 //Gene info box
 //Need to make textPositionFactorDirect, textPositionFactorReverse,

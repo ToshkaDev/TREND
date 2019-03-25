@@ -60,7 +60,8 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
         argsForGeneNeighbors.addAll(protoTreeInternal.getFieldsForGeneNeighbors());
         argsForGeneNeighbors.addAll(Arrays.asList(
                 ParamPrefixes.INPUT.getPrefix() + outNewickFile,
-                ParamPrefixes.OUTPUT.getPrefix() + outJsonFile
+                ParamPrefixes.OUTPUT.getPrefix() + outJsonFile,
+                ParamPrefixes.PROCESS_NUMBER.getPrefix() + super.getProperties().getGeneNeighborsProcessNum()
         ));
 
         protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outJsonFile));
@@ -88,9 +89,6 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
 
         protoTreeInternal.setFields();
 
-        String numberOfThreadsForTree = "7";
-        String numberOfThreadsForAlgn = "7";
-
         String outAlgnFile = super.getRandomFileName(".fa");
         String outNewickTree = super.getRandomFileName("noPostfix");
         argsForAlignmentAndTree.addAll(protoTreeInternal.getFieldsForAlignmentAndTreeBuild());
@@ -99,8 +97,8 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
                 ParamPrefixes.MEGACC_PATH.getPrefix() + super.getProperties().getMegacc(),
                 ParamPrefixes.OUTPUT_PARAMS.getPrefix() + super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix(),
                 ParamPrefixes.OUTPUT_TREE.getPrefix() + outNewickTree,
-                ParamPrefixes.THREAD_ALGN.getPrefix() + numberOfThreadsForAlgn,
-                ParamPrefixes.THREAD.getPrefix() + numberOfThreadsForTree,
+                ParamPrefixes.THREADS_MAFFT.getPrefix() + super.getProperties().getMafftThreadNum(),
+                ParamPrefixes.THREADS_MEGA_HMMSCAN.getPrefix() + super.getProperties().getMegaThreadNum(),
                 ParamPrefixes.OUTPUT.getPrefix() + outAlgnFile
         ));
 
@@ -123,7 +121,8 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
         argsForGeneNeighbors.addAll(protoTreeInternal.getFieldsForGeneNeighbors());
         argsForGeneNeighbors.addAll(Arrays.asList(
                 ParamPrefixes.INPUT.getPrefix() + outNewickFile,
-                ParamPrefixes.OUTPUT.getPrefix() + outJsonFile
+                ParamPrefixes.OUTPUT.getPrefix() + outJsonFile,
+                ParamPrefixes.PROCESS_NUMBER.getPrefix() + super.getProperties().getGeneNeighborsProcessNum()
         ));
 
         protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outJsonFile, outOrderedAlgnFile));

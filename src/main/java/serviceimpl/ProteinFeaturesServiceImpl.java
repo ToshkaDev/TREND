@@ -134,9 +134,6 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         String proteinFeaturesOutFile = super.getRandomFileName(null);
         String segmakserOutFile = super.getRandomFileName(null);
 
-        String numberOfThreadsForProtFeatures = "7";
-        String numberOfThreadsForTree = "7";
-        String numberOfThreadsForAlgn = "7";
         argsForProteinFeatures.addAll(protoTreeInternal.getFieldsForFeaturesPrediction());
         argsForProteinFeatures.addAll(Arrays.asList(
                 inputFileNameForProtFeatures,
@@ -153,7 +150,7 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
                 ParamPrefixes.RPSBPROC_PATH.getPrefix() + super.getProperties().getRpsbprocPath(),
                 ParamPrefixes.TMHMM_PATH.getPrefix() + super.getProperties().getTmhmm2Path(),
                 ParamPrefixes.SEGMASKER_PATH.getPrefix() + super.getProperties().getSegmaskerPath(),
-                ParamPrefixes.THREAD.getPrefix() + numberOfThreadsForProtFeatures,
+                ParamPrefixes.THREADS_MEGA_HMMSCAN.getPrefix() + super.getProperties().getHmmscanThreadNum(),
                 ParamPrefixes.OUTPUT_THIRD.getPrefix() + proteinFeaturesOutFile
         ));
 
@@ -165,8 +162,8 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
                 ParamPrefixes.MEGACC_PATH.getPrefix() + super.getProperties().getMegacc(),
                 ParamPrefixes.OUTPUT_PARAMS.getPrefix() + super.getRandomFileName(null),
                 ParamPrefixes.OUTPUT_TREE.getPrefix() + outNewickTree,
-                ParamPrefixes.THREAD_ALGN.getPrefix() + numberOfThreadsForAlgn,
-                ParamPrefixes.THREAD.getPrefix() + numberOfThreadsForTree,
+                ParamPrefixes.THREADS_MAFFT.getPrefix() + super.getProperties().getMafftThreadNum(),
+                ParamPrefixes.THREADS_MEGA_HMMSCAN.getPrefix() + super.getProperties().getMegaThreadNum(),
                 ParamPrefixes.OUTPUT.getPrefix() + outAlgnFile
         ));
 
@@ -254,7 +251,6 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         String proteinFeaturesOutFile = super.getRandomFileName(null);
         String segmakserOutFile = super.getRandomFileName(null);
 
-        String numberOfThreadsForProtFeatures = "7";
         argsForProteinFeatures.addAll(protoTreeInternal.getFieldsForFeaturesPrediction());
         argsForProteinFeatures.addAll(Arrays.asList(
                 protoTreeInternal.getFirstFileName(),
@@ -271,7 +267,7 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
                 ParamPrefixes.RPSBPROC_PATH.getPrefix() + super.getProperties().getRpsbprocPath(),
                 ParamPrefixes.TMHMM_PATH.getPrefix() + super.getProperties().getTmhmm2Path(),
                 ParamPrefixes.SEGMASKER_PATH.getPrefix() + super.getProperties().getSegmaskerPath(),
-                ParamPrefixes.THREAD.getPrefix() + numberOfThreadsForProtFeatures,
+                ParamPrefixes.THREADS_MEGA_HMMSCAN.getPrefix() + super.getProperties().getHmmscanThreadNum(),
                 ParamPrefixes.OUTPUT_THIRD.getPrefix() + proteinFeaturesOutFile
         ));
 

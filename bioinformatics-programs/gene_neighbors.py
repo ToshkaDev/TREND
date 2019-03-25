@@ -5,6 +5,8 @@ import urllib
 import json
 import random
 from ete2 import Tree
+import math
+import multiprocessing
 
 
 USAGE = "\n\nThe script cluster genes in gene neighborhoods json file based on the shared domains.\n\n" + \
@@ -18,16 +20,19 @@ USAGE = "\n\nThe script cluster genes in gene neighborhoods json file based on t
 	[-s || --second_color]     - first color threshold; default is 1000
 	[-r || --random_seed]      - random color generator seed
 	[-p || --operon_tolerance] - allowed distance between genes in operons, default is 150
+	[-c || --proc_num]         - number of processes to run simultaneously, default is 50. The number is big beacous the process is not CPU-intencive
 	-o || --ofile              - output file with sequences with changed names
 	'''
 
-OPERON_COLOR_DICT = ["#ff4d4d", "#1a75ff", "#cc33ff", "#00cc00", "#ff9900", "#993333", "#000099", "#00b3b3", "#660033", "#00b386"]
+manager = multiprocessing.Manager()
+NUMBER_OF_PROCESSES = 50
+OPERON_COLOR_DICT = manager.list(["#ff4d4d", "#1a75ff", "#cc33ff", "#00cc00", "#ff9900", "#993333", "#000099", "#00b3b3", "#660033", "#00b386"])
 SELECTED_COLORS = set()
 NUMBER_OF_GENERATED_COLORS = 0
 FIRST_COLOR_THRESHOLD = 100
 SECOND_COLOR_THRESHOLD = 1000
 #random seed for color generation
-RANDOM_SEED = 1
+RANDOM_SEED = 3
 RANDOM_STATE = random.getstate()
 
 
@@ -42,13 +47,17 @@ BASE_URL = "https://api.mistdb.caltech.edu/v1/genes"
 GENE_FIELDS = "id,stable_id,version,locus,strand,start,stop,length,pseudo,product"
 PFAM = "pfam31"
 
-GENE_TO_NEIGHBORS = dict()
+
 REGEX_NUMBER_UNDERSCORE = re.compile(r"^\d+_")
+PROCESSED_STABLE_IDS = set()
+PROCESSED_MAIN_GENE_STABLE_IDS = set()
+GENE_TO_NEIGHBORS = manager.dict()
 
 def initialize(argv):
-	global INPUT_FILE, TREE_FILE, NOT_SHARED_DOMAIN_NUMBER_TOLERANCE, OPERON_TOLERANCE, OUTPUT_FILE, FIRST_COLOR_THRESHOLD, SECOND_COLOR_THRESHOLD, RANDOM_SEED, RANDOM_STATE
+	global INPUT_FILE, TREE_FILE, NOT_SHARED_DOMAIN_NUMBER_TOLERANCE, OPERON_TOLERANCE, OUTPUT_FILE
+	global FIRST_COLOR_THRESHOLD, SECOND_COLOR_THRESHOLD, RANDOM_SEED, RANDOM_STATE, NUMBER_OF_PROCESSES
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:s:n:f:s:r:p:o:",["help", "itree=", "ilist=", "tolerance=", "first_color=", "second_color=", "random_seed=", "operon_tolerance=", "ofile="])
+		opts, args = getopt.getopt(argv[1:],"hi:s:n:f:s:r:p:c:o:",["help", "itree=", "ilist=", "tolerance=", "first_color=", "second_color=", "random_seed=", "operon_tolerance=", "proc_num=", "ofile="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
@@ -73,6 +82,8 @@ def initialize(argv):
 				RANDOM_SEED = int(arg)
 			elif opt in ("-p", "--operon_tolerance"):
 				OPERON_TOLERANCE = int(arg)
+			elif opt in ("-c", "--proc_num"):
+				NUMBER_OF_PROCESSES = int(arg)
 			elif opt in ("-o", "--ofile"):
 				OUTPUT_FILE = str(arg).strip()
 	except Exception as e:
@@ -175,11 +186,11 @@ def identifyIfBelongToOperon(previousGene, currentGene, operonCounter, usedAsCol
 				usedAsColourIndex = False
 	return (operonCounter, usedAsColourIndex)
 
-def clusterGenesBasedOnSharedDomains():
+def clusterGenesBasedOnSharedDomains(gene_to_neighbors):
 	gene1ClusterId = None
 	mainGene1ClusterId = 0
 	gene1ClusterColor = None
-	for mainGene1StableId, allNeighborGenes1 in GENE_TO_NEIGHBORS.items():
+	for mainGene1StableId, allNeighborGenes1 in gene_to_neighbors.items():
 		mainGene1ClusterId+=1
 		for gene1Index in xrange(len(allNeighborGenes1)):
 			gene1 = allNeighborGenes1[gene1Index]
@@ -193,42 +204,53 @@ def clusterGenesBasedOnSharedDomains():
 					gene1ClusterId = None
 					gene1ClusterColor = None
 				for gene2 in allNeighborGenes1:
-					if gene2['Aseq'] and gene1['stable_id'] != gene2['stable_id']:
-						if not 'clusterId' in gene2 and 'pfam31NamesOnly' in gene2['Aseq']:
-							numberOfSharedDomains = len(set(gene1['Aseq']['pfam31NamesOnly']) & set(gene2['Aseq']['pfam31NamesOnly']))
-							numberOfMaxDomains = getNumberOfMaxDomains(gene2, numberOfDomainsInGene1)
-							if numberOfSharedDomains > 0 and abs(numberOfMaxDomains - numberOfSharedDomains) <= NOT_SHARED_DOMAIN_NUMBER_TOLERANCE:
-								if gene1ClusterId:
-									gene2['clusterId'] = gene1ClusterId
-									gene2['clusterColor'] = gene1ClusterColor
-								else:
-									gene1ClusterId = str(mainGene1ClusterId) + str(gene1Index)
-									gene1ClusterColor = getNextColour()
-									gene1['clusterId'] = gene1ClusterId
-									gene2['clusterId'] = gene1ClusterId
-									gene1['clusterColor'] = gene1ClusterColor
-									gene2['clusterColor'] = gene1ClusterColor
+					# check first wether gene2 was already clustered
+					if gene2['stable_id'] not in PROCESSED_STABLE_IDS:
+						if gene2['Aseq'] and gene1['stable_id'] != gene2['stable_id']:
+							if not 'clusterId' in gene2 and 'pfam31NamesOnly' in gene2['Aseq']:
+								numberOfSharedDomains = len(set(gene1['Aseq']['pfam31NamesOnly']) & set(gene2['Aseq']['pfam31NamesOnly']))
+								numberOfMaxDomains = getNumberOfMaxDomains(gene2, numberOfDomainsInGene1)
+								if numberOfSharedDomains > 0 and abs(numberOfMaxDomains - numberOfSharedDomains) <= NOT_SHARED_DOMAIN_NUMBER_TOLERANCE:
+									if gene1ClusterId:
+										gene2['clusterId'] = gene1ClusterId
+										gene2['clusterColor'] = gene1ClusterColor
+									else:
+										gene1ClusterId = str(mainGene1ClusterId) + str(gene1Index)
+										gene1ClusterColor = getNextColour()
+										gene1['clusterId'] = gene1ClusterId
+										gene2['clusterId'] = gene1ClusterId
+										gene1['clusterColor'] = gene1ClusterColor
+										gene2['clusterColor'] = gene1ClusterColor
+									PROCESSED_STABLE_IDS.add(gene2['stable_id'])
 
 
-				for mainGene2StableId, allNeighborGenes2 in GENE_TO_NEIGHBORS.items():
-					if mainGene1StableId != mainGene2StableId:
+
+				for mainGene2StableId, allNeighborGenes2 in gene_to_neighbors.items():
+					# first check that these are two different gene neigborhoods
+					# and whether mainGene2StableId was already processed
+					if mainGene1StableId != mainGene2StableId and mainGene2StableId not in PROCESSED_MAIN_GENE_STABLE_IDS:
 						for gene3 in allNeighborGenes2:
-							#we shouldn't check if gene3 is diffenre than gene1 because this is another gene set
-							if gene3['Aseq']:
-								if not 'clusterId' in gene3 and 'pfam31NamesOnly' in gene3['Aseq']:
-									numberOfSharedDomains = len(set(gene1['Aseq']['pfam31NamesOnly']) & set(gene3['Aseq']['pfam31NamesOnly']))
-									numberOfMaxDomains = getNumberOfMaxDomains(gene3, numberOfDomainsInGene1)
-									if numberOfSharedDomains > 0 and abs(numberOfMaxDomains - numberOfSharedDomains) <= NOT_SHARED_DOMAIN_NUMBER_TOLERANCE:
-										if gene1ClusterId:
-											gene3['clusterId'] = gene1ClusterId
-											gene3['clusterColor'] = gene1ClusterColor
-										else:
-											gene1ClusterId = str(mainGene1ClusterId) + str(gene1Index)
-											gene1ClusterColor = getNextColour()
-											gene1['clusterId'] = gene1ClusterId
-											gene3['clusterId'] = gene1ClusterId
-											gene1['clusterColor'] = gene1ClusterColor
-											gene3['clusterColor'] = gene1ClusterColor
+							# check wether gene3 was already clustered
+							if gene3['stable_id'] not in PROCESSED_STABLE_IDS:
+								#we shouldn't check if gene3 is different than gene1 because this is another gene set
+								if gene3['Aseq']:
+									if not 'clusterId' in gene3 and 'pfam31NamesOnly' in gene3['Aseq']:
+										numberOfSharedDomains = len(set(gene1['Aseq']['pfam31NamesOnly']) & set(gene3['Aseq']['pfam31NamesOnly']))
+										numberOfMaxDomains = getNumberOfMaxDomains(gene3, numberOfDomainsInGene1)
+										if numberOfSharedDomains > 0 and abs(numberOfMaxDomains - numberOfSharedDomains) <= NOT_SHARED_DOMAIN_NUMBER_TOLERANCE:
+											if gene1ClusterId:
+												gene3['clusterId'] = gene1ClusterId
+												gene3['clusterColor'] = gene1ClusterColor
+											else:
+												gene1ClusterId = str(mainGene1ClusterId) + str(gene1Index)
+												gene1ClusterColor = getNextColour()
+												gene1['clusterId'] = gene1ClusterId
+												gene3['clusterId'] = gene1ClusterId
+												gene1['clusterColor'] = gene1ClusterColor
+												gene3['clusterColor'] = gene1ClusterColor
+											PROCESSED_STABLE_IDS.add(gene3['stable_id'])
+			PROCESSED_STABLE_IDS.add(gene1['stable_id'])
+		PROCESSED_MAIN_GENE_STABLE_IDS.add(mainGene1StableId)
 
 def removeOverlapps(domainsSorted):
 	if (len(domainsSorted)) > 0:
@@ -344,11 +366,10 @@ def hsv_to_rgb(h, s, v):
 
 
 def readTreeAndStartProcess():
-	proteinIds1 = []
-	proteinIds2 = []
-	proteinIds3 = []
-	originalNames = []
-	proteinIdsAll = []
+	proteinIds1 = manager.list()
+	proteinIds2 = manager.list()
+	proteinIds3 = manager.list()
+	originalNames = manager.list()
 	with open(TREE_FILE, "r") as inputFile:
 		treeObject = Tree(inputFile.read())
 
@@ -363,7 +384,25 @@ def readTreeAndStartProcess():
  		partProteinName = fullProteinName.split("_")[0].strip()
 		proteinIds3.append(partProteinName)
 		originalNames.append(originalProteinName)
-	getGeneAndProcessGeneNeighbors([proteinIds1, proteinIds2, proteinIds3, originalNames])
+
+	elementsForOneThread = int(math.ceil(len(proteinIds1)/float(NUMBER_OF_PROCESSES)))
+	processes = list()
+	startIndex = 0
+	endIndex = elementsForOneThread
+	for ind in xrange(NUMBER_OF_PROCESSES):
+		if startIndex <= len(proteinIds1):
+			process = multiprocessing.Process(target=getGeneAndProcessGeneNeighbors, \
+				args=([proteinIds1[startIndex:endIndex], proteinIds2[startIndex:endIndex], proteinIds3[startIndex:endIndex], originalNames[startIndex:endIndex]],))
+			processes.append(process)
+			startIndex = endIndex
+			endIndex = endIndex + elementsForOneThread
+
+	for proc in processes:
+		proc.start()
+
+	for proc in processes:
+		proc.join()
+	#getGeneAndProcessGeneNeighbors([proteinIds1, proteinIds2, proteinIds3, originalNames])
 
 
 def main(argv):
@@ -373,9 +412,11 @@ def main(argv):
 		#~ for line in inputFile:
 			#~ listOfIds.append(line.strip())
 	readTreeAndStartProcess()
-	clusterGenesBasedOnSharedDomains()
+	# shallow copying DictProxy object created by Manager.dict() to standart python dict to continue processing
+	gene_to_neighbors = GENE_TO_NEIGHBORS.copy()
+	clusterGenesBasedOnSharedDomains(gene_to_neighbors)
 	with open(OUTPUT_FILE, "w") as outputFile:
-		json.dump(GENE_TO_NEIGHBORS, outputFile, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+		json.dump(gene_to_neighbors, outputFile, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 
 if __name__ == "__main__":

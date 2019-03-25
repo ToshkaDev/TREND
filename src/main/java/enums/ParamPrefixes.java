@@ -10,12 +10,12 @@ public enum  ParamPrefixes {
 
     //alignment specific parameters
     ALGORITHM("-a "),
-    THREAD_ALGN("-t "),
+    THREADS_MAFFT("-t "),
     MAFFT_PATH("-f "),
 
     //tree building specific parameters
     MEGACC_PATH("-k "),
-    THREAD("-u "),
+    THREADS_MEGA_HMMSCAN("-u "),
     TREE_BUILD_METHOD("-m "),
     AA_SUBST_MODEL("-l "),
     AA_SUBST_RATE("-n "),
@@ -51,7 +51,8 @@ public enum  ParamPrefixes {
 
     //gene_neighbors.py specific parameters
     NOT_SHARED_DOMAIN_TOLERANCE("-n "),
-    OPERON_TOLERANCE("-p ");
+    OPERON_TOLERANCE("-p "),
+    PROCESS_NUMBER("-c ");
 
     private String paramPrefix;
 

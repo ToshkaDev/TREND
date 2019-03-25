@@ -51,6 +51,11 @@ public class AppProperties {
     private String mafft = "/usr/bin/mafft";
     private String megacc = "/usr/bin/megacc";
 
+    private String geneNeighborsProcessNum = "50";
+    private String megaThreadNum = "7";
+    private String mafftThreadNum = "7";
+    private String hmmscanThreadNum = "10";
+
 
     public String getWorkingDirLocation() {
         return workingDirLocation;
@@ -326,5 +331,37 @@ public class AppProperties {
 
     public void setPfamAndMist(String pfamAndMist) {
         this.pfamAndMist = pfamAndMist;
+    }
+
+    public String getGeneNeighborsProcessNum() {
+        return geneNeighborsProcessNum;
+    }
+
+    public void setGeneNeighborsProcessNum(String geneNeighborsProcessNum) {
+        this.geneNeighborsProcessNum = geneNeighborsProcessNum;
+    }
+
+    public String getMegaThreadNum() {
+        return megaThreadNum;
+    }
+
+    public void setMegaThreadNum(String megaThreadNum) {
+        this.megaThreadNum = megaThreadNum;
+    }
+
+    public String getMafftThreadNum() {
+        return mafftThreadNum;
+    }
+
+    public void setMafftThreadNum(String mafftThreadNum) {
+        this.mafftThreadNum = mafftThreadNum;
+    }
+
+    public String getHmmscanThreadNum() {
+        return hmmscanThreadNum;
+    }
+
+    public void setHmmscanThreadNum(String hmmscanThreadNum) {
+        this.hmmscanThreadNum = hmmscanThreadNum;
     }
 }
