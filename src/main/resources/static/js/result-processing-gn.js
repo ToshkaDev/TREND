@@ -115,10 +115,14 @@ function getGenesAndDraw(protIdsToYCoords, xCoordinate, xCoordinateText, jsonDom
     var refSeqCounter = 0;
 
     for (proteinName in protIdsToYCoords) {
-        var gene = jsonDomainsAndGenesObj[proteinName][jsonDomainsAndGenesObj[proteinName].length-1]
-        var neighbGenes = jsonDomainsAndGenesObj[proteinName].slice(0, -1);
-        drawNeighborGenes(d3.select('#treeContainer>svg'), gene, neighbGenes,
-                                    protIdsToYCoords[proteinName], xCoordinate);
+        if (jsonDomainsAndGenesObj.hasOwnProperty(proteinName)) {
+            var gene = jsonDomainsAndGenesObj[proteinName][jsonDomainsAndGenesObj[proteinName].length-1]
+            var neighbGenes = jsonDomainsAndGenesObj[proteinName].slice(0, -1);
+            if (neighbGenes && neighbGenes.length > 0) {
+                drawNeighborGenes(d3.select('#treeContainer>svg'), gene, neighbGenes,
+                                            protIdsToYCoords[proteinName], xCoordinate);
+            }
+        }
     }
 }
 
