@@ -149,9 +149,11 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
     private String initArgsForPrepareNames(ProtoTreeInternal protoTreeInternal, List<String> argsForPrepareNames,
                                            List<String> listOfPrograms, List<List<String>> listOfArgumentLists) {
         String preparedFile = null;
+        protoTreeInternal.setFieldsForPrepareNames();
         if (!protoTreeInternal.isFullPipeline().equals("false")) {
             preparedFile = super.getRandomFileName(null);
             argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + preparedFile));
+            argsForPrepareNames.addAll(protoTreeInternal.getFieldsForPrepareNames());
         } else if (protoTreeInternal.isFullPipeline().equals("false")) {
             preparedFile = super.getRandomFileName(".newick");
             argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getTreeFile(), ParamPrefixes.OUTPUT_SECOND.getPrefix() + preparedFile));

@@ -61,15 +61,28 @@ $(document).ready(function (){
 });
 
 function fastaIsCorrect(fasta, malformedMessageId,  notFastaMessageId) {
-	if (fasta.trim().slice(0, 1) !== ">") {
-		$("#"+notFastaMessageId).show();
-		return false;
-	}
-    seqMatches = fasta.match(/>/g);
-    if (seqMatches.length < 3) {
-        $('#'+malformedMessageId).show();
-        return false;
+    var fetchFromIds = $("#fetch-fromIds-value1").prop("checked");
+    if (!fetchFromIds)
+        fetchFromIds = $("#fetch-fromIds-value2").prop("checked");
+
+    if (!fetchFromIds) {
+    	if (fasta.trim().slice(0, 1) !== ">") {
+    		$("#"+notFastaMessageId).show();
+    		return false;
+    	}
+        seqMatches = fasta.match(/>/g);
+        if (seqMatches.length < 3) {
+            $('#'+malformedMessageId).show();
+            return false;
+        }
+    } else {
+        matches = fasta.match(/^.+$/gm);
+        if (matches.length < 3) {
+            $('#'+malformedMessageId).show();
+            return false;
+        }
     }
+
     return true;
 }
 
@@ -179,8 +192,10 @@ function checkFileAndSendQueryNeib(options) {
     var fileReader = new FileReader();
     fileReader.readAsText(options.get("firstFile"));
     fileReader.onloadend = function() {
-        if (fileReader.result.trim().slice(0, 1) !== ">" && fileReader.result.trim().slice(0, 1) !== "(")
-            $("#first-area-message").show();
+        if (fileReader.result.trim().slice(0, 1) !== ">" && fileReader.result.trim().slice(0, 1) !== "(") {
+            if (fastaIsCorrect(fileReader.result, "malformed-fasta", "first-area-message"))
+                getDataAsyncNeighborGenes(options);
+        }
         else {
             if (fileReader.result.trim().slice(0, 1) === "(") {
                 var textCounter = Newick.parse(fileReader.result)[1]
@@ -202,8 +217,10 @@ function checkFileAreaAndSendQueryNeib(options) {
     if (!options.get("firstFileArea"))
         $("#one-area-message").show();
     else if (options.get("firstFileArea") && options.get("firstFileArea").trim().slice(0, 1) !== ">"
-        && options.get("firstFileArea").trim().slice(0, 1) !== "(")
-        $("#first-area-message").show();
+        && options.get("firstFileArea").trim().slice(0, 1) !== "(") {
+            if (fastaIsCorrect(options.get("firstFileArea"), "malformed-fasta", "first-area-message"))
+                getDataAsyncNeighborGenes(options);
+        }
     else {
         if (options.get("firstFileArea").trim().slice(0, 1) === "(") {
             var textCounter = Newick.parse(options.get("firstFileArea"))[1]

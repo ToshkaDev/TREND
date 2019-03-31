@@ -32,6 +32,8 @@ public class ProtoTreeRequest {
     private String commandToBeProcessedBy;
     private String isFullPipeline;
     private String protoTreeCookies;
+    private String fetchFromIds;
+    private String fetchFromTree;
 
     public MultipartFile getFirstFile() {
         return firstFile;
@@ -243,6 +245,22 @@ public class ProtoTreeRequest {
 
     public void setEnumerate(String enumerate) {
         this.enumerate = enumerate;
+    }
+
+    public String getFetchFromIds() {
+        return fetchFromIds;
+    }
+
+    public void setFetchFromIds(String fetchFromIds) {
+        this.fetchFromIds = fetchFromIds;
+    }
+
+    public String getFetchFromTree() {
+        return fetchFromTree;
+    }
+
+    public void setFetchFromTree(String fetchFromTree) {
+        this.fetchFromTree = fetchFromTree;
     }
 }
 

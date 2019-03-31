@@ -38,9 +38,12 @@ public class ProtoTreeInternal {
     private String  commandToBeProcessedBy;
     private String isFullPipeline;
     private String protoTreeCookies;
+    private String fetchFromIds;
+    private String fetchFromTree;
     private List<List<String>> commandsAndArguments;
     private List<String> outputFilesNames = new LinkedList<>();
 
+    private List<String> fieldsForPrepareNames = new LinkedList<>();
     private List<String> fieldsForAlignmentAndTreeBuild = new LinkedList<>();
     private List<String> fieldsForFeaturesPrediction = new LinkedList<>();
     private List<String> fieldsForGeneNeighbors = new LinkedList<>();
@@ -230,6 +233,16 @@ public class ProtoTreeInternal {
         this.lcrPrediction = lcrPrediction;
     }
 
+    public void setFieldsForPrepareNames() {
+        if (getFetchFromIds() != null) {
+            fieldsForPrepareNames.add(getFetchFromIds());
+        }
+        if (getFetchFromTree() != null) {
+            fieldsForPrepareNames.add(getFetchFromTree());
+        }
+
+    }
+
     public void setFields() {
         if (getReorderOrNot() != null) {
             fieldsForAlignmentAndTreeBuild.add(getReorderOrNot());
@@ -258,6 +271,10 @@ public class ProtoTreeInternal {
         if (getEnumerate() != null) {
             fieldsForTreeAndDomains.add(getEnumerate());
         }
+    }
+
+    public List<String> getFieldsForPrepareNames() {
+        return fieldsForPrepareNames;
     }
 
     public List<String> getFieldsForAlignmentAndTreeBuild() {
@@ -314,5 +331,21 @@ public class ProtoTreeInternal {
 
     public void setEnumerate(String enumerate) {
         this.enumerate = enumerate;
+    }
+
+    public String getFetchFromIds() {
+        return fetchFromIds;
+    }
+
+    public void setFetchFromIds(String fetchFromIds) {
+        this.fetchFromIds = fetchFromIds;
+    }
+
+    public String getFetchFromTree() {
+        return fetchFromTree;
+    }
+
+    public void setFetchFromTree(String fetchFromTree) {
+        this.fetchFromTree = fetchFromTree;
     }
 }

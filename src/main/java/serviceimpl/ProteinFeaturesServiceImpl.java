@@ -109,20 +109,27 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         List<String> argsForAlignmentAndTree = new LinkedList<>();
         List<String> argsForTreeWithDomains = new LinkedList<>();
 
+        protoTreeInternal.setFieldsForPrepareNames();
+
         String firstPreparedFile = super.getRandomFileName(null);
         argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + firstPreparedFile));
         protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + firstPreparedFile);
         String inputFileNameForProtFeatures = protoTreeInternal.getFirstFileName();
         listOfPrograms.add(super.getProperties().getPrepareNames());
-        listOfArgumentLists.add(argsForPrepareNames);
 
         if (protoTreeInternal.getSecondFileName() != null) {
             String secondPreparedFile = super.getRandomFileName(null);
+            argsForPrepareNamesSecond.addAll(protoTreeInternal.getFieldsForPrepareNames());
             argsForPrepareNamesSecond.addAll(Arrays.asList(protoTreeInternal.getSecondFileName(), ParamPrefixes.OUTPUT.getPrefix() + secondPreparedFile));
             protoTreeInternal.setSecondFileName(ParamPrefixes.INPUT.getPrefix() + secondPreparedFile);
             inputFileNameForProtFeatures = protoTreeInternal.getSecondFileName();
             listOfPrograms.add(super.getProperties().getPrepareNames());
             listOfArgumentLists.add(argsForPrepareNamesSecond);
+        } else {
+            // If Second file is null we need to add to argsForPrepareNames additional fields add argsForPrepareNames to listOfArgumentLists
+            System.out.println("=========================== " + protoTreeInternal.getFieldsForPrepareNames());
+            argsForPrepareNames.addAll(protoTreeInternal.getFieldsForPrepareNames());
+            listOfArgumentLists.add(argsForPrepareNames);
         }
 
         protoTreeInternal.setFields();

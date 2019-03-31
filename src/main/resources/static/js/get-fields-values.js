@@ -30,6 +30,10 @@ function getOptions() {
 
     var lcrPrediction = $("#lc-value").attr("checked");
     var enumerate = $("#enumerate-value").attr("checked");
+    var fetchFromIds = $("#fetch-fromIds-value1").prop("checked");
+    if (!fetchFromIds)
+        fetchFromIds = $("#fetch-fromIds-value2").prop("checked");
+    var fetchFromTree = $("#fetch-fromTree-value").prop("checked");
 
     var operonTolerance = $('#operon-tolerance').val();
     var domainTolerance = $('#domain-tolerance').val();
@@ -37,6 +41,8 @@ function getOptions() {
     var protoTreeCookies = setOrGetCookies();
 
     var optionToOptionName = {
+        "fetchFromIds": fetchFromIds,
+        "fetchFromTree": fetchFromTree,
         "enumerate": enumerate,
         "operonTolerance": operonTolerance,
         "domainTolerance": domainTolerance,

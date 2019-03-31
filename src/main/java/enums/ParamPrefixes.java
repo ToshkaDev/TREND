@@ -7,6 +7,9 @@ public enum  ParamPrefixes {
     INPUT_FOURTH("-f "),
     OUTPUT("-o "),
     EVAL_THRESH("-e "),
+    FETCH_FROM_IDS("-f "),
+    FETCH_FROM_TREE("-t "),
+
 
     //alignment specific parameters
     ALGORITHM("-a "),

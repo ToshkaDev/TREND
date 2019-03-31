@@ -27,6 +27,11 @@
                 <span id="one-area-message">To start the analysis you need to choose a file with protein sequences or paste the sequences in the area above.</span>
                 <span id="malformed-fasta">There should be at least 3 protein sequences to start the analysis.</span>
             </div>
+            <div class="row fetch-fromIds1">
+                <div class="checkbox">
+                    <label><input id="fetch-fromIds-value1" type="checkbox">Retrieve sequences</label>
+                </div>
+            </div>
             <br /> <br />
         </form>
         <form class="col-md-8 my-textarea second-area">
@@ -43,6 +48,11 @@
             <div class="row">
                 <span id="second-area-message">Wrong format. The fasta format is expected to begin with '>' sign.</span>
                 <span id="malformed-fasta-second">There should be at least 3 protein sequences to start the analysis.</span>
+            </div>
+            <div class="row fetch-fromIds2">
+                <div class="checkbox">
+                    <label><input id="fetch-fromIds-value2" type="checkbox">Retrieve sequences</label>
+                </div>
             </div>
             <br /> <br />
         </form>
@@ -87,6 +97,11 @@
                 <button id="GoAsyncPartial" class="btn btn-primary btn-md pull-right proto-tree-button" type="button">
                     <span>SUBMIT</span>
                 </button>
+            </div>
+            <div class="row fetch-fromTree-value">
+                <div class="checkbox">
+                    <label><input id="fetch-fromTree-value" type="checkbox">Retrieve sequences</label>
+                </div>
             </div>
         </div>
 
