@@ -134,9 +134,16 @@ function checkFileAndSubmit(options, firstFile, firstInsuffSeqsMessageId, firstM
 function checkAndSubmit(options, secondFile) {
 	var firstAreaStatus = null, secondAreaStatus = null;
     if (secondFile === "alignmentFile") {
-        if (!(options.get("firstFile") && options.get("treeFile")) || (options.get("firstFile") && !options.get("treeFile"))) {
-            $("#partial-pipeline-message").show();
-            return;
+        if (!options.get("fetchFromTree")) {
+            if (!(options.get("firstFile") && options.get("treeFile")) || (options.get("firstFile") && !options.get("treeFile"))) {
+                $("#partial-pipeline-message").show();
+                return;
+            }
+        } else {
+            if (options.get("treeFile")) {
+                getDataAsync(options);
+                return;
+            }
         }
     }
     if (secondFile === "secondFile") {

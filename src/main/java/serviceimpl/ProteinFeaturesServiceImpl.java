@@ -120,15 +120,16 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         if (protoTreeInternal.getSecondFileName() != null) {
             String secondPreparedFile = super.getRandomFileName(null);
             argsForPrepareNamesSecond.addAll(protoTreeInternal.getFieldsForPrepareNames());
+            argsForPrepareNamesSecond.add(ParamPrefixes.FETCH_FROM_MIST_TOO.getPrefix() + super.getProperties().getFetchFromMistToo());
             argsForPrepareNamesSecond.addAll(Arrays.asList(protoTreeInternal.getSecondFileName(), ParamPrefixes.OUTPUT.getPrefix() + secondPreparedFile));
             protoTreeInternal.setSecondFileName(ParamPrefixes.INPUT.getPrefix() + secondPreparedFile);
             inputFileNameForProtFeatures = protoTreeInternal.getSecondFileName();
             listOfPrograms.add(super.getProperties().getPrepareNames());
             listOfArgumentLists.add(argsForPrepareNamesSecond);
         } else {
-            // If Second file is null we need to add to argsForPrepareNames additional fields add argsForPrepareNames to listOfArgumentLists
-            System.out.println("=========================== " + protoTreeInternal.getFieldsForPrepareNames());
+            // If Second file is null we need to add to argsForPrepareNames additional fields, fetchFromMist add argsForPrepareNames to listOfArgumentLists
             argsForPrepareNames.addAll(protoTreeInternal.getFieldsForPrepareNames());
+            argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_MIST_TOO.getPrefix() + super.getProperties().getFetchFromMistToo());
             listOfArgumentLists.add(argsForPrepareNames);
         }
 
@@ -227,10 +228,14 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         List<String> argsForProteinFeatures = new LinkedList<>();
         List<String> argsForTreeWithDomains = new LinkedList<>();
 
+        protoTreeInternal.setFieldsForPrepareNames();
         String sequencePreparedFile = super.getRandomFileName(null);
         String treePreparedFile = super.getRandomFileName(null);
+        argsForPrepareNames.addAll(protoTreeInternal.getFieldsForPrepareNames());
+        argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_MIST_TOO.getPrefix() + super.getProperties().getFetchFromMistToo());
+        if (protoTreeInternal.getFirstFileName() != null)
+            argsForPrepareNames.add(protoTreeInternal.getFirstFileName());
         argsForPrepareNames.addAll(Arrays.asList(
-                protoTreeInternal.getFirstFileName(),
                 ParamPrefixes.OUTPUT.getPrefix() + sequencePreparedFile,
                 protoTreeInternal.getTreeFile(),
                 ParamPrefixes.OUTPUT_SECOND.getPrefix() + treePreparedFile

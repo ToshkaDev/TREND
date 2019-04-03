@@ -55,6 +55,7 @@ public class AppProperties {
     private String megaThreadNum = "7";
     private String mafftThreadNum = "7";
     private String hmmscanThreadNum = "10";
+    private String fetchFromMistToo = "true";
 
 
     public String getWorkingDirLocation() {
@@ -363,5 +364,13 @@ public class AppProperties {
 
     public void setHmmscanThreadNum(String hmmscanThreadNum) {
         this.hmmscanThreadNum = hmmscanThreadNum;
+    }
+
+    public String getFetchFromMistToo() {
+        return fetchFromMistToo;
+    }
+
+    public void setFetchFromMistToo(String fetchFromMistToo) {
+        this.fetchFromMistToo = fetchFromMistToo;
     }
 }

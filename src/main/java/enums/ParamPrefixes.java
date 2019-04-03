@@ -10,6 +10,9 @@ public enum  ParamPrefixes {
     FETCH_FROM_IDS("-f "),
     FETCH_FROM_TREE("-t "),
 
+    //prepareNames specific parameters
+    FETCH_FROM_MIST_TOO("-m "),
+
 
     //alignment specific parameters
     ALGORITHM("-a "),

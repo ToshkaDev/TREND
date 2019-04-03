@@ -40,6 +40,7 @@ public class ProtoTreeInternal {
     private String protoTreeCookies;
     private String fetchFromIds;
     private String fetchFromTree;
+
     private List<List<String>> commandsAndArguments;
     private List<String> outputFilesNames = new LinkedList<>();
 
@@ -240,7 +241,6 @@ public class ProtoTreeInternal {
         if (getFetchFromTree() != null) {
             fieldsForPrepareNames.add(getFetchFromTree());
         }
-
     }
 
     public void setFields() {
@@ -348,4 +348,5 @@ public class ProtoTreeInternal {
     public void setFetchFromTree(String fetchFromTree) {
         this.fetchFromTree = fetchFromTree;
     }
+
 }
