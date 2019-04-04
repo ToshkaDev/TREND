@@ -122,12 +122,12 @@ def getChangedNamesForSeqsAndSave(handle=False, proteinIdToSeq=False):
 	if not isInOutOk(INPUT_FILE, OUTPUT_FILE):
 		return
 	with open(OUTPUT_FILE, "w") as outputFile:
-		if not handle:
+		if not handle and not proteinIdToSeq:
 			#default case
 			with open(INPUT_FILE, "r") as inputFile:
 				for line in inputFile:
 					outputFile.write(getChangedName(line))
-		else:
+		if handle:
 			#after retrieving seqeunces by Id from NCBI
 			for eachRecord in SeqIO.parse(handle, "fasta"):
 				outputFile.write(">" + getChangedName(eachRecord.description) + "\n")
@@ -153,16 +153,34 @@ def prepareIdListFromInput():
 
 def fetchNamesAndSave():
 	handle = None
+	proteinIdToSeq = None
+	mistFetchStatusMessage = "No error while fetching from MiST."
 	proteinIds, proteinIdsMultiProc = prepareIdListFromInput()
 	try:
-		handle = getHandleOfFetchedSequencesFromNcbi(proteinIds)
 		proteinIdToSeq = fetchFromMistByIds(proteinIdsMultiProc)
-		if FETCH_FROM_MIST_TOO:
-			getChangedNamesForSeqsAndSave(handle, proteinIdToSeq)
-		else:
-			getChangedNamesForSeqsAndSave(handle=handle)
+	except Exception, e:
+		mistFetchStatusMessage = "Error while fetching from MiST."
+		print(mistFetchStatusMessage)
+		print (e)
+		print("Will try to fetch from NCBI.")
 	finally:
-		handle.close()
+		try:
+			handle = getHandleOfFetchedSequencesFromNcbi(proteinIds)
+			print(mistFetchStatusMessage)
+			print("No error while fetching from NCBI.")
+			if FETCH_FROM_MIST_TOO and proteinIdToSeq:
+				getChangedNamesForSeqsAndSave(handle, proteinIdToSeq)
+			else:
+				getChangedNamesForSeqsAndSave(handle=handle)
+		except Exception, e:
+			print("Error while fetching from NCBI.")
+			print (e)
+			if FETCH_FROM_MIST_TOO and proteinIdToSeq:
+				print(mistFetchStatusMessage)
+				getChangedNamesForSeqsAndSave(handle, proteinIdToSeq)
+		finally:
+			if handle:
+				handle.close()
 
 
 # ============== Fetch from MiST# ============== #
@@ -183,7 +201,7 @@ def fetchFromMistByIds(proteinIds, proteinIdsToOrigNames=None):
 		proc.start()
 	for proc in processes:
 		proc.join()
-	return proteinIdToSeq
+	return proteinIdToSeq.copy()
 
 def fetchFromMist(proteinIdToSeq, multiProcList, proteinIdsToOrigNames=None):
 	for proteinId in multiProcList:
@@ -261,7 +279,6 @@ def fetchSequencesAndGetNameToSeqMap(proteinIds, proteinIdsToOrigNames, message)
 	finally:
 		if proteinIdsHandle:
 			proteinIdsHandle.close()
-	print message + " " + str(proteinIdsHandle)
 	return proteinIds_ToFullSeqInfo
 
 ####===================================================#####
