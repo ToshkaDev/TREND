@@ -29,19 +29,23 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
 
 	public ProteinFeaturesServiceImpl(final StorageService storageService, final AppProperties properties, final BioJobDao bioJobDao, final BioJobResultDao bioJobResultDao) {
 		super(storageService, properties, bioJobResultDao, bioJobDao);
-        counterToStageOneInput.put(1, "['Predicting proteins features.']");
-        counterToStageOneInput.put(2, "['Predicting proteins features.', 'Aligning sequences and building phylogenetic tree.']");
-        counterToStageOneInput.put(3, "['Predicting proteins features.', 'Aligning sequences and building phylogenetic tree.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStageOneInput.put(0, "['Processing input.']");
+        counterToStageOneInput.put(1, "['Processing input.', 'Predicting proteins features.']");
+        counterToStageOneInput.put(2, "['Processing input.', 'Predicting proteins features.', 'Aligning sequences and building phylogenetic tree.']");
+        counterToStageOneInput.put(3, "['Processing input.', 'Predicting proteins features.', 'Aligning sequences and building phylogenetic tree.', 'Ordering alignment and putting features and tree together.-last']");
 
-        counterToStageTwoInputs.put(2, "['Predicting proteins features.']");
-        counterToStageTwoInputs.put(3, "['Predicting proteins features.', 'Aligning sequences and building phylogenetic tree.']");
-        counterToStageTwoInputs.put(4, "['Predicting proteins features.', 'Aligning sequences and building phylogenetic tree.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStageTwoInputs.put(1, "['Processing input.', 'Predicting proteins features.']");
+        counterToStageTwoInputs.put(2, "['Processing input.', 'Predicting proteins features.']");
+        counterToStageTwoInputs.put(3, "['Processing input.', 'Predicting proteins features.', 'Aligning sequences and building phylogenetic tree.']");
+        counterToStageTwoInputs.put(4, "['Processing input.', 'Predicting proteins features.', 'Aligning sequences and building phylogenetic tree.', 'Ordering alignment and putting features and tree together.-last']");
 
-        counterToStagePartialOneInput.put(1, "['Predicting proteins features.']");
-        counterToStagePartialOneInput.put(2, "['Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStagePartialOneInput.put(0, "['Processing input.']");
+        counterToStagePartialOneInput.put(1, "['Processing input.', 'Predicting proteins features.']");
+        counterToStagePartialOneInput.put(2, "['Processing input.', 'Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
 
-        counterToStagePartialTwoInputs.put(2, "['Predicting proteins features.']");
-        counterToStagePartialTwoInputs.put(3, "['Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStagePartialTwoInputs.put(1, "['Processing input.']");
+        counterToStagePartialTwoInputs.put(2, "['Processing input.', 'Predicting proteins features.']");
+        counterToStagePartialTwoInputs.put(3, "['Processing input.', 'Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
 	}
 
 	private String getDomainPredictionDb(String dbName) {
@@ -120,7 +124,9 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         if (protoTreeInternal.getSecondFileName() != null) {
             String secondPreparedFile = super.getRandomFileName(null);
             argsForPrepareNamesSecond.addAll(protoTreeInternal.getFieldsForPrepareNames());
-            argsForPrepareNamesSecond.add(ParamPrefixes.FETCH_FROM_MIST_TOO.getPrefix() + super.getProperties().getFetchFromMistToo());
+            argsForPrepareNamesSecond.add(ParamPrefixes.FETCH_FROM_MIST.getPrefix() + super.getProperties().getFetchFromMist());
+            argsForPrepareNamesSecond.add(ParamPrefixes.FETCH_FROM_NCBI.getPrefix() + super.getProperties().getFetchFromNCBI());
+            argsForPrepareNamesSecond.add(ParamPrefixes.PROCESS_NUMBER.getPrefix() + super.getProperties().getFetchFromMistProcNum());
             argsForPrepareNamesSecond.addAll(Arrays.asList(protoTreeInternal.getSecondFileName(), ParamPrefixes.OUTPUT.getPrefix() + secondPreparedFile));
             protoTreeInternal.setSecondFileName(ParamPrefixes.INPUT.getPrefix() + secondPreparedFile);
             inputFileNameForProtFeatures = protoTreeInternal.getSecondFileName();
@@ -129,7 +135,9 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         } else {
             // If Second file is null we need to add to argsForPrepareNames additional fields, fetchFromMist add argsForPrepareNames to listOfArgumentLists
             argsForPrepareNames.addAll(protoTreeInternal.getFieldsForPrepareNames());
-            argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_MIST_TOO.getPrefix() + super.getProperties().getFetchFromMistToo());
+            argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_MIST.getPrefix() + super.getProperties().getFetchFromMist());
+            argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_NCBI.getPrefix() + super.getProperties().getFetchFromNCBI());
+            argsForPrepareNames.add(ParamPrefixes.PROCESS_NUMBER.getPrefix() + super.getProperties().getFetchFromMistProcNum());
             listOfArgumentLists.add(argsForPrepareNames);
         }
 
@@ -232,14 +240,15 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         String sequencePreparedFile = super.getRandomFileName(null);
         String treePreparedFile = super.getRandomFileName(null);
         argsForPrepareNames.addAll(protoTreeInternal.getFieldsForPrepareNames());
-        argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_MIST_TOO.getPrefix() + super.getProperties().getFetchFromMistToo());
+        argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_MIST.getPrefix() + super.getProperties().getFetchFromMist());
+        argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_NCBI.getPrefix() + super.getProperties().getFetchFromNCBI());
+        argsForPrepareNames.add(ParamPrefixes.PROCESS_NUMBER.getPrefix() + super.getProperties().getFetchFromMistProcNum());
         if (protoTreeInternal.getFirstFileName() != null)
             argsForPrepareNames.add(protoTreeInternal.getFirstFileName());
         argsForPrepareNames.addAll(Arrays.asList(
                 ParamPrefixes.OUTPUT.getPrefix() + sequencePreparedFile,
                 protoTreeInternal.getTreeFile(),
-                ParamPrefixes.OUTPUT_SECOND.getPrefix() + treePreparedFile
-        ));
+                ParamPrefixes.OUTPUT_SECOND.getPrefix() + treePreparedFile));
         listOfPrograms.add(super.getProperties().getPrepareNames());
         listOfArgumentLists.add(argsForPrepareNames);
 

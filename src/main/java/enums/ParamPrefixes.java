@@ -11,7 +11,8 @@ public enum  ParamPrefixes {
     FETCH_FROM_TREE("-t "),
 
     //prepareNames specific parameters
-    FETCH_FROM_MIST_TOO("-m "),
+    FETCH_FROM_MIST("-m "),
+    FETCH_FROM_NCBI("-b "),
 
 
     //alignment specific parameters

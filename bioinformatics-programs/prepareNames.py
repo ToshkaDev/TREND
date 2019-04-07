@@ -12,10 +12,14 @@ import urllib
 import json
 import math
 import multiprocessing
+import time
+# pip install timeout-decorator
+import timeout_decorator
 
 manager = multiprocessing.Manager()
 Entrez.email = "A.N.Other@example.com"
-
+# 2 sec
+ENTREZ_EFETCH_TIMEOUT = 2
 SLEEP_TIME_FOR_NCBI_REQUEST = 0.25
 
 INPUT_FILE = None
@@ -34,30 +38,36 @@ REGEX_LEAF_NAME_1 = re.compile(r"(\('[^\(].+?':|,'[^\(].+?':)")
 REGEX_LEAF_NAME_2 = re.compile(r"(\([^\(].+?:|,[^\(].+?:)")
 REGEX_NUMBER_UNDERSCORE = re.compile(r"^\d+_")
 
-MIST_BASE_URL = "https://api.mistdb.caltech.edu/v1/genes/"
-ASEQ_SEQUENCE_FIELD = "?fields=id,stable_id&fields.Aseq=sequence&fields.Component=definition"
-NUMBER_OF_PROCESSES = 50
-FETCH_FROM_MIST_TOO = False
+#~ MIST_BASE_URL = "https://api.mistdb.caltech.edu/v1/genes/"
+#~ ASEQ_SEQUENCE_FIELD = "?fields=id,stable_id&fields.Aseq=sequence&fields.Component=definition"
+MIST_BASE_URL = "https://api.mistdb.caltech.edu/v1/genes?search="
+ASEQ_SEQUENCE_FIELD = "&fields=id,stable_id&fields.Aseq=sequence&fields.Component=definition"
+NUMBER_OF_PROCESSES = 30
+FETCH_FROM_NCBI = True
+FETCH_FROM_MIST = False
 
 USAGE = "\nThe script makes sequence names and/or tree leaves names newick friendly.\n" + \
 	"Moreover the script fetch sequences by id from the list of ids or from the tree leves.\n\n" + \
 	"python 	" + sys.argv[0] + '''
 	-h || --help            - help
-	-i || --ifile           - input file with sequences
+	-i || --ifile           - input file with sequences or id list
 	-s || --sfile           - input file with phylogenetic tree in newick format
-	-o || --ofile           - output file with sequences with changed names
+	-o || --ofile           - output file with sequences with changed names (and retrieved seqs if id list was given)
 	-n || --nfile           - output file with tree with changed names of leaves
 	[-f || --fetchFromIds]  - fetch sequences from ids or not: "true" or "false". Default is "false".
 							 Only "-f" or "-t" (below) can be used. Not both at the same time.
 	[-t || --fetchFromTree] - fetch sequences from tree leaves names or not: "true" or "false". Default is "false"
-	[-c || --proc_num]      - number of processes to run simultaneously, default is 50. The number is big bacause the process is not CPU-intensive
+	[-c || --proc_num]      - number of processes to run simultaneously, default is 30. The number is big bacause the process is not CPU-intensive
 	[-m || --fetchFromMist] - fetch or not from Mist: "true" or "false". Default is "false".
+	[-b || --fetchFromNCBI] - fetch or not from NCBI: "true" or "false". Default is "true".
 	'''
 
 def initialize(argv):
-	global INPUT_FILE, INPUT_FILE_TREE, OUTPUT_FILE, OUTPUT_FILE_TREE, FETCH_FROM_IDS, FETCH_FROM_TREE, NUMBER_OF_PROCESSES, FETCH_FROM_MIST_TOO
+	global INPUT_FILE, INPUT_FILE_TREE, OUTPUT_FILE, OUTPUT_FILE_TREE, FETCH_FROM_IDS, FETCH_FROM_TREE
+	global NUMBER_OF_PROCESSES, FETCH_FROM_MIST, FETCH_FROM_NCBI
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:s:o:n:f:t:c:m:",["help", "ifile=", "sfile=", "ofile=", "nfile=", "fetchFromIds=", "fetchFromTree=", "proc_num=", "fetchFromMist="])
+		opts, args = getopt.getopt(argv[1:],"hi:s:o:n:f:t:c:m:b:",["help", "ifile=", "sfile=", "ofile=", "nfile=", "fetchFromIds=", \
+			"fetchFromTree=", "proc_num=", "fetchFromMist=", "fetchFromNCBI="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
@@ -84,13 +94,15 @@ def initialize(argv):
 					FETCH_FROM_TREE = True
 			elif opt in ("-m", "--fetchFromMist"):
 				if str(arg).strip().lower() == "true":
-					FETCH_FROM_MIST_TOO = True
+					FETCH_FROM_MIST = True
+			elif opt in ("-b", "--fetchFromNCBI"):
+				if str(arg).strip().lower() == "false":
+					FETCH_FROM_NCBI = False
 			elif opt in ("-c", "--proc_num"):
-				NUMBER_OF_PROCESSES = str(arg).strip()
+				NUMBER_OF_PROCESSES = int(str(arg).strip())
 	except Exception as e:
 		print "===========ERROR==========\n " + str(e) + USAGE
 		sys.exit(2)
-
 
 # basic name changer
 def getChangedName(line):
@@ -118,9 +130,10 @@ def getChangedNamesForTree():
 	return treeObject
 
 # Save sequences by Id: this is a final step
-def getChangedNamesForSeqsAndSave(handle=False, proteinIdToSeq=False):
+def getChangedNamesForSeqsAndSave(handle=False, proteinIdToSeq=False, proteinIdToTrueId=False):
 	if not isInOutOk(INPUT_FILE, OUTPUT_FILE):
 		return
+	savedIds = set()
 	with open(OUTPUT_FILE, "w") as outputFile:
 		if not handle and not proteinIdToSeq:
 			#default case
@@ -130,54 +143,56 @@ def getChangedNamesForSeqsAndSave(handle=False, proteinIdToSeq=False):
 		if handle:
 			#after retrieving seqeunces by Id from NCBI
 			for eachRecord in SeqIO.parse(handle, "fasta"):
-				outputFile.write(">" + getChangedName(eachRecord.description) + "\n")
-				outputFile.write(str(eachRecord.seq) + "\n")
+				if eachRecord.id not in savedIds:
+					outputFile.write(">" + getChangedName(eachRecord.description) + "\n")
+					outputFile.write(str(eachRecord.seq) + "\n")
+					savedIds.add(eachRecord.id)
 		if proteinIdToSeq:
 			#after retrieving seqeunces by Id from Mist
 			for proteinName, seq in proteinIdToSeq.items():
-				outputFile.write(">" + getChangedName(proteinName) + "\n")
-				outputFile.write(seq + "\n")
-
+				if proteinIdToTrueId[proteinName] not in savedIds:
+					outputFile.write(">" + getChangedName(proteinName) + "\n")
+					outputFile.write(seq + "\n")
+					savedIds.add(proteinIdToTrueId[proteinName])
 
 ####===================================================#####
 ### Fetching sequences from NCBI using input Id list ###
 
 def prepareIdListFromInput():
-	proteinIds = list()
+	proteinIds = set()
 	with open(INPUT_FILE, "r") as inputFile:
 		for line in inputFile:
-			proteinIds.append(line.strip())
-	proteinIdsMultiProc = manager.list(proteinIds[:])
+			proteinIds.add(line.strip())
+	proteinIdsMultiProc = manager.list(proteinIds.copy())
 	return (proteinIds, proteinIdsMultiProc)
 
 
 def fetchNamesAndSave():
 	handle = None
 	proteinIdToSeq = None
-	mistFetchStatusMessage = "No error while fetching from MiST."
+	proteinIdToTrueId = None
 	proteinIds, proteinIdsMultiProc = prepareIdListFromInput()
 	try:
-		proteinIdToSeq = fetchFromMistByIds(proteinIdsMultiProc)
+		proteinIdToSeq, proteinIdToTrueId = fetchFromMistByIds(proteinIdsMultiProc)
+		print("No error while fetching from MiST.")
 	except Exception, e:
-		mistFetchStatusMessage = "Error while fetching from MiST."
-		print(mistFetchStatusMessage)
+		print("Error while fetching from MiST.")
 		print (e)
-		print("Will try to fetch from NCBI.")
 	finally:
 		try:
-			handle = getHandleOfFetchedSequencesFromNcbi(proteinIds)
-			print(mistFetchStatusMessage)
-			print("No error while fetching from NCBI.")
-			if FETCH_FROM_MIST_TOO and proteinIdToSeq:
-				getChangedNamesForSeqsAndSave(handle, proteinIdToSeq)
+			if FETCH_FROM_NCBI:
+				print("Will try to fetch from NCBI.")
+				handle = getHandleOfFetchedSequencesFromNcbi(proteinIds)
+				print("No error while fetching from NCBI.")
+			if FETCH_FROM_MIST and proteinIdToSeq:
+				getChangedNamesForSeqsAndSave(handle, proteinIdToSeq, proteinIdToTrueId)
 			else:
 				getChangedNamesForSeqsAndSave(handle=handle)
 		except Exception, e:
 			print("Error while fetching from NCBI.")
 			print (e)
-			if FETCH_FROM_MIST_TOO and proteinIdToSeq:
-				print(mistFetchStatusMessage)
-				getChangedNamesForSeqsAndSave(handle, proteinIdToSeq)
+			if FETCH_FROM_MIST and proteinIdToSeq:
+				getChangedNamesForSeqsAndSave(handle, proteinIdToSeq, proteinIdToTrueId)
 		finally:
 			if handle:
 				handle.close()
@@ -186,6 +201,7 @@ def fetchNamesAndSave():
 # ============== Fetch from MiST# ============== #
 def fetchFromMistByIds(proteinIds, proteinIdsToOrigNames=None):
 	proteinIdToSeq = manager.dict()
+	proteinIdToTrueId = manager.dict()
 	elementsForOneThread = int(math.ceil(len(proteinIds)/float(NUMBER_OF_PROCESSES)))
 	processes = list()
 	startIndex = 0
@@ -193,7 +209,7 @@ def fetchFromMistByIds(proteinIds, proteinIdsToOrigNames=None):
 	for ind in xrange(NUMBER_OF_PROCESSES):
 		if startIndex <= len(proteinIds):
 			process = multiprocessing.Process(target=fetchFromMist, \
-				args=(proteinIdToSeq, proteinIds[startIndex:endIndex], proteinIdsToOrigNames,))
+				args=(proteinIdToSeq, proteinIdToTrueId, proteinIds[startIndex:endIndex], proteinIdsToOrigNames,))
 			processes.append(process)
 			startIndex = endIndex
 			endIndex = endIndex + elementsForOneThread
@@ -201,32 +217,39 @@ def fetchFromMistByIds(proteinIds, proteinIdsToOrigNames=None):
 		proc.start()
 	for proc in processes:
 		proc.join()
-	return proteinIdToSeq.copy()
+	return (proteinIdToSeq.copy(), proteinIdToTrueId.copy())
 
-def fetchFromMist(proteinIdToSeq, multiProcList, proteinIdsToOrigNames=None):
+
+def fetchFromMist(proteinIdToSeq, proteinIdToTrueId, multiProcList, proteinIdsToOrigNames=None):
 	for proteinId in multiProcList:
 		proteinId = proteinId.strip()
 		preparedUrl = MIST_BASE_URL + proteinId + ASEQ_SEQUENCE_FIELD
 		result = urllib.urlopen(preparedUrl).read()
 		proteinDict = json.loads(result)
-		if "Aseq" in proteinDict and "sequence" in proteinDict["Aseq"]:
-			proteinSeq = proteinDict["Aseq"]["sequence"]
-			if not proteinIdsToOrigNames:
-				if "Component" in proteinDict and "definition" in proteinDict["Component"]:
-					proteinName = proteinId + "_" + proteinDict["Component"]["definition"].split(",")[0]
-					proteinIdToSeq[proteinName] = proteinSeq
-			else:
-				for proteinName in proteinIdsToOrigNames[proteinId]:
-					proteinIdToSeq[proteinName] = proteinSeq
+		if len(proteinDict):
+			proteinDict = proteinDict[0]
+			if "Aseq" in proteinDict and "sequence" in proteinDict["Aseq"]:
+				proteinSeq = proteinDict["Aseq"]["sequence"]
+				if not proteinIdsToOrigNames:
+					if "Component" in proteinDict and "definition" in proteinDict["Component"]:
+						proteinName = proteinId + "_" + proteinDict["Component"]["definition"].split(",")[0]
+						proteinIdToSeq[proteinName] = proteinSeq
+						proteinIdToTrueId[proteinName]  = proteinId
+				else:
+					for proteinName in proteinIdsToOrigNames[proteinId]:
+						proteinIdToSeq[proteinName] = proteinSeq
 # ============== Fetch from MiST# ============== #
 
 ####===================================================#####
 ### Fetching sequences from NCBI using Tree leaves names ###
 
 def fetchSequencesForTreeAndSave(treeObject):
-	proteinIds1 = list()
-	proteinIds2 = list()
-	proteinIds3 = manager.list()
+	proteinIds1 = set()
+	proteinIds2 = set()
+	proteinIds03 = set()
+	proteinIdsToSeq1 = None
+	proteinIdsToSeq2 = None
+	proteinIdsToSeq3 = None
 	proteinIdsToOrigNames1 = collections.defaultdict(set)
 	proteinIdsToOrigNames2 = collections.defaultdict(set)
 	proteinIdsToOrigNames3 = collections.defaultdict(set)
@@ -236,38 +259,42 @@ def fetchSequencesForTreeAndSave(treeObject):
 		fullProteinName = REGEX_NUMBER_UNDERSCORE.sub("", originalProteinName)
 
 		partProteinName = "_".join(fullProteinName.split("_")[0:2]).strip()
-		proteinIds1.append(partProteinName)
+		proteinIds1.add(partProteinName)
 		proteinIdsToOrigNames1[partProteinName].add(originalProteinName)
 
  		partProteinName = fullProteinName.split("_")[0].strip()
-		proteinIds2.append(partProteinName)
+		proteinIds2.add(partProteinName)
 		proteinIdsToOrigNames2[partProteinName].add(originalProteinName)
 
+		# this case can happen only for MiST Ids
 		partProteinName = "_".join(fullProteinName.split("_")[0:3]).strip()
-		proteinIds3.append(partProteinName)
+		proteinIds03.add(partProteinName)
 		proteinIdsToOrigNames3[partProteinName].add(originalProteinName)
 
-	proteinIds1_ToFullSeqInfo = fetchSequencesAndGetNameToSeqMap(proteinIds1, proteinIdsToOrigNames1, "first")
-	proteinIds2_ToFullSeqInfo = fetchSequencesAndGetNameToSeqMap(proteinIds2, proteinIdsToOrigNames2, "second")
-	proteinIds3_ToFullSeqInfo = None
-	if FETCH_FROM_MIST_TOO:
-		proteinIds3_ToFullSeqInfo = fetchFromMistByIds(proteinIds3, proteinIdsToOrigNames3)
+	# multiporcess dicts from usual sets to fetch from MiST
+	proteinIdsForMist1 = manager.list(proteinIds1)
+	proteinIdsForMist2 = manager.list(proteinIds2)
+	proteinIdsForMist3 = manager.list(proteinIds03)
+	if FETCH_FROM_NCBI:
+		proteinIdsToSeq1 = fetchSequencesAndGetNameToSeqMap(proteinIds1, proteinIdsToOrigNames1)
+		proteinIdsToSeq2 = fetchSequencesAndGetNameToSeqMap(proteinIds2, proteinIdsToOrigNames2)
+	if FETCH_FROM_MIST:
+		proteinIdsToSeq3ForMist = fetchFromMistByIds(proteinIdsForMist3, proteinIdsToOrigNames3)[0]
+		if not FETCH_FROM_NCBI:
+			proteinIdsToSeq1ForMist = fetchFromMistByIds(proteinIdsForMist1, proteinIdsToOrigNames1)[0]
+			proteinIdsToSeq2ForMist = fetchFromMistByIds(proteinIdsForMist2, proteinIdsToOrigNames2)[0]
 	with open(OUTPUT_FILE, "w") as outputFile:
-		if len(proteinIds1_ToFullSeqInfo):
-			for name, seqs in proteinIds1_ToFullSeqInfo.items():
-				outputFile.write(">" + name + "\n")
-				outputFile.write(seqs + "\n")
-		if len(proteinIds2_ToFullSeqInfo):
-			for name, seqs in proteinIds2_ToFullSeqInfo.items():
-				outputFile.write(">" + name + "\n")
-				outputFile.write(seqs + "\n")
-		if proteinIds3_ToFullSeqInfo and len(proteinIds3_ToFullSeqInfo):
-			for name, seqs in proteinIds3_ToFullSeqInfo.items():
-				outputFile.write(">" + name + "\n")
-				outputFile.write(seqs + "\n")
+		if FETCH_FROM_NCBI:
+			saveFetchedSeqsForTree(proteinIdsToSeq1, outputFile)
+			saveFetchedSeqsForTree(proteinIdsToSeq2, outputFile)
+		if FETCH_FROM_MIST:
+			saveFetchedSeqsForTree(proteinIdsToSeq3ForMist, outputFile)
+			if not FETCH_FROM_NCBI:
+				saveFetchedSeqsForTree(proteinIdsToSeq1ForMist, outputFile)
+				saveFetchedSeqsForTree(proteinIdsToSeq2ForMist, outputFile)
 
-def fetchSequencesAndGetNameToSeqMap(proteinIds, proteinIdsToOrigNames, message):
-	proteinIds_ToFullSeqInfo  = dict()
+def fetchSequencesAndGetNameToSeqMap(proteinIds, proteinIdsToOrigNames):
+	proteinIdsSeqs = dict()
 	proteinIdsHandle = None
 	try:
 		proteinIdsHandle = getHandleOfFetchedSequencesFromNcbi(proteinIds)
@@ -275,20 +302,28 @@ def fetchSequencesAndGetNameToSeqMap(proteinIds, proteinIdsToOrigNames, message)
 			for eachRecord in SeqIO.parse(proteinIdsHandle, "fasta"):
 				for name in proteinIdsToOrigNames[eachRecord.id]:
 					seq = str(eachRecord.seq)
-					proteinIds_ToFullSeqInfo[name] = seq
+					proteinIdsSeqs[name] = seq
+	except Exception, e:
+		print(e)
 	finally:
 		if proteinIdsHandle:
 			proteinIdsHandle.close()
-	return proteinIds_ToFullSeqInfo
+	return proteinIdsSeqs
 
+def saveFetchedSeqsForTree(proteinIdsToSeq, outputFile):
+	if proteinIdsToSeq and len(proteinIdsToSeq):
+		for name, seqs in proteinIdsToSeq.items():
+			outputFile.write(">" + name + "\n")
+			outputFile.write(seqs + "\n")
 ####===================================================#####
 
 # A generic fetcher. It returns a handle of fetched records
-def getHandleOfFetchedSequencesFromNcbi(idList):
+@timeout_decorator.timeout(ENTREZ_EFETCH_TIMEOUT, use_signals=False)
+def getHandleOfFetchedSequencesFromNcbi(proteinIds):
 	handle = None
 	try:
 		#handle = Entrez.efetch(db="protein", id="OYV75139.1,ACR67403.1", rettype="fasta", retmode="text")
-		handle = Entrez.efetch(db="protein", id=",".join(idList), rettype="fasta", retmode="text")
+		handle = Entrez.efetch(db="protein", id=",".join(proteinIds), rettype="fasta", retmode="text")
 	except Exception, e:
 		if handle:
 			handle.close()
@@ -312,9 +347,12 @@ def isInOutOk(inputFile, outputFile, isTree=False):
 
 def main(argv):
 	initialize(argv)
+	if FETCH_FROM_IDS and FETCH_FROM_TREE:
+		print("You can't fetch both using id list and tree leaves names! Exiting")
+		return
 	if FETCH_FROM_IDS:
 		fetchNamesAndSave()
-	else:
+	elif not FETCH_FROM_TREE:
 		getChangedNamesForSeqsAndSave()
 	treeObject = getChangedNamesForTree()
 	if FETCH_FROM_TREE:

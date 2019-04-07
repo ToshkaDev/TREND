@@ -51,11 +51,12 @@ public class AppProperties {
     private String mafft = "/usr/bin/mafft";
     private String megacc = "/usr/bin/megacc";
 
-    private String geneNeighborsProcessNum = "50";
+    private String fetchFromMistProcNum = "50";
     private String megaThreadNum = "7";
     private String mafftThreadNum = "7";
     private String hmmscanThreadNum = "10";
-    private String fetchFromMistToo = "true";
+    private String fetchFromMist = "true";
+    private String fetchFromNCBI = "false";
 
 
     public String getWorkingDirLocation() {
@@ -334,12 +335,12 @@ public class AppProperties {
         this.pfamAndMist = pfamAndMist;
     }
 
-    public String getGeneNeighborsProcessNum() {
-        return geneNeighborsProcessNum;
+    public String getFetchFromMistProcNum() {
+        return fetchFromMistProcNum;
     }
 
-    public void setGeneNeighborsProcessNum(String geneNeighborsProcessNum) {
-        this.geneNeighborsProcessNum = geneNeighborsProcessNum;
+    public void setFetchFromMistProcNum(String fetchFromMistProcNum) {
+        this.fetchFromMistProcNum = fetchFromMistProcNum;
     }
 
     public String getMegaThreadNum() {
@@ -366,11 +367,19 @@ public class AppProperties {
         this.hmmscanThreadNum = hmmscanThreadNum;
     }
 
-    public String getFetchFromMistToo() {
-        return fetchFromMistToo;
+    public String getFetchFromMist() {
+        return fetchFromMist;
     }
 
-    public void setFetchFromMistToo(String fetchFromMistToo) {
-        this.fetchFromMistToo = fetchFromMistToo;
+    public void setFetchFromMist(String fetchFromMist) {
+        this.fetchFromMist = fetchFromMist;
+    }
+
+    public String getFetchFromNCBI() {
+        return fetchFromNCBI;
+    }
+
+    public void setFetchFromNCBI(String fetchFromNCBI) {
+        this.fetchFromNCBI = fetchFromNCBI;
     }
 }
