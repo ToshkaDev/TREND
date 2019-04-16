@@ -3,7 +3,26 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
     <div th:fragment="main-navbar">
-        <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid logo-area">
+            <div class="row">
+                <div class="col-md-6">
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <a class="logo-text" th:href="@{/}" style="color:#c62f2d; font-size:350%; font-weight: bold">ProtoTree</a>
+                    <div class="logo-text">Protein evolution and function analysis hub.</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="protoTree-figure">
+                        <a th:href="@{/}">
+                            <img th:src="@{/images/ProtoTree.png}" width="500" height="200">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav id="navbar" class="navbar navbar-inverse">
             <div class="container-fluid">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bu-navbar">
@@ -12,7 +31,6 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" id="logo" th:href="@{/}" style="font-size:180%; color:#D8F0E3">ProtoTree</a>
                 </div>
 
                 <div class="navbar-collapse" id="bu-navbar">
@@ -51,7 +69,7 @@
             </div>
             <div class="col-md-6 footer-info">
                 <a th:href="@{https://www.osu.edu}">
-                    <img th:src="@{/images/TheOhioStateUniversity.jpg}" width="300" height="170">
+                    <img th:src="@{/images/OSU.png}" width="220" height="150">
                 </a>
             </div>
         </div>

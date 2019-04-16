@@ -36,10 +36,10 @@
     <div th:fragment="proto-tree-filter">
         <div class="col-md-2 panel panel-default">
             <div class="panel-body">
-                <h3 class="text-primary">Set options:</h3>
+                <h2 class="text-primary">Set options</h2>
                 <div class="form-group">
                     <form id="first">
-                        <h4 class="text-info" >Alignment (Mafft):</h4>
+                        <h3 class="text-info" >Alignment (Mafft):</h3>
                         <span>Alignment Algorithm:</span>
                         <select id="alignment-alg" class="form-control input-md">
                             <option selected='selected' value="--retree 2 --maxiterate 0">FFT-NS-2</option>
@@ -48,7 +48,7 @@
                             <option value="--genafpair">E-INS-i</option>
                             <option value="--globalpair">G-INS-i</option>
                         </select>
-                        <h4 class="text-info">Tree Building (Mega):</h4>
+                        <h3 class="text-info">Tree Building (Mega):</h3>
                         <span>Tree Building Method:</span>
                         <select id="tree-method" class="form-control input-md">
                             <option selected='selected' value="JN">Neighbour Joining</option>
@@ -132,7 +132,7 @@
                             <span>Number of replicates:</span>
                             <input value="100" id="number-of-replicates" name="number-of-replicates" type="text" class="form-control input-md"/>
                         </div>
-                        <h4 class="text-info">Gene neighbors processing:</h4>
+                        <h3 class="text-info">Gene neighbors:</h3>
                         <div class="operon-tolerance">
                             <span>Operon tolerance:</span>
                             <input type="number" min="0" max="500" step="10" value="150" id="operon-tolerance" name="operon-tolerance" class="form-control input-md"/>

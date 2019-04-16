@@ -13,13 +13,13 @@ import json
 import math
 import multiprocessing
 import time
-# pip install timeout-decorator
+#pip install timeout-decorator
 import timeout_decorator
 
 manager = multiprocessing.Manager()
 Entrez.email = "A.N.Other@example.com"
 # 2 sec
-ENTREZ_EFETCH_TIMEOUT = 2
+ENTREZ_EFETCH_TIMEOUT = 15
 SLEEP_TIME_FOR_NCBI_REQUEST = 0.25
 
 INPUT_FILE = None
@@ -142,6 +142,7 @@ def getChangedNamesForSeqsAndSave(handle=False, proteinIdToSeq=False, proteinIdT
 					outputFile.write(getChangedName(line))
 		if handle:
 			#after retrieving seqeunces by Id from NCBI
+			print "Handle is present"
 			for eachRecord in SeqIO.parse(handle, "fasta"):
 				if eachRecord.id not in savedIds:
 					outputFile.write(">" + getChangedName(eachRecord.description) + "\n")
@@ -318,13 +319,14 @@ def saveFetchedSeqsForTree(proteinIdsToSeq, outputFile):
 ####===================================================#####
 
 # A generic fetcher. It returns a handle of fetched records
-@timeout_decorator.timeout(ENTREZ_EFETCH_TIMEOUT, use_signals=False)
+@timeout_decorator.timeout(ENTREZ_EFETCH_TIMEOUT, use_signals=True)
 def getHandleOfFetchedSequencesFromNcbi(proteinIds):
 	handle = None
 	try:
 		#handle = Entrez.efetch(db="protein", id="OYV75139.1,ACR67403.1", rettype="fasta", retmode="text")
 		handle = Entrez.efetch(db="protein", id=",".join(proteinIds), rettype="fasta", retmode="text")
 	except Exception, e:
+		print ("Couldn't retrieve sequences by id from NCBI in time")
 		if handle:
 			handle.close()
 	return handle

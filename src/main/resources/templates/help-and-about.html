@@ -2,13 +2,95 @@
 
 <html xmlns:th="http://www.thymeleaf.org">
 
-<div th:fragment="about">
+<div th:fragment="contact">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Support & feedback</h2>
+            <div class="contact">
+                Send your comments or bug reports to: comp.bioverse@gmail.com
+            </div>
 
+        </div>
+    </div>
+</div>
+
+<div th:fragment="credits">
+    <div class="row">
+        <div class="col-md-12 credits-list">
+            <div class="credits">
+                MAFFT
+            </div>
+            <div class="credits">
+                MEGA
+            </div>
+            <div class="credits">
+                HMMER
+            </div>
+            <div class="credits">
+                TMHMM
+            </div>
+            <div class="credits">
+                BLAST
+            </div>
+            <div class="credits">
+                ETE Toolkit
+            </div>
+            <div class="credits">
+                jsPhyloSVG
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<div th:fragment="about">
+    <div class="row about-div">
+        <div class="col-md-11 home-description">
+            <h2 id="moto">Searching for regularities in protein evolution... </h2>
+        </div>
+    </div>
+    <div class="row about-div">
+        <div class="col-md-4 home-description">
+            <h3 class="h3-about">Align proteins and build a tree</h3>
+            Provide protein sequences and start the analysis or use our embedded id parser.
+            Use variety of MAFFT alignment algorithms and MEGA tree building options.
+            Reorder the alignment according to the tree leaves.
+        </div>
+        <div class="col-md-4 home-description">
+            <h3 class="h3-about">Bring your own data</h3>
+            If you have your own tree upload it and run subsequent steps.
+            You can optionally upload your alignment to reorder it.
+        </div>
+        <div class="col-md-4 home-description">
+            <h3 class="h3-about">Predict protein domain architectures</h3>
+            Predict protein domains, transmembrane and low-complexity regions.
+            Make use of Pfam, MiST and CDD models.
+        </div>
+    </div>
+    <div class="row about-div">
+        <div class="col-md-4 home-description">
+            <h3 class="h3-about">Identify gene neighborhoods</h3>
+            Identify gene neighborhoods and operons for 125000+ genomes.
+            Set your own distance threshold between genes in operons.
+        </div>
+        <div class="col-md-4 home-description">
+            <h3 class="h3-about">Cluster genes</h3>
+            Cluster genes based on predicted shared domains of encoded proteins.
+            Customize the number of not shared domains for genes to be clustered.
+        </div>
+        <div class="col-md-4 home-description">
+            <h3 class="h3-about">Visualize on the tree</h3>
+            Combine the tree and predictions in one interactive picture.
+            Explore domain predictions and gene neighborhoods.
+            Take advantage of сross-links with Pfam, CDD, NCBI and MiST.
+            Save SVG figure and detailed results of each step.
+        </div>
+    </div>
 </div>
 
 <div th:fragment="help">
     <div class="col-md-12 help-div">
-        <h2>Protein evolution and function analysis hub.</h2>
+        <h2 class="info-href">Analysis</h2>
         <div>
             <p>Study of evolutionary history and function(s) of a protein is an intriguing but not a trivial task.</p>
             <p>The bioinformatics analysis usually starts with collecting homologues proteins.</p>
@@ -55,9 +137,17 @@
                 <h4 class="text-head4" style="font-weight: bold">
                     1. Predicting protein features and building phylogenetic tree using full-length sequences.
                 </h4>
-                <p class="indented-text">
-                    If you want to use this option just paste your sequences or upload a file and click <span class="proto-tree-text"> SUBMIT </span> button.
-                </p>
+                <div class="indented-text">
+                    <p>
+                        If you want to use this option just paste your sequences or upload a file and click <span class="proto-tree-text"> SUBMIT </span> button.
+                    </p>
+                    <p>
+                        You can also provide a list of NCBI or MiST protein ids/locus tags instead of protein sequences, and our id analyzer will extract the sequences from  NCBI and MiST.
+                    </p>
+                    <p>
+                        Just don't forget to tick <span class="proto-tree-text">Retrieve sequences (NCBI and MiST)</span>.
+                    </p>
+                </div>
                 <h4  class="text-head4" style="font-weight: bold">
                     2. Building phylogenetic tree using fragments of protein sequences and predicting protein features using full-length sequences.
                 </h4>
@@ -72,27 +162,49 @@
                         b) Put fragments of sequences into the first area (or choose a file). Protein sequences in this area will be used for alignment and building phylogentic tree.
                     </p>
                     <p>
-                        c) Put full-length sequences into the second area (or choose a file). Protein features will be predicted using these sequences.
+                        c) Put full-length sequences or list of protein ids/locus tags into the second area (or choose a file). Protein features will be predicted using these sequences.
                     </p>
                 </div>
             </div>
             <div>
                 <h3 class="text-head3" style="font-weight: bold"> Partial pipeline mode. </h3>
                 <p>
-                    If you have your own phylogenetic tree and protein sequences used to produce the tree use this mode:
+                    If you have your own phylogenetic tree and protein sequences used to produce the tree use this mode.
                 </p>
-                <p>
-                    a) In <span class="proto-tree-text">Domains</span> section click <span class="proto-tree-text">Partial Pipeline</span> button.
-                </p>
-                <p>
-                    b) Upload protein sequences used to build the tree (<span class="proto-tree-text">Choose file with protein sequences</span> button).
-                </p>
-                <p>
-                    c) Optional, if you want the alignment to be ordered and enumerated according to the tree branches order, upload your alignment (<span class="proto-tree-text">Choose file with alignment (optional)</span> button).
-                </p>
-                <p>
-                    d) Upload the tree in <a href="https://en.wikipedia.org/wiki/Newick_format" target="_blank">newick</a> format (<span class="proto-tree-text">Choose file with tree (Newick)</span> button).
-                </p>
+                <div><p style="font-weight:bold">First way:</p>
+                    <div class="indented-text">
+                        <p>
+                            a) In <span class="proto-tree-text">Domains</span> section click <span class="proto-tree-text">Partial Pipeline</span> button.
+                        </p>
+                        <p>
+                            b) Upload protein sequences used to build the tree (<span class="proto-tree-text">Choose file with protein sequences</span> button).
+                        </p>
+                        <p>
+                            c) Optional, if you want the alignment to be ordered and enumerated according to the tree branches order, upload your alignment (<span class="proto-tree-text">Choose file with alignment (optional)</span> button).
+                        </p>
+                        <p>
+                            d) Upload the tree in <a href="https://en.wikipedia.org/wiki/Newick_format" target="_blank">newick</a> format (<span class="proto-tree-text">Choose file with tree (Newick)</span> button).
+                        </p>
+                    </div>
+                </div>
+                <div><p style="font-weight:bold">First way:</p>
+                    <div class="indented-text">
+                        <p>
+                            Put at the beginning of the tree leaves names NCBI/MiST protein ids/locus tags separated from the rest of the names by
+                            space, underscore( _ ) or vertical bar (|).
+                        </p>
+                        <p>
+                            Tick <span class="proto-tree-text">Retrieve sequences (NCBI and MiST)</span>. Our id analyzer will extract the sequences from NCBI and MiST.
+                        </p>
+                        <p>
+                            And then just upload the tree in <a href="https://en.wikipedia.org/wiki/Newick_format" target="_blank">newick</a> format (<span class="proto-tree-text">Choose file with tree (Newick)</span> button) and start the analysis
+                        </p>
+                        <p>
+                            If you download sequences from NCBI or MiST and use them to build the tree, the ids will be naturally at the beginning of sequences and you don't have to do anything.
+                        </p>
+
+                    </div>
+                </div>
             </div>
             <div>
                 <br/>
@@ -119,7 +231,7 @@
         <div id="neighborhoods-info" class="collapse">
             <div>
                 <p>
-                    You can easily visualize gene neighborhoods on the phylogenetic tree running our neighborhoods analyzer.
+                    You can easily visualize gene neighborhoods on the phylogenetic tree running our neighborhoods analysis pipeline.
                 </p>
                 <p>
                     Protein names in the file with the sequences or the tree should start with protein identifiers
