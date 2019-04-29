@@ -310,7 +310,7 @@ function createDivToAddTo(event, currentClassName, classNameForJson) {
     var yCoor = event.clientY - yOffset + "px";
     var readyClassName = currentClassName + infoPostfix;
     var divElement = $("<div/>");
-    var removeElement = $("<div><a href='#' class='proto-tree-link'><span class='glyphicon glyphicon-remove pull-right'></span></a></div>");
+    var removeElement = $("<div><span class='proto-tree-link'><span class='glyphicon glyphicon-remove pull-right'></span></a></div>");
     divElement.addClass(readyClassName + " protein-info-container");
     divElement.append(removeElement);
     divElement.append($("<h4>" + classNameForJson + "</h4><hr/>"));

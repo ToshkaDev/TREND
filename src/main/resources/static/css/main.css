@@ -151,7 +151,7 @@ label.error {
 #both-areas-message, #one-area-message,
 #partial-pipeline-message, #second-area-message-partialP,
 #first-area-message-partialP, #malformed-fasta, #malformed-fasta-second,
-#malformed-fasta-partialP, #malformed-fasta-second-partialP, #malformed-newick {
+#malformed-fasta-partialP, #malformed-fasta-second-partialP, #malformed-newick, #cannot-have-ids-and-seqs {
     color: #3F7C7A;
     display: none;
 }
@@ -309,6 +309,8 @@ div.result-area {
 }
 
 .text-head3 {
+    font-size: 20px;
+    font-weight: bold;
     margin-bottom: 15px;
 }
 
@@ -513,9 +515,10 @@ input:checked + .slider:before {
 }
 
 /*Help section*/
-.info-href, .info-href:hover, .info-href:focus {
+.info-header {
     text-decoration: none;
     color: #e5ac9d;
+    cursor: default;
 }
 
 .indented-text {
@@ -555,6 +558,13 @@ input:checked + .slider:before {
   box-shadow: inset 0 1px 1px #db8c8d, 0 0 8px #db8c8d;
 }
 
-a, a:hover {
+a, a:hover, a:focus, a:active {
     color: #cb2e2e;
+}
+
+/*Examples*/
+
+.features-example {
+    display: flex;
+    justify-content: flex-start;
 }

@@ -113,33 +113,7 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         List<String> argsForAlignmentAndTree = new LinkedList<>();
         List<String> argsForTreeWithDomains = new LinkedList<>();
 
-        protoTreeInternal.setFieldsForPrepareNames();
-
-        String firstPreparedFile = super.getRandomFileName(null);
-        argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + firstPreparedFile));
-        protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + firstPreparedFile);
-        String inputFileNameForProtFeatures = protoTreeInternal.getFirstFileName();
-        listOfPrograms.add(super.getProperties().getPrepareNames());
-
-        if (protoTreeInternal.getSecondFileName() != null) {
-            String secondPreparedFile = super.getRandomFileName(null);
-            argsForPrepareNamesSecond.addAll(protoTreeInternal.getFieldsForPrepareNames());
-            argsForPrepareNamesSecond.add(ParamPrefixes.FETCH_FROM_MIST.getPrefix() + super.getProperties().getFetchFromMist());
-            argsForPrepareNamesSecond.add(ParamPrefixes.FETCH_FROM_NCBI.getPrefix() + super.getProperties().getFetchFromNCBI());
-            argsForPrepareNamesSecond.add(ParamPrefixes.PROCESS_NUMBER.getPrefix() + super.getProperties().getFetchFromMistProcNum());
-            argsForPrepareNamesSecond.addAll(Arrays.asList(protoTreeInternal.getSecondFileName(), ParamPrefixes.OUTPUT.getPrefix() + secondPreparedFile));
-            protoTreeInternal.setSecondFileName(ParamPrefixes.INPUT.getPrefix() + secondPreparedFile);
-            inputFileNameForProtFeatures = protoTreeInternal.getSecondFileName();
-            listOfPrograms.add(super.getProperties().getPrepareNames());
-            listOfArgumentLists.add(argsForPrepareNamesSecond);
-        } else {
-            // If Second file is null we need to add to argsForPrepareNames additional fields, fetchFromMist add argsForPrepareNames to listOfArgumentLists
-            argsForPrepareNames.addAll(protoTreeInternal.getFieldsForPrepareNames());
-            argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_MIST.getPrefix() + super.getProperties().getFetchFromMist());
-            argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_NCBI.getPrefix() + super.getProperties().getFetchFromNCBI());
-            argsForPrepareNames.add(ParamPrefixes.PROCESS_NUMBER.getPrefix() + super.getProperties().getFetchFromMistProcNum());
-            listOfArgumentLists.add(argsForPrepareNames);
-        }
+        String inputFileNameForProtFeatures =  initFullPipeArgsForPrepareNames(protoTreeInternal, argsForPrepareNames, argsForPrepareNamesSecond, listOfPrograms, listOfArgumentLists);
 
         protoTreeInternal.setFields();
 
@@ -240,11 +214,13 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         String sequencePreparedFile = super.getRandomFileName(null);
         String treePreparedFile = super.getRandomFileName(null);
         argsForPrepareNames.addAll(protoTreeInternal.getFieldsForPrepareNames());
+        argsForPrepareNames.add(ParamPrefixes.REMOVE_DASHES.getPrefix() + "true");
         argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_MIST.getPrefix() + super.getProperties().getFetchFromMist());
         argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_NCBI.getPrefix() + super.getProperties().getFetchFromNCBI());
         argsForPrepareNames.add(ParamPrefixes.PROCESS_NUMBER.getPrefix() + super.getProperties().getFetchFromMistProcNum());
-        if (protoTreeInternal.getFirstFileName() != null)
+        if (protoTreeInternal.getFirstFileName() != null) {
             argsForPrepareNames.add(protoTreeInternal.getFirstFileName());
+        }
         argsForPrepareNames.addAll(Arrays.asList(
                 ParamPrefixes.OUTPUT.getPrefix() + sequencePreparedFile,
                 protoTreeInternal.getTreeFile(),
@@ -258,6 +234,7 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         if (protoTreeInternal.getAlignmentFile() != null) {
             String alignmentPreparedFile = super.getRandomFileName(null);
             argsForPrepareNamesSecond.addAll(Arrays.asList(protoTreeInternal.getAlignmentFile(), ParamPrefixes.OUTPUT.getPrefix() + alignmentPreparedFile));
+            argsForPrepareNamesSecond.add(ParamPrefixes.REMOVE_DASHES.getPrefix() + "false");
             protoTreeInternal.setAlignmentFile(ParamPrefixes.INPUT_SECOND.getPrefix() + alignmentPreparedFile);
             listOfPrograms.add(super.getProperties().getPrepareNames());
             listOfArgumentLists.add(argsForPrepareNamesSecond);
@@ -329,6 +306,37 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         ));
         super.prepareCommandArgumentsCommon(protoTreeInternal, arrayOfInterpreters, arrayOfPrograms, listOfArgumentLists);
         return protoTreeInternal;
+    }
+
+    private String initFullPipeArgsForPrepareNames(ProtoTreeInternal protoTreeInternal, List<String> argsForPrepareNames, List<String> argsForPrepareNamesSecond,
+                                                   List<String> listOfPrograms, List<List<String>> listOfArgumentLists) {
+        protoTreeInternal.setFieldsForPrepareNames();
+        String firstPreparedFile = super.getRandomFileName(null);
+        argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + firstPreparedFile));
+        argsForPrepareNames.add(ParamPrefixes.REMOVE_DASHES.getPrefix() + "true");
+        protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + firstPreparedFile);
+        String inputFileNameForProtFeatures = protoTreeInternal.getFirstFileName();
+        listOfPrograms.add(super.getProperties().getPrepareNames());
+
+        if (protoTreeInternal.getSecondFileName() != null) {
+            // We don't fetch sequences if a second file with sequences fragmetns is provided
+            String secondPreparedFile = super.getRandomFileName(null);
+            argsForPrepareNamesSecond.addAll(Arrays.asList(protoTreeInternal.getSecondFileName(), ParamPrefixes.OUTPUT.getPrefix() + secondPreparedFile));
+            argsForPrepareNamesSecond.add(ParamPrefixes.REMOVE_DASHES.getPrefix() + "true");
+            protoTreeInternal.setSecondFileName(ParamPrefixes.INPUT.getPrefix() + secondPreparedFile);
+            inputFileNameForProtFeatures = protoTreeInternal.getSecondFileName();
+            listOfPrograms.add(super.getProperties().getPrepareNames());
+            listOfArgumentLists.add(argsForPrepareNamesSecond);
+        } else {
+            // If Second file is null we need to add to argsForPrepareNames additional fields, FETCH_FROM_MIST and FETCH_FROM_NCBI, PROCESS_NUMBER
+            argsForPrepareNames.addAll(protoTreeInternal.getFieldsForPrepareNames());
+            argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_MIST.getPrefix() + super.getProperties().getFetchFromMist());
+            argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_NCBI.getPrefix() + super.getProperties().getFetchFromNCBI());
+            argsForPrepareNames.add(ParamPrefixes.PROCESS_NUMBER.getPrefix() + super.getProperties().getFetchFromMistProcNum());
+        }
+        // We adding argsForPrepareNames to listOfArgumentLists
+        listOfArgumentLists.add(argsForPrepareNames);
+        return inputFileNameForProtFeatures;
     }
 
     @Override

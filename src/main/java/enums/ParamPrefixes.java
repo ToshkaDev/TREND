@@ -13,6 +13,7 @@ public enum  ParamPrefixes {
     //prepareNames specific parameters
     FETCH_FROM_MIST("-m "),
     FETCH_FROM_NCBI("-b "),
+    REMOVE_DASHES("-d "),
 
 
     //alignment specific parameters

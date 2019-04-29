@@ -5,6 +5,14 @@
 <body>
     <div th:fragment="proto-tree">
         <form class="col-md-8 my-textarea full-pipe">
+            <div class="row features-example">
+                <div style="margin-right: 3px">
+                    <a id="features-exmaple1" href="#">Example1</a>
+                </div>
+                <div>
+                    <a id="features-exmaple2" href="#">Example2</a>
+                </div>
+            </div>
             <div class="row">
                 <textarea id="first-file-area" class="form-control" rows="12"> </textarea>
             </div>
@@ -26,6 +34,7 @@
                 <span id="both-areas-message">To start the analysis you need to choose all the necessary files or paste the sequences in the areas.</span>
                 <span id="one-area-message">To start the analysis you need to choose a file with protein sequences or paste the sequences in the area above.</span>
                 <span id="malformed-fasta">There should be at least 3 protein sequences to start the analysis.</span>
+                <span id="cannot-have-ids-and-seqs">You can't both provide sequences and check 'Retrieve sequences'</span>
             </div>
             <div class="row fetch-fromIds1">
                 <div class="checkbox">
@@ -48,11 +57,6 @@
             <div class="row">
                 <span id="second-area-message">Wrong format. The fasta format is expected to begin with '>' sign.</span>
                 <span id="malformed-fasta-second">There should be at least 3 protein sequences to start the analysis.</span>
-            </div>
-            <div class="row fetch-fromIds2">
-                <div class="checkbox">
-                    <label><input id="fetch-fromIds-value2" type="checkbox">Retrieve sequences (NCBI and MiST)</label>
-                </div>
             </div>
             <br /> <br />
         </form>
@@ -163,7 +167,7 @@
     <div th:fragment="proto-tree-filter">
         <div class="col-md-2 panel panel-default">
             <div class="panel-body">
-                <h2 class="text-primary">Set options</h2>
+                <h2 class="text-primary info-header">Set options</h2>
                 <div class="form-group full-pipe alignment-and-tree">
                     <form id="first">
                         <h3 class="text-info" >Alignment (Mafft):</h3>

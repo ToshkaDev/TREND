@@ -22,6 +22,7 @@
                     <span id="one-area-message">To start the analysis you need to choose a file or paste its content in the area above.</span>
                     <span id="malformed-fasta">There should be at least 3 protein sequences to start the analysis.</span>
                     <span id="malformed-newick">Malformed newick tree. Please correct the tree.</span>
+                    <span id="cannot-have-ids-and-seqs">You can't both provide sequences and check 'Retrieve sequences'</span>
                 </div>
             </div>
             <div class="row fetch-fromIds1">
@@ -36,7 +37,7 @@
     <div th:fragment="proto-tree-filter">
         <div class="col-md-2 panel panel-default">
             <div class="panel-body">
-                <h2 class="text-primary">Set options</h2>
+                <h2 class="text-primary info-header">Set options</h2>
                 <div class="form-group">
                     <form id="first">
                         <h3 class="text-info" >Alignment (Mafft):</h3>

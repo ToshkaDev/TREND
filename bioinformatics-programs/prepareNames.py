@@ -28,6 +28,7 @@ INPUT_FILE_TREE = None
 OUTPUT_FILE_TREE = None
 FETCH_FROM_IDS = False
 FETCH_FROM_TREE = False
+REMOVE_DASHES = True
 
 REGEX_VOID = re.compile(r"(\(|\)|:|,|}|{|'|/|]|\[|\\)")
 REGEX_UNDERSCORE = re.compile(r"( |\|)")
@@ -60,14 +61,15 @@ USAGE = "\nThe script makes sequence names and/or tree leaves names newick frien
 	[-c || --proc_num]      - number of processes to run simultaneously, default is 30. The number is big bacause the process is not CPU-intensive
 	[-m || --fetchFromMist] - fetch or not from Mist: "true" or "false". Default is "false".
 	[-b || --fetchFromNCBI] - fetch or not from NCBI: "true" or "false". Default is "true".
+	[-d || --removeDashes]  - remove or not dashes in sequences: "true" or "false". Default is "true".
 	'''
 
 def initialize(argv):
 	global INPUT_FILE, INPUT_FILE_TREE, OUTPUT_FILE, OUTPUT_FILE_TREE, FETCH_FROM_IDS, FETCH_FROM_TREE
-	global NUMBER_OF_PROCESSES, FETCH_FROM_MIST, FETCH_FROM_NCBI
+	global NUMBER_OF_PROCESSES, FETCH_FROM_MIST, FETCH_FROM_NCBI, REMOVE_DASHES
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:s:o:n:f:t:c:m:b:",["help", "ifile=", "sfile=", "ofile=", "nfile=", "fetchFromIds=", \
-			"fetchFromTree=", "proc_num=", "fetchFromMist=", "fetchFromNCBI="])
+		opts, args = getopt.getopt(argv[1:],"hi:s:o:n:f:t:c:m:b:d:",["help", "ifile=", "sfile=", "ofile=", "nfile=", "fetchFromIds=", \
+			"fetchFromTree=", "proc_num=", "fetchFromMist=", "fetchFromNCBI=", "removeDashes="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
@@ -100,6 +102,9 @@ def initialize(argv):
 					FETCH_FROM_NCBI = False
 			elif opt in ("-c", "--proc_num"):
 				NUMBER_OF_PROCESSES = int(str(arg).strip())
+			elif opt in ("-d", "--removeDashes"):
+				if str(arg).strip().lower() == "false":
+					REMOVE_DASHES = False
 	except Exception as e:
 		print "===========ERROR==========\n " + str(e) + USAGE
 		sys.exit(2)
@@ -118,11 +123,13 @@ def getChangedNamesForTree():
 		tree = inputFile.read()
 	iterObject1 = re.finditer(REGEX_LEAF_NAME_1, tree)
 	iterObject2 = re.finditer(REGEX_LEAF_NAME_2, tree)
+	iterObject3 = re.finditer(REGEX_NUMBER_UNDERSCORE, tree)
 	for match in iterObject1:
 		tree = tree.replace(match.group()[1:-1], getChangedName(match.group()[2:-2]))
 
 	for match in iterObject2:
 		tree = tree.replace(match.group()[1:-1], getChangedName(match.group()[1:-1]))
+
 	#check if we can read the tree
 	treeObject = Tree(tree)
 	with open(OUTPUT_FILE_TREE, "w") as outputFile:
@@ -138,22 +145,32 @@ def getChangedNamesForSeqsAndSave(handle=False, proteinIdToSeq=False, proteinIdT
 		if not handle and not proteinIdToSeq:
 			#default case
 			with open(INPUT_FILE, "r") as inputFile:
-				for line in inputFile:
-					outputFile.write(getChangedName(line))
+				for sequence in SeqIO.parse(inputFile, "fasta"):
+					protSeq = str(sequence.seq)
+					if REMOVE_DASHES:
+						protSeq = protSeq.replace("-", "")
+					outputFile.write(">" + getChangedName(sequence.description) + "\n")
+					outputFile.write(protSeq + "\n")
 		if handle:
 			#after retrieving seqeunces by Id from NCBI
-			print "Handle is present"
+			print("Handle is present")
 			for eachRecord in SeqIO.parse(handle, "fasta"):
 				if eachRecord.id not in savedIds:
+					protSeq = str(eachRecord.seq)
+					if REMOVE_DASHES:
+						protSeq = protSeq.replace("-", "")
 					outputFile.write(">" + getChangedName(eachRecord.description) + "\n")
-					outputFile.write(str(eachRecord.seq) + "\n")
+					outputFile.write(protSeq + "\n")
 					savedIds.add(eachRecord.id)
 		if proteinIdToSeq:
 			#after retrieving seqeunces by Id from Mist
 			for proteinName, seq in proteinIdToSeq.items():
 				if proteinIdToTrueId[proteinName] not in savedIds:
+					protSeq = seq
+					if REMOVE_DASHES:
+						protSeq = protSeq.replace("-", "")
 					outputFile.write(">" + getChangedName(proteinName) + "\n")
-					outputFile.write(seq + "\n")
+					outputFile.write(protSeq + "\n")
 					savedIds.add(proteinIdToTrueId[proteinName])
 
 ####===================================================#####
@@ -201,6 +218,9 @@ def fetchNamesAndSave():
 
 # ============== Fetch from MiST# ============== #
 def fetchFromMistByIds(proteinIds, proteinIdsToOrigNames=None):
+	if not proteinIds:
+		return None
+	print("Fetching from MiST using ids from the tree leaves")
 	proteinIdToSeq = manager.dict()
 	proteinIdToTrueId = manager.dict()
 	elementsForOneThread = int(math.ceil(len(proteinIds)/float(NUMBER_OF_PROCESSES)))
@@ -218,6 +238,7 @@ def fetchFromMistByIds(proteinIds, proteinIdsToOrigNames=None):
 		proc.start()
 	for proc in processes:
 		proc.join()
+	print("Fetched from MiST OK using ids from the tree leaves")
 	return (proteinIdToSeq.copy(), proteinIdToTrueId.copy())
 
 
@@ -258,19 +279,22 @@ def fetchSequencesForTreeAndSave(treeObject):
 	for protein in terminals:
 		originalProteinName = protein.name.strip("'")
 		fullProteinName = REGEX_NUMBER_UNDERSCORE.sub("", originalProteinName)
+		fullProteinNameSplitted = fullProteinName.split("_")
 
-		partProteinName = "_".join(fullProteinName.split("_")[0:2]).strip()
-		proteinIds1.add(partProteinName)
-		proteinIdsToOrigNames1[partProteinName].add(originalProteinName)
-
- 		partProteinName = fullProteinName.split("_")[0].strip()
+ 		partProteinName = fullProteinNameSplitted[0].strip()
 		proteinIds2.add(partProteinName)
 		proteinIdsToOrigNames2[partProteinName].add(originalProteinName)
 
-		# this case can happen only for MiST Ids
-		partProteinName = "_".join(fullProteinName.split("_")[0:3]).strip()
-		proteinIds03.add(partProteinName)
-		proteinIdsToOrigNames3[partProteinName].add(originalProteinName)
+		if len(fullProteinNameSplitted) >= 2:
+			partProteinName = "_".join(fullProteinNameSplitted[0:2]).strip()
+			proteinIds1.add(partProteinName)
+			proteinIdsToOrigNames1[partProteinName].add(originalProteinName)
+
+			# this case can happen only for MiST Ids
+			if len(fullProteinNameSplitted) >= 3:
+				partProteinName = "_".join(fullProteinNameSplitted[0:3]).strip()
+				proteinIds03.add(partProteinName)
+				proteinIdsToOrigNames3[partProteinName].add(originalProteinName)
 
 	# multiporcess dicts from usual sets to fetch from MiST
 	proteinIdsForMist1 = manager.list(proteinIds1)
@@ -280,10 +304,16 @@ def fetchSequencesForTreeAndSave(treeObject):
 		proteinIdsToSeq1 = fetchSequencesAndGetNameToSeqMap(proteinIds1, proteinIdsToOrigNames1)
 		proteinIdsToSeq2 = fetchSequencesAndGetNameToSeqMap(proteinIds2, proteinIdsToOrigNames2)
 	if FETCH_FROM_MIST:
-		proteinIdsToSeq3ForMist = fetchFromMistByIds(proteinIdsForMist3, proteinIdsToOrigNames3)[0]
+		proteinIdsToSeq3ForMist = fetchFromMistByIds(proteinIdsForMist3, proteinIdsToOrigNames3)
+		if proteinIdsToSeq3ForMist:
+			proteinIdsToSeq3ForMist = proteinIdsToSeq3ForMist[0]
 		if not FETCH_FROM_NCBI:
 			proteinIdsToSeq1ForMist = fetchFromMistByIds(proteinIdsForMist1, proteinIdsToOrigNames1)[0]
+			if proteinIdsToSeq1ForMist:
+				proteinIdsToSeq1ForMist = proteinIdsToSeq1ForMist[0]
 			proteinIdsToSeq2ForMist = fetchFromMistByIds(proteinIdsForMist2, proteinIdsToOrigNames2)[0]
+			if proteinIdsToSeq2ForMist:
+				proteinIdsToSeq2ForMist = proteinIdsToSeq2ForMist[0]
 	with open(OUTPUT_FILE, "w") as outputFile:
 		if FETCH_FROM_NCBI:
 			saveFetchedSeqsForTree(proteinIdsToSeq1, outputFile)
@@ -297,9 +327,12 @@ def fetchSequencesForTreeAndSave(treeObject):
 def fetchSequencesAndGetNameToSeqMap(proteinIds, proteinIdsToOrigNames):
 	proteinIdsSeqs = dict()
 	proteinIdsHandle = None
+	if not proteinIds:
+		return None
 	try:
 		proteinIdsHandle = getHandleOfFetchedSequencesFromNcbi(proteinIds)
 		if proteinIdsHandle:
+			print("NCBI hanlde is present")
 			for eachRecord in SeqIO.parse(proteinIdsHandle, "fasta"):
 				for name in proteinIdsToOrigNames[eachRecord.id]:
 					seq = str(eachRecord.seq)
@@ -325,6 +358,7 @@ def getHandleOfFetchedSequencesFromNcbi(proteinIds):
 	try:
 		#handle = Entrez.efetch(db="protein", id="OYV75139.1,ACR67403.1", rettype="fasta", retmode="text")
 		handle = Entrez.efetch(db="protein", id=",".join(proteinIds), rettype="fasta", retmode="text")
+		print("Fetched from NCBI OK")
 	except Exception, e:
 		print ("Couldn't retrieve sequences by id from NCBI in time")
 		if handle:
@@ -336,14 +370,14 @@ def isInOutOk(inputFile, outputFile, isTree=False):
 		return False
 	if not inputFile or not outputFile:
 		if isTree:
-			print("Both input file name with tree in newick format and output file name should be provided!")
+			print("Both input file name with the tree in newick format and output file name should be provided!")
 		elif not FETCH_FROM_TREE:
-			print("Both input file name with sequenes and output file name should be provided!")
+			print("Both input file name with the sequenes and output file name should be provided!")
 		return False
 	if isTree:
-		print "Changing tree leaves names"
+		print("Changing tree leaves names")
 	else:
-		print "Changing sequences names"
+		print("Changing sequences names")
 	return True
 
 

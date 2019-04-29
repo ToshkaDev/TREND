@@ -154,6 +154,7 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
             preparedFile = super.getRandomFileName(null);
             argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + preparedFile));
             argsForPrepareNames.addAll(protoTreeInternal.getFieldsForPrepareNames());
+            argsForPrepareNames.add(ParamPrefixes.REMOVE_DASHES.getPrefix() + "true");
             argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_MIST.getPrefix() + super.getProperties().getFetchFromMist());
             argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_NCBI.getPrefix() + super.getProperties().getFetchFromNCBI());
             argsForPrepareNames.add(ParamPrefixes.PROCESS_NUMBER.getPrefix() + super.getProperties().getFetchFromMistProcNum());

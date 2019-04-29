@@ -3,7 +3,7 @@ $(document).ready(function (){
 	takeCareOfFields();
 
     $('#GoAsync').click(function() {
-        $("#first-area-message, #second-area-message, #both-areas-message, #one-area-message, #malformed-fasta, #malformed-fasta-second").hide();
+        $("#first-area-message, #second-area-message, #both-areas-message, #one-area-message, #malformed-fasta, #malformed-fasta-second, #cannot-have-ids-and-seqs").hide();
     	options = getOptions();
     	checkAndSubmit(options, "secondFile");
     });
@@ -16,7 +16,7 @@ $(document).ready(function (){
     });
 
     $('#GoAsyncNeib').click(function() {
-        $("#first-area-message, #one-area-message, #malformed-fasta, #malformed-newick").hide();
+        $("#first-area-message, #one-area-message, #malformed-fasta, #malformed-newick, #cannot-have-ids-and-seqs").hide();
         options = getOptions();
         checkFileAndSendQueryNeib(options);
     });
@@ -29,13 +29,15 @@ $(document).ready(function (){
     $('#addSecondArea').click(function() {
         $('.full-pipe, .second-area').trigger('reset');
         $('#first-file-info, #second-file-info').empty();
-        $("#first-area-message, #second-area-message, #both-areas-message, #one-area-message, #malformed-fasta, #malformed-fasta-second").hide();
+        $("#first-area-message, #second-area-message, #both-areas-message, #one-area-message, #malformed-fasta, #malformed-fasta-second, #cannot-have-ids-and-seqs").hide();
         $('.second-area').toggle();
         if ($('.second-area').css("display") !== "none") {
-            $('#addSecondArea').html("Close Second Area")
+            $('#addSecondArea').html("Close Second Area");
+            $('.fetch-fromIds1').hide();
         }
         else {
             $('#addSecondArea').html("Add Second Area");
+            $('.fetch-fromIds1').show();
         }
     });
 
@@ -60,10 +62,8 @@ $(document).ready(function (){
     });
 });
 
-function fastaIsCorrect(fasta, malformedMessageId,  notFastaMessageId) {
+function fastaIsCorrect(fasta, malformedMessageId,  notFastaMessageId, cannotHaveIdsAndSeqsMessage) {
     var fetchFromIds = $("#fetch-fromIds-value1").prop("checked");
-    if (!fetchFromIds)
-        fetchFromIds = $("#fetch-fromIds-value2").prop("checked");
 
     if (!fetchFromIds) {
     	if (fasta.trim().slice(0, 1) !== ">") {
@@ -76,10 +76,15 @@ function fastaIsCorrect(fasta, malformedMessageId,  notFastaMessageId) {
             return false;
         }
     } else {
-        matches = fasta.match(/^.+$/gm);
-        if (matches.length < 3) {
-            $('#'+malformedMessageId).show();
+        if (fasta.trim().slice(0, 1) == ">") {
+            $('#'+cannotHaveIdsAndSeqsMessage).show();
             return false;
+        } else {
+            matches = fasta.match(/^.+$/gm);
+            if (matches.length < 3) {
+                $('#'+malformedMessageId).show();
+                return false;
+            }
         }
     }
 
@@ -97,18 +102,19 @@ function submitIfNewickTreeIsOK(newickFile, options) {
 }
 
 function checkFileAndSubmit(options, firstFile, firstInsuffSeqsMessageId, firstMalformedMessageId,
-							secondFile=null, secondInsuffSeqsMessageId=null, secondMalformedMessageId=null, areaStatus=null) {
+							secondFile=null, secondInsuffSeqsMessageId=null, secondMalformedMessageId=null,
+							areaStatus=null, cannotHaveIdsAndSeqs=null) {
     var fileReader = new FileReader();
     fileReader.readAsText(options.get(firstFile));
     fileReader.onloadend = function() {
-		var firstInputStatus = fastaIsCorrect(fileReader.result, firstInsuffSeqsMessageId, firstMalformedMessageId);
+		var firstInputStatus = fastaIsCorrect(fileReader.result, firstInsuffSeqsMessageId, firstMalformedMessageId, cannotHaveIdsAndSeqs);
 		console.log(firstInputStatus)
         if (firstInputStatus) {
 			if (options.get(secondFile)) {
 				var secondFileReader = new FileReader();
 				secondFileReader.readAsText(options.get(secondFile));
 				secondFileReader.onloadend = function() {
-					var secondInputStatus = fastaIsCorrect(secondFileReader.result, secondInsuffSeqsMessageId, secondMalformedMessageId);
+					var secondInputStatus = fastaIsCorrect(secondFileReader.result, secondInsuffSeqsMessageId, secondMalformedMessageId, cannotHaveIdsAndSeqs);
 					if (secondInputStatus && !options.get("treeFile"))
 						getDataAsync(options);
 					else if (secondInputStatus && options.get("treeFile"))
@@ -152,7 +158,7 @@ function checkAndSubmit(options, secondFile) {
 		}
 
 		if (!options.get("firstFile") && options.get("firstFileArea") && options.get("firstFileArea").length) {
-			firstAreaStatus = fastaIsCorrect(options.get("firstFileArea"), "malformed-fasta", "first-area-message");
+			firstAreaStatus = fastaIsCorrect(options.get("firstFileArea"), "malformed-fasta", "first-area-message", "cannot-have-ids-and-seqs");
 		}
 		if (!options.get("secondFile") && options.get("secondFileArea") && options.get("secondFileArea").length) {
 		    secondAreaStatus = fastaIsCorrect(options.get("secondFileArea"), "malformed-fasta-second", "second-area-message");
@@ -177,7 +183,7 @@ function checkAndSubmit(options, secondFile) {
 				secondFile, "malformed-fasta-second-partialP", "second-area-message-partialP", null);
 		else if (secondFile === "secondFile")
 			checkFileAndSubmit(options, "firstFile", "malformed-fasta", "first-area-message",
-				secondFile, "malformed-fasta-second", "second-area-message", secondAreaStatus);
+				secondFile, "malformed-fasta-second", "second-area-message", secondAreaStatus, "cannot-have-ids-and-seqs");
 	} else if (options.get("secondFile")) {
 		// nulls in the argument list below because sending request with second input specified by the user and empty first input
 		// is invalid (we are ending up in this condition only if the previous is false; but the first area can be speicified).
@@ -200,7 +206,7 @@ function checkFileAndSendQueryNeib(options) {
     fileReader.readAsText(options.get("firstFile"));
     fileReader.onloadend = function() {
         if (fileReader.result.trim().slice(0, 1) !== ">" && fileReader.result.trim().slice(0, 1) !== "(") {
-            if (fastaIsCorrect(fileReader.result, "malformed-fasta", "first-area-message"))
+            if (fastaIsCorrect(fileReader.result, "malformed-fasta", "first-area-message", "cannot-have-ids-and-seqs"))
                 getDataAsyncNeighborGenes(options);
         }
         else {
@@ -213,7 +219,7 @@ function checkFileAndSendQueryNeib(options) {
                 options.set("treeFile", options.get("firstFile"));
                 options.delete("firstFile");
                 options.set("isFullPipeline", "false");
-            } else if (!fastaIsCorrect(fileReader.result, "malformed-fasta", "first-area-message"))
+            } else if (!fastaIsCorrect(fileReader.result, "malformed-fasta", "first-area-message", "cannot-have-ids-and-seqs"))
                 return;
             getDataAsyncNeighborGenes(options);
         }
@@ -225,7 +231,7 @@ function checkFileAreaAndSendQueryNeib(options) {
         $("#one-area-message").show();
     else if (options.get("firstFileArea") && options.get("firstFileArea").trim().slice(0, 1) !== ">"
         && options.get("firstFileArea").trim().slice(0, 1) !== "(") {
-            if (fastaIsCorrect(options.get("firstFileArea"), "malformed-fasta", "first-area-message"))
+            if (fastaIsCorrect(options.get("firstFileArea"), "malformed-fasta", "first-area-message", "cannot-have-ids-and-seqs"))
                 getDataAsyncNeighborGenes(options);
         }
     else {
@@ -238,7 +244,7 @@ function checkFileAreaAndSendQueryNeib(options) {
             options.set("treeFileArea", options.get("firstFileArea"));
             options.delete("firstFileArea");
             options.set("isFullPipeline", "false");
-        } else if (!fastaIsCorrect(options.get("firstFileArea"), "malformed-fasta", "first-area-message"))
+        } else if (!fastaIsCorrect(options.get("firstFileArea"), "malformed-fasta", "first-area-message", "cannot-have-ids-and-seqs"))
             return;
         getDataAsyncNeighborGenes(options);
     }
