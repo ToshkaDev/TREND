@@ -1,5 +1,5 @@
 //Figure
-svgWidth = 700;
+svgWidth = 900;
 svgHeight = 300;
 
 clusterFrameHeight = svgHeight*0.17;
@@ -54,7 +54,7 @@ function buildGeneTree(nwkObject, jsonDomainsAndGenesData) {
     phylocanvas = new Smits.PhyloCanvas(
         nwkObject,
         'treeContainer',
-        2000, 1300*textCounter/21
+        3000, 1300*textCounter/21
     );
     d3.select('#treeContainer>svg').select('desc').text("ProtoTree");
     var processed = false;
@@ -82,7 +82,6 @@ function buildGeneTree(nwkObject, jsonDomainsAndGenesData) {
             } else
                 processed = false;
         });
-
     getGenesAndDraw(protIdsToYCoords, longestXCoord, longestXCoordText, JSON.parse(jsonDomainsAndGenesData));
     return true;
 }
@@ -128,10 +127,15 @@ function getGenesAndDraw(protIdsToYCoords, xCoordinate, xCoordinateText, jsonDom
 
 function drawNeighborGenes(domElement, gene, neighbGenes, yCoordinate, xCoordinate) {
     var clusterPictureWidth = svgWidth - 0.19*svgWidth;
-    var span = neighbGenes[neighbGenes.length-1].stop - neighbGenes[0].start;
-    var genomeNeighbStart = neighbGenes[0].start - span*clusterOffsetLeft;
-    var genomeNeighbStop = neighbGenes[neighbGenes.length-1].stop + span*clusterOffsetRight;
-    var lastGeneStop = neighbGenes[neighbGenes.length-1].stop;
+    var spanStart = neighbGenes[0].start;
+    var spanStop = neighbGenes[neighbGenes.length-1].stop;
+    if (gene.start < spanStart) { spanStart = gene.start; }
+    else if (gene.stop > spanStop) { spanStop = gene.stop; }
+
+    var span = spanStop - spanStart;
+    var genomeNeighbStart = spanStart - span*clusterOffsetLeft;
+    var genomeNeighbStop = spanStop + span*clusterOffsetRight;
+    var lastGeneStop = spanStop;
     var geneScale = d3.scaleLinear()
         .domain([genomeNeighbStart, genomeNeighbStop])
         .range([4, clusterPictureWidth-5]);
@@ -231,7 +235,8 @@ function addHtml(neighbourGenes, d3ParentElement) {
             var format = gene.strand === "-" ? "complement(coords)" : "(coords)";
             var geneCoordinates = format.replace("coords", gene.start + ".." + gene.stop);
             return `<div><a href="https://mistdb.com/genes/${gene.stable_id}" target="_blank">${gene.stable_id}</a></div>` +
-                `<div>${gene.version}</div><div>${geneCoordinates}</div>` +
+                `<div><a href="https://www.ncbi.nlm.nih.gov/protein/${gene.version}" target="_blank">${gene.version}</a></div>` +
+                `<div>${geneCoordinates}</div>` +
                 `<div>${gene.product}<div/>`;
         });
 }

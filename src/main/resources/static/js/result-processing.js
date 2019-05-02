@@ -251,7 +251,7 @@ function organizeData(currentClassName) {
             domainOrganizedData.push(domainHeaders);
             for (var domain of dataAsJson.domains) {
                 domainRaw = [];
-                domainName = "<span><a href='" + hrefRootPath+domain.domainName + "'>" + domain.domainName + "</a></span>";
+                domainName = "<span><a target='_blank' href='" + hrefRootPath+domain.domainName + "'>" + domain.domainName + "</a></span>";
                 domainRaw.push(domainCounter++ + ".");
                 domainRaw.push(domainName);
                 domainRaw.push(domain.aliStart);
