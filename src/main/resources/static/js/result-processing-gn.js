@@ -51,10 +51,24 @@ function buildGeneTree(nwkObject, jsonDomainsAndGenesData) {
     if (textCounter < 3)
         return false;
     createZoomableBox();
+
+    var reductionFactor = 1;
+
+    // factoring the tree vertical size depending on the number of leaves
+    if (textCounter <= 6) {
+        reductionFactor = 0.43;
+    } else if (textCounter <= 100) {
+        reductionFactor = textCounter/16;
+    } else if (textCounter <= 1000) {
+        reductionFactor = textCounter/20;
+    } else {
+        reductionFactor = textCounter/23;
+    }
+
     phylocanvas = new Smits.PhyloCanvas(
         nwkObject,
         'treeContainer',
-        3000, 1300*textCounter/21
+        3000, 1300*reductionFactor
     );
     d3.select('#treeContainer>svg').select('desc').text("ProtoTree");
     var processed = false;
