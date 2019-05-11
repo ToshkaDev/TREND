@@ -3,6 +3,7 @@ $(document).ready(function(){
 	takeCareOfFields();
     var jobId = $('#jobId').text();
     stageList = [];
+    controlProgressBar(jobId);
     getIfReady(jobId);
 });
 
@@ -108,4 +109,13 @@ function processStageMessage(stage) {
         $('#result-stage').append("<div class='stage-element'><h4>" + stage + "</h4></div>");
     }
     stageList.push(stage);
+    console.log()
+}
+
+function controlProgressBar(jobId) {
+    var stageNumToPercentFullPipe = {"1":"33", "2":"66", "3": "100"};
+    var stageNumToPercentPartialPipe = {"1":"50", "2":"100"};
+    var stageNumToPercent = jobId.split("-")[1] == "f" ? stageNumToPercentFullPipe : stageNumToPercentPartialPipe;
+    /*moveProgressBar is in fields-processing.js */
+    moveProgressBar(stageNumToPercent);
 }

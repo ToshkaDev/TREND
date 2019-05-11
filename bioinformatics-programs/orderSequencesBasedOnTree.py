@@ -69,13 +69,16 @@ def writeSeqsAndTree():
 			if processedName in PROCESSED_TO_ALIGNED_NAMES:
 				if ENUMERATE:
 					terminals[i].name = str(i+1) + "_" + proteinName
+					alnProtName = terminals[i].name
 					alignedName = PROCESSED_TO_ALIGNED_NAMES[processedName]
-					ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name] = ALIGNED_PROTEIN_NAME_TO_SEQ[alignedName]
+					ALIGNED_PROTEIN_NAME_TO_SEQ[alnProtName] = ALIGNED_PROTEIN_NAME_TO_SEQ[alignedName]
 					del ALIGNED_PROTEIN_NAME_TO_SEQ[alignedName]
+
 				else:
 					terminals[i].name = proteinName
+					alnProtName = PROCESSED_TO_ALIGNED_NAMES[processedName]
 				outputFile.write(">" + terminals[i].name + "\n")
-				outputFile.write(str(ALIGNED_PROTEIN_NAME_TO_SEQ[terminals[i].name]) + "\n")
+				outputFile.write(str(ALIGNED_PROTEIN_NAME_TO_SEQ[alnProtName]) + "\n")
 	tree.write(outfile=OUTPUT_TREE_NEWICK_FILENAME)
 
 def prepareNameDict():

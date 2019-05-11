@@ -191,7 +191,7 @@ div.query-area {
 }
 
 div.result-area {
-    padding-left: 5%;
+    padding-left: 2%;
 }
 
 .my-textarea {
@@ -373,6 +373,10 @@ div.protein-info-container {
 
 .proto-tree-link:hover, .proto-tree-link:active {
     color: #406336;
+}
+
+#pipelineProgressBar {
+    background-color: #db8c8d;
 }
 /*End of Results container and raw files container*/
 
@@ -568,3 +572,4 @@ a, a:hover, a:focus, a:active {
     display: flex;
     justify-content: flex-start;
 }
+

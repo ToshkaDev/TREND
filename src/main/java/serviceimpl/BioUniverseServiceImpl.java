@@ -250,13 +250,13 @@ public class BioUniverseServiceImpl implements BioUniverseService {
             while ((line = ebr.readLine()) != null) {
                 if (line.toLowerCase().contains("error") || line.contains("Traceback"))
                     errorHappened = true;
-                System.out.println(line);
+                System.out.println("Error stream (OK if Mafft): " + line);
                 System.out.println("\n");
             }
             while ((line = ibr.readLine()) != null) {
                 if (line.contains("Error") && line.contains("Message"))
                     megaErrorMessage = line;
-                System.out.println(line);
+                System.out.println("Input stream: " + line);
                 System.out.println("\n");
             }
 

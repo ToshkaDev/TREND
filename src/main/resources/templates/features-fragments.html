@@ -7,10 +7,10 @@
         <form class="col-md-8 my-textarea full-pipe">
             <div class="row features-example">
                 <div style="margin-right: 3px">
-                    <a id="features-exmaple1" href="#">Example1</a>
+                    <a class="pipelines-example1" href="#">Example1</a>
                 </div>
                 <div>
-                    <a id="features-exmaple2" href="#">Example2</a>
+                    <a class="pipelines-example2" href="#">Example2</a>
                 </div>
             </div>
             <div class="row">
@@ -112,6 +112,10 @@
     </div>
 
     <div th:fragment="result">
+        <div class="progress">
+            <div id="pipelineProgressBar" class="progress-bar progress-bar-striped active" aria-valuenow="0" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width:0%">
+            </div>
+        </div>
         <div class="col-md-11 wait-for-it">
             <div id="result-stage"></div>
         </div>
@@ -241,7 +245,7 @@
                             <option value="pairDel">Pairwise deletion</option>
                         </select>
                         <div class="cov-cutoff">
-                            <span>TSite Coverage Cutoff:</span>
+                            <span>Site Coverage Cutoff:</span>
                             <input value="95" id="site-cov-cutoff" name="site-cov-cutoff" type="text" class="form-control input-sm"/>
                         </div>
                         <div class="nj-and-me-options">

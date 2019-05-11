@@ -1,5 +1,5 @@
 //Figure
-svgWidth = 900;
+svgWidth = 700;
 svgHeight = 300;
 
 clusterFrameHeight = svgHeight*0.17;
@@ -68,7 +68,7 @@ function buildGeneTree(nwkObject, jsonDomainsAndGenesData) {
     phylocanvas = new Smits.PhyloCanvas(
         nwkObject,
         'treeContainer',
-        3000, 1300*reductionFactor
+        2500, 1300*reductionFactor
     );
     d3.select('#treeContainer>svg').select('desc').text("ProtoTree");
     var processed = false;
@@ -102,8 +102,8 @@ function buildGeneTree(nwkObject, jsonDomainsAndGenesData) {
 
 function createZoomableBox() {
     var minSvgWidth = 650;
-    var widthShrinkageFactor = 0.89;
-    var heightShrinkageFactor = 0.8;
+    var widthShrinkageFactor = 0.93;
+    var heightShrinkageFactor = 0.91;
     var width = window.innerWidth*widthShrinkageFactor;
     var height = window.innerHeight*heightShrinkageFactor;
     var tree = d3.select('#svgContainer')

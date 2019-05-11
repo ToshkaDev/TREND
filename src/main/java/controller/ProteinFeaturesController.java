@@ -76,9 +76,9 @@ public class ProteinFeaturesController extends BioUniverseController {
         //and files in 'listOfFiles' field of evolutionRequest are got cleared at the end of request processing.
         protoTreeRequest.setCommandToBeProcessedBy("domains");
         protoTreeInternal = proteinFeaturesService.storeFilesAndPrepareCommandArguments(protoTreeRequest);
-        String jobId = protoTreeInternal.getJobId() + "-" + protoTreeInternal.getProtoTreeCookies();
+        String fullOrPartialPipe = protoTreeRequest.isFullPipeline().equals("true") ? "f" : "p";
+        String jobId = protoTreeInternal.getJobId() + "-" + fullOrPartialPipe + "-" + protoTreeInternal.getProtoTreeCookies();
         proteinFeaturesService.runMainProgram(protoTreeInternal);
-
         return jobId;
     }
 
@@ -96,7 +96,7 @@ public class ProteinFeaturesController extends BioUniverseController {
 	     if (jobId != null ) {
 	        String jobIdSplitted[] = jobId.split("-");
 	        int id = Integer.valueOf(jobIdSplitted[0]);
-	        String cookieId = jobIdSplitted[1];
+	        String cookieId = jobIdSplitted[2];
             bioJob = proteinFeaturesService.getBioJob(id);
 	        if (bioJob != null && bioJob.getCookieId().equals(cookieId)) {
 	            if (bioJob.isFinished()) {

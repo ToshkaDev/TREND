@@ -10,6 +10,7 @@ $(document).ready(function (){
     buttonIdToTableClass = {"Domains": "domain-table", "TMs": "tm-table", "LCRs": "lcr-table", "Sequence": "sequence-table", "Additional": "additional-table"};
     entityToButton = {"domainOrganizedData": buttonIds[0], 'tmOrganizedData': buttonIds[1],
     "lcrOrganized": buttonIds[2], "sequenceData": buttonIds[3], "additionalOrganizedData": buttonIds[4]};
+    controlProgressBar(jobId);
     getIfReady(jobId);
 });
 
@@ -33,8 +34,8 @@ function tryToGetFileName(jobId) {
 
 function prepareTreeContainer() {
     var minSvgWidth = 650;
-    var widthShrinkageFactor = 0.89;
-    var heightShrinkageFactor = 0.8;
+    var widthShrinkageFactor = 0.93;
+    var heightShrinkageFactor = 0.91;
     var width = window.innerWidth*widthShrinkageFactor;
     var height = window.innerHeight*heightShrinkageFactor;
     var tree = d3.select("div#svgContainer")
@@ -462,4 +463,12 @@ $(document).on("click", function () {
 function error(jqXHR, textStatus, errorThrown) {
 	window.alert('Error happened!');
 	console.log(jqXHR);
+}
+
+function controlProgressBar(jobId) {
+    var stageNumToPercentFullPipe = {"1":"25", "2":"50", "3": "75", "4": "100"};
+    var stageNumToPercentPartialPipe = {"1":"33", "2":"66", "3": "100"};
+    var stageNumToPercent = jobId.split("-")[1] == "f" ? stageNumToPercentFullPipe : stageNumToPercentPartialPipe;
+    /*moveProgressBar is in fields-processing.js */
+    moveProgressBar(stageNumToPercent);
 }
