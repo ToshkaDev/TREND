@@ -1,34 +1,10 @@
 $(document).ready(function(){
-	takeCareOfValidators();
-	takeCareOfFields();
     var jobId = $('#jobId').text();
     stageList = [];
     controlProgressBar(jobId);
+    // getIfReady(jobId) is in result-processing-common.js
     getIfReady(jobId);
 });
-
-function getIfReady(jobId) {
-    fileGetter = setInterval(function() {
-        tryToGetFileName(jobId)
-    }, 2000);
-}
-
-function tryToGetFileName(jobId) {
-    $.ajax({
-      type: 'GET',
-      url: 'get-filename',
-      dataType:'json',
-      contentType: 'application/json',
-      data: {"jobId": jobId},
-      success: processRetrievedDataAsync,
-      error: error
-    });
-}
-
-function error(jqXHR, textStatus, errorThrown) {
-	window.alert('Error happened!');
-	console.log(jqXHR);
-}
 
 function processRetrievedDataAsync(data) {
     if (data.status[0] === 'noSuchBioJob') {
@@ -43,7 +19,8 @@ function processRetrievedDataAsync(data) {
         $('.server-error').show();
     } else  if (data.status[0] === 'ready') {
         clearInterval(fileGetter);
-        displayStage(data.stage[0], true);
+        // displayStage(data, statusReady=false) is in result-processing-common.js
+        displayStage(data, true);
 
         if (data.result.length >= 1) {
             // Add corresponding links to download buttons
@@ -70,7 +47,8 @@ function processRetrievedDataAsync(data) {
         }
 
 	} else if (data.status[0] === 'notReady') {
-	    displayStage(data.stage[0]);
+	    // displayStage(data, statusReady=false) is in result-processing-common.js
+	    displayStage(data);
 	}
 }
 
@@ -80,36 +58,6 @@ function onDownload() {
         .attr("href", 'data:application/octet-stream;base64,' + btoa(d3.select("#svgContainer>svg>#treeContainer").html()))
         .attr("download", "ProtoTree.svg")
     });
-}
-
-function displayStage(dataStage, statusReady=false) {
-    var stages = JSON.parse(dataStage.replace(/'/g, '"'));
-    for (var stage of stages) {
-        var stageReady = stage.split("-")[0]
-        if (!statusReady) {
-            if (!stageList.includes(stageReady)) {
-                processStageMessage(stageReady);
-            }
-        } else {
-            if (!stageList.includes(stageReady)) {
-                processStageMessage(stageReady);
-            }
-            if (stage.split("-").length == 2) {
-                $('.stage-element').last().append("<span class='glyphicon glyphicon-ok complete'></span>");
-            }
-        }
-    }
-}
-
-function processStageMessage(stage) {
-    if (stageList.length > 0) {
-        $('.stage-element').last().append("<span class='glyphicon glyphicon-ok complete'></span>");
-        $('#result-stage').append("<div class='stage-element'><h4>" + stage + "</h4></div>");
-    } else {
-        $('#result-stage').append("<div class='stage-element'><h4>" + stage + "</h4></div>");
-    }
-    stageList.push(stage);
-    console.log()
 }
 
 function controlProgressBar(jobId) {

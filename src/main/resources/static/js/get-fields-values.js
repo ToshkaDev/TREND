@@ -73,7 +73,7 @@ function setOrGetCookies() {
     var cookies = Cookies.get('ProtoTree_@BioUniverse_');
     if (typeof cookies == 'undefined') {
         cookies = Math.random().toString(36).substring(6);
-        Cookies.set('ProtoTree_@BioUniverse_', cookies, { expires: 30 });
+        Cookies.set('Trend_@BioUniverse_', cookies, { expires: 30 });
     }
     return cookies;
 }

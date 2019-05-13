@@ -192,7 +192,7 @@ def fetchNamesAndSave():
 	proteinIds, proteinIdsMultiProc = prepareIdListFromInput()
 	try:
 		proteinIdToSeq, proteinIdToTrueId = fetchFromMistByIds(proteinIdsMultiProc)
-		print("No error while fetching from MiST.")
+		print("Fetching from MiST finished OK.")
 	except Exception, e:
 		print("Error while fetching from MiST.")
 		print (e)
@@ -201,7 +201,7 @@ def fetchNamesAndSave():
 			if FETCH_FROM_NCBI:
 				print("Will try to fetch from NCBI.")
 				handle = getHandleOfFetchedSequencesFromNcbi(proteinIds)
-				print("No error while fetching from NCBI.")
+				print("Fetching from NCBI finished OK.")
 			if FETCH_FROM_MIST and proteinIdToSeq:
 				getChangedNamesForSeqsAndSave(handle, proteinIdToSeq, proteinIdToTrueId)
 			else:

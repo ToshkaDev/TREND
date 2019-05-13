@@ -4,16 +4,17 @@ public enum Status {
     status("status"),
     result("result"),
     stage("stage"),
+    stageDetails("stageDetails"),
     error("Error"),
     megaError("ERROR. MEGA");
 
-    private String miscEnum;
+    private String statusEnum;
 
-    Status(String miscEnum) {
-        this.miscEnum = miscEnum;
+    Status(String statusEnum) {
+        this.statusEnum = statusEnum;
     }
 
     public String getStatusEnum() {
-        return miscEnum;
+        return statusEnum;
     }
 }

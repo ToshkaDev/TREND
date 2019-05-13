@@ -11,26 +11,9 @@ $(document).ready(function (){
     entityToButton = {"domainOrganizedData": buttonIds[0], 'tmOrganizedData': buttonIds[1],
     "lcrOrganized": buttonIds[2], "sequenceData": buttonIds[3], "additionalOrganizedData": buttonIds[4]};
     controlProgressBar(jobId);
+    // getIfReady(jobId) is in result-processing-common.js
     getIfReady(jobId);
 });
-
-function getIfReady(jobId) {
-    fileGetter = setInterval(function() {
-        tryToGetFileName(jobId)
-    }, 2000);
-}
-
-function tryToGetFileName(jobId) {
-    $.ajax({
-      type: 'GET',
-      url: 'get-filename',
-      dataType:'json',
-      contentType: 'application/json',
-      data: {"jobId": jobId},
-      success: processRetrievedDataAsync,
-      error: error
-    });
-}
 
 function prepareTreeContainer() {
     var minSvgWidth = 650;
@@ -64,7 +47,8 @@ function processRetrievedDataAsync(data) {
         $('.server-error').show();
     } else  if (data.status[0] === 'ready') {
         clearInterval(fileGetter);
-        displayStage(data.stage[0], true);
+        // displayStage(data, statusReady=false) is in result-processing-common.js
+        displayStage(data, true);
 
         if (data.result.length === 1) {
             $('#results-load').attr('href', data.result[0]);
@@ -105,37 +89,9 @@ function processRetrievedDataAsync(data) {
         }
         $('.result-container').show();
 	} else if (data.status[0] === 'notReady') {
-	    displayStage(data.stage[0]);
+	    // displayStage(data, statusReady=false) is in result-processing-common.js
+	    displayStage(data);
 	}
-}
-
-function displayStage(dataStage, statusReady=false) {
-    var stages = JSON.parse(dataStage.replace(/'/g, '"'));
-    for (var stage of stages) {
-        var stageReady = stage.split("-")[0]
-        if (!statusReady) {
-            if (!stageList.includes(stageReady)) {
-                processStageMessage(stageReady);
-            }
-        } else {
-            if (!stageList.includes(stageReady)) {
-                processStageMessage(stageReady);
-            }
-            if (stage.split("-").length == 2) {
-                $('.stage-element').last().append("<span class='glyphicon glyphicon-ok complete'></span>");
-            }
-        }
-    }
-}
-
-function processStageMessage(stage) {
-    if (stageList.length > 0) {
-        $('.stage-element').last().append("<span class='glyphicon glyphicon-ok complete'></span>");
-        $('#result-stage').append("<div class='stage-element'><h4>" + stage + "</h4></div>");
-    } else {
-        $('#result-stage').append("<div class='stage-element'><h4>" + stage + "</h4></div>");
-    }
-    stageList.push(stage);
 }
 
 function addEventListeners(data) {
@@ -459,11 +415,6 @@ function updatePositionAndShow(event, readyClassName) {
 $(document).on("click", function () {
     $("." + renderedClass + infoPostfix).hide();
 });
-
-function error(jqXHR, textStatus, errorThrown) {
-	window.alert('Error happened!');
-	console.log(jqXHR);
-}
 
 function controlProgressBar(jobId) {
     var stageNumToPercentFullPipe = {"1":"25", "2":"50", "3": "75", "4": "100"};

@@ -42,7 +42,7 @@ public interface BioUniverseService {
 
     BioJobResultDao getBioJobResultDao();
 
-    void launchProcess(List<String> commandArguments) throws IncorrectRequestException;
+    void launchProcess(List<String> commandArguments, ProtoTreeInternal protoTreeInternal) throws IncorrectRequestException;
 
     ProtoTreeInternal storeFileAndGetInternalRepresentation(final ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException;
 

@@ -34,17 +34,10 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
 
     @Override
     public ProtoTreeInternal storeFilesAndPrepareCommandArguments(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
-        System.out.println("========================");
-        System.out.println(protoTreeRequest.isFullPipeline());
         if (protoTreeRequest.isFullPipeline().equals("false"))
             return pipelineProcessingPartial(protoTreeRequest);
         else
             return pipelineProcessing(protoTreeRequest);
-    }
-
-    @Override
-    public BioJob getBioJob(int jobId) {
-        return super.getBioJobDao().findByJobId(jobId);
     }
 
     private ProtoTreeInternal pipelineProcessingPartial(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
@@ -178,7 +171,7 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
             else if (protoTreeInternal.isFullPipeline().equals("true"))
                 super.saveStage(protoTreeInternal, counter++, counterToStageOneInputFull);
             try {
-                super.launchProcess(commandArgument);
+                super.launchProcess(commandArgument, protoTreeInternal);
             } catch (Exception exception) {
                 if (exception.getMessage().contains(Status.megaError.getStatusEnum()))
                     super.saveError(protoTreeInternal, exception.getMessage());

@@ -32,6 +32,9 @@ public class BioJob {
     @Column(name="STAGE")
     private String stage;
 
+    @Column(name="STAGE_DETAILS")
+    private String stageDetails;
+
     @NotNull
     @Column(name="PROGRAM_NAME")
     private String programName;
@@ -72,6 +75,14 @@ public class BioJob {
 
     public void setStage(String stage) {
         this.stage = stage;
+    }
+
+    public String getStageDetails() {
+        return stageDetails;
+    }
+
+    public void setStageDetails(String stageDetails) {
+        this.stageDetails = stageDetails;
     }
 
     public String getProgramNameName() {

@@ -35,7 +35,8 @@ public class BioUniverseServiceImpl implements BioUniverseService {
     private final StorageService storageService;
     private final BioJobResultDao bioJobResultDao;
     private final BioJobDao bioJobDao;
-
+    private final String stageArray[] = {"Conducting Bootstrap Test", "Computing distances", "Optimizing initial tree",
+            "Searching ML tree", "Optimizing final tree", "Bootstrapping Tree", "Analysis Complete"};
     @Autowired
     public BioUniverseServiceImpl(StorageService storageService, AppProperties properties, BioJobResultDao bioJobResultDao, BioJobDao bioJobDao) {
         this.storageService = storageService;
@@ -227,6 +228,13 @@ public class BioUniverseServiceImpl implements BioUniverseService {
         getBioJobDao().save(bioJob);
     }
 
+    private void saveStageDetails(ProtoTreeInternal protoTreeInternal, String stageDetails) {
+        BioJob bioJob = getBioJobDao().findByJobId(protoTreeInternal.getJobId());
+        bioJob.setStageDetails(stageDetails);
+        getBioJobDao().save(bioJob);
+    }
+
+
     @Override
     public Integer getLastJobId() {
         Integer lastJobId = getBioJobDao().getLastJobId();
@@ -234,32 +242,33 @@ public class BioUniverseServiceImpl implements BioUniverseService {
     }
 
     @Override
-    public void launchProcess(List<String> commandArguments) throws IncorrectRequestException {
-        ProcessBuilder processBuilder = new ProcessBuilder(commandArguments);
+    public void launchProcess(List<String> commandArguments, ProtoTreeInternal protoTreeInternal) throws IncorrectRequestException {
+        ProcessBuilder processBuilder = new ProcessBuilder(commandArguments).redirectErrorStream(true);
         processBuilder.directory(new File(getWorkingDir()));
         try {
             System.out.println("processBuilder.directory() " + processBuilder.directory());
             System.out.println(processBuilder.command());
 
             Process process = processBuilder.start();
-            BufferedReader ibr = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            BufferedReader ebr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+            BufferedReader iebr = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             String megaErrorMessage = null;
             boolean errorHappened = false;
-            while ((line = ebr.readLine()) != null) {
-                if (line.toLowerCase().contains("error") || line.contains("Traceback"))
-                    errorHappened = true;
-                System.out.println("Error stream (OK if Mafft): " + line);
-                System.out.println("\n");
-            }
-            while ((line = ibr.readLine()) != null) {
+            while ((line = iebr.readLine()) != null) {
                 if (line.contains("Error") && line.contains("Message"))
                     megaErrorMessage = line;
-                System.out.println("Input stream: " + line);
+                if (line.toLowerCase().contains("error") || line.contains("Traceback"))
+                    errorHappened = true;
+                for (int i=0; i < stageArray.length; i++) {
+                    if(line.contains(stageArray[i])) {
+                        saveStageDetails(protoTreeInternal, line);
+                        break;
+                    }
+                }
+                System.out.println("Input/Error stream: " + line);
                 System.out.println("\n");
             }
-
             if (errorHappened || megaErrorMessage != null) {
                 if (megaErrorMessage != null)
                     throw new IncorrectRequestException(Status.megaError.getStatusEnum() + ": " + megaErrorMessage.split("=")[1]);

@@ -2,7 +2,6 @@ package serviceimpl;
 
 import java.util.*;
 
-import biojobs.BioJob;
 import biojobs.BioJobDao;
 import biojobs.BioJobResultDao;
 import enums.Status;
@@ -12,13 +11,13 @@ import model.request.ProtoTreeRequest;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import service.ProtoTreeService;
+import service.ProteinFeaturesService;
 import service.StorageService;
 import exceptions.IncorrectRequestException;
 import springconfiguration.AppProperties;
 
 @Service
-public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implements ProtoTreeService {
+public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implements ProteinFeaturesService {
 	private final int defaultLastJobId = 1;
 	private final String bootstrapFilePostfix = "_consensus";
 	private Map<Integer, String> counterToStageOneInput = new HashMap<>();
@@ -87,19 +86,10 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
 
     @Override
     public ProtoTreeInternal storeFilesAndPrepareCommandArguments(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
-        ProtoTreeInternal protoTreeInternal;
-	    if (protoTreeRequest.isFullPipeline().equals("true")) {
-            protoTreeInternal = fullPipelineProcessing(protoTreeRequest);
-
-        } else {
-            protoTreeInternal = partialPipelineProcessing(protoTreeRequest);
-        }
-        return protoTreeInternal;
-    }
-
-    @Override
-    public BioJob getBioJob(int jobId) {
-        return super.getBioJobDao().findByJobId(jobId);
+	    if (protoTreeRequest.isFullPipeline().equals("true"))
+            return fullPipelineProcessing(protoTreeRequest);
+        else
+            return partialPipelineProcessing(protoTreeRequest);
     }
 
     private ProtoTreeInternal fullPipelineProcessing(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
@@ -357,7 +347,7 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
             }
             counter++;
             try {
-                super.launchProcess(commandArgument);
+                super.launchProcess(commandArgument, protoTreeInternal);
             } catch (Exception exception) {
                 if (exception.getMessage().contains(Status.megaError.getStatusEnum()))
                     super.saveError(protoTreeInternal, exception.getMessage());

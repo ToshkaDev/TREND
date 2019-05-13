@@ -10,6 +10,7 @@ CREATE TABLE biojobs(
 	COOKIE_ID text,
 	FINISHED BOOLEAN NOT NULL,
 	STAGE text,
+	STAGE_DETAILS,
 	PROGRAM_NAME text,
 	EMAIL text,
 	JOB_DATE timestamp without time zone NOT NULL

@@ -77,7 +77,7 @@ DEFAULT_PATTERN_AMONG_LINEAGES = "Same (Homogeneous)"
 TEST_OF_PHYLOGENY = "None"
 BOOTSTRAPS = NOT_APPLICABLE
 DEFAULT_ML_HEURISTIC_METHOD = "Nearest-Neighbor-Interchange (NNI)"
-DEFAULT_CPU_NUMBER = "4"
+BOOTSTRAP_CPU_NUMBER = "1"
 SUBST_MODEL = NJ_ME_SUBSTITUTIAN_MODELS["jtt"]
 GAPS_MISSING = GAPS_AND_MISSING_DATA_BEHAVIOUR["compDel"]
 COVERAGE_CUTOFF = NOT_APPLICABLE
@@ -89,18 +89,18 @@ PROCESS_TYPES = collections.OrderedDict()
 PROCESS_TYPES_DICT = {"ML": "ppML", "ME": "ppME", "NJ": "ppNJ"}
 TREE_METHOD = "NJ"
 TREE_METHODS = {"NJ": None, "ML": None, "ME": None}
-MAFFT_PROGRAM = None 
+MAFFT_PROGRAM = None
 MEGACC_PROGRAM = None
 
 
 
 def initialyze(argv):
 	global INPUT_FILE, ALGORITHM, REORDER_OR_NOT, MAFFT_PROGRAM, MEGACC_PROGRAM, ALIGN_THREADS, OUTPUT_FILE_FIRST, TREE_METHOD, SUBST_MODEL, GAPS_MISSING, \
-	COVERAGE_CUTOFF, TREE_THREADS, TEST_OF_PHYLOGENY, BOOTSTRAPS, ML_INITIAL_TREE, SUBST_RATE, OUTPUT_FILE_SECOND, OUTPUT_FILE_THIRD, TREE_METHODS
+	COVERAGE_CUTOFF, TREE_THREADS, TEST_OF_PHYLOGENY, BOOTSTRAPS, ML_INITIAL_TREE, SUBST_RATE, OUTPUT_FILE_SECOND, OUTPUT_FILE_THIRD, TREE_METHODS, BOOTSTRAP_CPU_NUMBER
 	try:
 		opts, args = getopt.getopt(argv[1:],"hi:a:r:k:f:t:o:m:l:g:c:u:p:b:e:n:x:z:",
-		["isequence=", "al_algorithm=", "reorder=", "megacc", "mafft=", "thread=", "oaligned=",  
-		"tree_method=", "subst_model=", "gaps_missing=", "coverage_cutoff=", 
+		["isequence=", "al_algorithm=", "reorder=", "megacc", "mafft=", "thread=", "oaligned=",
+		"tree_method=", "subst_model=", "gaps_missing=", "coverage_cutoff=",
 		"cpu=", "phylotest=" "bootstrap=", "initial_tree=", "subst_rate=", "otree_params", "otree="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Parameters are required\n")
@@ -163,28 +163,31 @@ def initialyze(argv):
 		elif opt in ("-n", "--subst_rate"):
 			param = str(arg).strip()
 			if param in RATES:
-				SUBST_RATE = RATES[param] 
+				SUBST_RATE = RATES[param]
 		elif opt in ("-x", "--otree_params"):
-			OUTPUT_FILE_SECOND = str(arg).strip()   
+			OUTPUT_FILE_SECOND = str(arg).strip()
 		elif opt in ("-z", "--otree"):
 			OUTPUT_FILE_THIRD = str(arg).strip()
 
 	if TEST_OF_PHYLOGENY == "None":
 		BOOTSTRAPS = NOT_APPLICABLE
+	# if bootsrap test was set up use TREE_THREADS number of threads for bootstrapping
+	else:
+		BOOTSTRAP_CPU_NUMBER = TREE_THREADS
 	if GAPS_MISSING != GAPS_AND_MISSING_DATA_BEHAVIOUR["partDel"]:
 		COVERAGE_CUTOFF = NOT_APPLICABLE
-		
-		
+
 	print "TEST_OF_PHYLOGENY " + TEST_OF_PHYLOGENY
 	print "BOOTSTRAPS " + BOOTSTRAPS
 	print "GAPS_MISSING " + GAPS_MISSING
-	print "COVERAGE_CUTOFF " + COVERAGE_CUTOFF 
+	print "COVERAGE_CUTOFF " + COVERAGE_CUTOFF
+	print "TREE_THREADS " + TREE_THREADS
+
 	PROCESS_TYPES["ppInfer"] = "true"
 	specificPocessTypes = PROCESS_TYPES_DICT[TREE_METHOD]
 	PROCESS_TYPES[specificPocessTypes] = "true"
-	
 	initializeTreeParams()
-	
+
 
 def initializeTreeParams():
 	NJ_PARAMETERS = {
@@ -216,10 +219,11 @@ def initializeTreeParams():
 			"Gaps/Missing Data Treatment": GAPS_MISSING,
 			"Site Coverage Cutoff (%)": COVERAGE_CUTOFF,
 			"Has Time Limit": "False",
+			"Number of Threads": BOOTSTRAP_CPU_NUMBER,
 			"Maximum Execution Time": "-1"
 		}
 	}
-	
+
 	ML_PARAMETERS = {
 		"[ MEGAinfo ]":{
 			"ver": LINUX_VERSION
@@ -291,6 +295,7 @@ def initializeTreeParams():
 			"Initial Tree for ME": "Obtain initial tree by Neighbor-Joining",
 			"ME Search Level": "1",
 			"Has Time Limit": "False",
+			"Number of Threads": BOOTSTRAP_CPU_NUMBER,
 			"Maximum Execution Time": "-1"
 		}
 	}
@@ -323,10 +328,10 @@ def runSubProcess(command, processName):
 		proc = Popen(command, shell=True)
 		status = proc.poll()
 		while status == None:
-			print "Still runnig " + processName
-			time.sleep(0.5)
+			#print "Still runnig " + processName
+			time.sleep(0.05)
 			status = proc.poll()
-		print "Seems like finished " + processName + " " + str(status)
+		#print "Seems like finished " + processName + " " + str(status)
 	except OSError, osError:
 		print "osError " + osError
 		print traceback.print_exc()
@@ -338,9 +343,4 @@ def main(argv):
 
 if __name__ == "__main__":
 	main(sys.argv)
-
-
-
-
-
 
