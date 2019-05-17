@@ -398,6 +398,7 @@ div.protein-info-container {
     justify-content: center;
     height: 50px;
     width: 50px;
+    margin-bottom: 5px;
 }
 
 .social:hover, .social:active, .social:visited {
@@ -416,6 +417,14 @@ div.protein-info-container {
 .footer-container {
     background-color: #acb4a5;
     height: 210px;
+}
+
+@media screen and (max-width: 995px) {
+    .footer-container {
+        background-color: #acb4a5;
+        height: 310px;
+        min-width: 231px;
+    }
 }
 
 .footer-text, .footer-text:hover {
