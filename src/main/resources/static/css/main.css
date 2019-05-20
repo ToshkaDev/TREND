@@ -215,6 +215,11 @@ div.result-area {
     margin-left: 4%;
 }
 
+#check-later {
+    margin-left: 4%;
+    margin-bottom: 5px;
+}
+
 #result-stageDetails {
     display: -webkit-box;
     display: -moz-box;

@@ -32,7 +32,7 @@ NUMBER_OF_GENERATED_COLORS = 0
 FIRST_COLOR_THRESHOLD = 100
 SECOND_COLOR_THRESHOLD = 1000
 #random seed for color generation
-RANDOM_SEED = 1
+RANDOM_SEED = 2
 RANDOM_STATE = random.getstate()
 
 
@@ -71,7 +71,7 @@ def initialize(argv):
 			elif opt in ("-i", "--itree"):
 				TREE_FILE = str(arg).strip()
 			elif opt in ("-n", "--tolerance"):
-				NOT_SHARED_DOMAIN_NUMBER_TOLERANCE = str(arg).strip()
+				NOT_SHARED_DOMAIN_NUMBER_TOLERANCE = int(arg)
 			elif opt in ("-s", "--ilist"):
 				INPUT_FILE = str(arg).strip()
 			elif opt in ("-f", "--first_color"):
@@ -194,61 +194,61 @@ def clusterGenesBasedOnSharedDomains(gene_to_neighbors):
 		mainGene1ClusterId+=1
 		for gene1Index in xrange(len(allNeighborGenes1)):
 			gene1 = allNeighborGenes1[gene1Index]
-			if  gene1['Aseq'] and 'pfam31NamesOnly' in gene1['Aseq']:
-				numberOfDomainsInGene1 = len(set(gene1['Aseq']['pfam31NamesOnly']))
-				numberOfMaxDomains = numberOfDomainsInGene1
-				if 'clusterId' in gene1 and gene1['clusterId']:
-					gene1ClusterId = gene1['clusterId']
-					gene1ClusterColor = gene1['clusterColor']
-				else:
-					gene1ClusterId = None
-					gene1ClusterColor = None
-				for gene2 in allNeighborGenes1:
-					# check first wether gene2 was already clustered
-					if gene2['stable_id'] not in PROCESSED_STABLE_IDS:
-						if gene2['Aseq'] and gene1['stable_id'] != gene2['stable_id']:
-							if not 'clusterId' in gene2 and 'pfam31NamesOnly' in gene2['Aseq']:
-								numberOfSharedDomains = len(set(gene1['Aseq']['pfam31NamesOnly']) & set(gene2['Aseq']['pfam31NamesOnly']))
-								numberOfMaxDomains = getNumberOfMaxDomains(gene2, numberOfDomainsInGene1)
-								if numberOfSharedDomains > 0 and abs(numberOfMaxDomains - numberOfSharedDomains) <= NOT_SHARED_DOMAIN_NUMBER_TOLERANCE:
-									if gene1ClusterId:
-										gene2['clusterId'] = gene1ClusterId
-										gene2['clusterColor'] = gene1ClusterColor
-									else:
-										gene1ClusterId = str(mainGene1ClusterId) + str(gene1Index)
-										gene1ClusterColor = getNextColour()
-										gene1['clusterId'] = gene1ClusterId
-										gene2['clusterId'] = gene1ClusterId
-										gene1['clusterColor'] = gene1ClusterColor
-										gene2['clusterColor'] = gene1ClusterColor
-									PROCESSED_STABLE_IDS.add(gene2['stable_id'])
+			if gene1['stable_id'] not in PROCESSED_STABLE_IDS:
+				if  gene1['Aseq'] and 'pfam31NamesOnly' in gene1['Aseq']:
+					numberOfDomainsInGene1 = len(set(gene1['Aseq']['pfam31NamesOnly']))
+					numberOfMaxDomains = numberOfDomainsInGene1
+					if 'clusterId' in gene1 and gene1['clusterId']:
+						gene1ClusterId = gene1['clusterId']
+						gene1ClusterColor = gene1['clusterColor']
+					else:
+						gene1ClusterId = None
+						gene1ClusterColor = None
+					for gene2 in allNeighborGenes1:
+						# check first wether gene2 was already clustered
+						if gene2['stable_id'] not in PROCESSED_STABLE_IDS:
+							if gene2['Aseq'] and gene1['stable_id'] != gene2['stable_id']:
+								if not 'clusterId' in gene2 and 'pfam31NamesOnly' in gene2['Aseq']:
+									numberOfSharedDomains = len(set(gene1['Aseq']['pfam31NamesOnly']) & set(gene2['Aseq']['pfam31NamesOnly']))
+									numberOfMaxDomains = getNumberOfMaxDomains(gene2, numberOfDomainsInGene1)
+									if numberOfSharedDomains > 0 and abs(numberOfMaxDomains - numberOfSharedDomains) <= NOT_SHARED_DOMAIN_NUMBER_TOLERANCE:
+										if gene1ClusterId:
+											gene2['clusterId'] = gene1ClusterId
+											gene2['clusterColor'] = gene1ClusterColor
+										else:
+											gene1ClusterId = str(mainGene1ClusterId) + str(gene1Index)
+											gene1ClusterColor = getNextColour()
+											gene1['clusterId'] = gene1ClusterId
+											gene2['clusterId'] = gene1ClusterId
+											gene1['clusterColor'] = gene1ClusterColor
+											gene2['clusterColor'] = gene1ClusterColor
+										PROCESSED_STABLE_IDS.add(gene2['stable_id'])
 
 
-
-				for mainGene2StableId, allNeighborGenes2 in gene_to_neighbors.items():
-					# first check that these are two different gene neigborhoods
-					# and whether mainGene2StableId was already processed
-					if mainGene1StableId != mainGene2StableId and mainGene2StableId not in PROCESSED_MAIN_GENE_STABLE_IDS:
-						for gene3 in allNeighborGenes2:
-							# check wether gene3 was already clustered
-							if gene3['stable_id'] not in PROCESSED_STABLE_IDS:
-								#we shouldn't check if gene3 is different than gene1 because this is another gene set
-								if gene3['Aseq']:
-									if not 'clusterId' in gene3 and 'pfam31NamesOnly' in gene3['Aseq']:
-										numberOfSharedDomains = len(set(gene1['Aseq']['pfam31NamesOnly']) & set(gene3['Aseq']['pfam31NamesOnly']))
-										numberOfMaxDomains = getNumberOfMaxDomains(gene3, numberOfDomainsInGene1)
-										if numberOfSharedDomains > 0 and abs(numberOfMaxDomains - numberOfSharedDomains) <= NOT_SHARED_DOMAIN_NUMBER_TOLERANCE:
-											if gene1ClusterId:
-												gene3['clusterId'] = gene1ClusterId
-												gene3['clusterColor'] = gene1ClusterColor
-											else:
-												gene1ClusterId = str(mainGene1ClusterId) + str(gene1Index)
-												gene1ClusterColor = getNextColour()
-												gene1['clusterId'] = gene1ClusterId
-												gene3['clusterId'] = gene1ClusterId
-												gene1['clusterColor'] = gene1ClusterColor
-												gene3['clusterColor'] = gene1ClusterColor
-											PROCESSED_STABLE_IDS.add(gene3['stable_id'])
+					for mainGene2StableId, allNeighborGenes2 in gene_to_neighbors.items():
+						# first check that these are two different gene neigborhoods
+						# and whether mainGene2StableId was already processed
+						if mainGene1StableId != mainGene2StableId and mainGene2StableId not in PROCESSED_MAIN_GENE_STABLE_IDS:
+							for gene3 in allNeighborGenes2:
+								# check wether gene3 was already clustered
+								if gene3['stable_id'] not in PROCESSED_STABLE_IDS:
+									#we shouldn't check if gene3 is different than gene1 because this is another gene set
+									if gene3['Aseq']:
+										if not 'clusterId' in gene3 and 'pfam31NamesOnly' in gene3['Aseq']:
+											numberOfSharedDomains = len(set(gene1['Aseq']['pfam31NamesOnly']) & set(gene3['Aseq']['pfam31NamesOnly']))
+											numberOfMaxDomains = getNumberOfMaxDomains(gene3, numberOfDomainsInGene1)
+											if numberOfSharedDomains > 0 and abs(numberOfMaxDomains - numberOfSharedDomains) <= NOT_SHARED_DOMAIN_NUMBER_TOLERANCE:
+												if gene1ClusterId:
+													gene3['clusterId'] = gene1ClusterId
+													gene3['clusterColor'] = gene1ClusterColor
+												else:
+													gene1ClusterId = str(mainGene1ClusterId) + str(gene1Index)
+													gene1ClusterColor = getNextColour()
+													gene1['clusterId'] = gene1ClusterId
+													gene3['clusterId'] = gene1ClusterId
+													gene1['clusterColor'] = gene1ClusterColor
+													gene3['clusterColor'] = gene1ClusterColor
+												PROCESSED_STABLE_IDS.add(gene3['stable_id'])
 			PROCESSED_STABLE_IDS.add(gene1['stable_id'])
 		PROCESSED_MAIN_GENE_STABLE_IDS.add(mainGene1StableId)
 
@@ -333,6 +333,8 @@ def getNextColour():
 	newColor = hsv_to_rgb(h, s, v)
 	print newColor
 	while newColor in SELECTED_COLORS:
+		h = random.random()
+		s = random.random()
 		newColor = hsv_to_rgb(h, s, v)
 	SELECTED_COLORS.add(newColor)
 

@@ -80,7 +80,7 @@ function moveProgressBar(stageNumToPercent) {
             prevStageNum = stageNum;
         }
         else {
-            if (stageNum+1 in stageNumToPercent && width < +stageNumToPercent[stageNum+1]) {
+            if (stageNum+1 in stageNumToPercent && width < +stageNumToPercent[stageNum+1] && width < 99) {
                 width++;
                 elem.style.width = width + '%';
                 elem.innerHTML = width * 1  + '%';

@@ -1,10 +1,15 @@
 $(document).ready( function() {
-    attacheOnChevronClick('#domains-href');
-     attacheOnChevronClick('#neib-href');
+    // control main navbar
 	var mainTab = "#" + $('#mainTab').text();
 	mainNavbar(mainTab);
-	// When the user scrolls the page, execute myFunction
+    // when the user scrolls the page, execute adjustStickyNavbar()
     window.onscroll = function() {adjustStickyNavbar()};
+    // on the help page
+    attacheOnChevronClick('#domains-href');
+    attacheOnChevronClick('#neib-href');
+    // attache the url of the page to show to a user that he can check the status of his job by this url.
+    $("#check-by-url").attr("href", window.location.href);
+    $("#check-by-url").text(window.location.href)
 });
 
 function mainNavbar(tab) {
