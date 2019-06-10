@@ -51,6 +51,13 @@
                 <h2 class="text-primary info-header">Set options</h2>
                 <div class="form-group">
                     <form id="first">
+                        <div class="cd-hit">
+                            <h3 class="text-info" >Redundancy (CD-HIT):</h3>
+                            <div class="checkbox">
+                                <label><input id="reduce-redundancy" type="checkbox" >Reduce sequence redundancy</label>
+                            </div>
+                            <input type="number" min="0.4" step="0.1" max="1" value="0.9" id="cd-hit" name="cd-hit" class="form-control input-md"/>
+                        </div>
                         <h3 class="text-info" >Alignment (Mafft):</h3>
                         <span>Alignment Algorithm:</span>
                         <select id="alignment-alg" class="form-control input-md">
@@ -216,6 +223,9 @@
                     </a>
                     <a id="alignment-load" class="btn btn-info btn-md proto-tree-button" href="#">
                         Download Alignment (FASTA) <span class="glyphicon glyphicon-download-alt"> </span>
+                    </a>
+                    <a id="cdhit-clusters-load" class="btn btn-info btn-md proto-tree-button" href="#">
+                        CD-HIT clusters (TXT) <span class="glyphicon glyphicon-download-alt"> </span>
                     </a>
                 </div>
             </div>

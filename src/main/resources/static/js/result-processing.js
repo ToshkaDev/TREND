@@ -59,14 +59,16 @@ function processRetrievedDataAsync(data) {
             $('#tree-load').attr('href', data.result[0]);
             featureData = null;
             // if all the files were provided for the pipeline
-            if (data.result.length == 4) {
+            if (data.result.length >= 4) {
                 $('#alignment-load').attr('href', data.result[2]);
                 $('#features-load').attr('href', data.result[3]);
-
+                $('#alignment-load').show();
+                if (data.result.length == 5) {
+                    $('#cdhit-clusters-load').show();
+                    $('#cdhit-clusters-load').attr('href', data.result[4]);
+                }
                 featureData = data.result[3];
-                // if alignment file was not provided for the pipeline (the partial one)
-            } else if (data.result.length == 3) {
-                $('#alignment-load').hide();
+            }  else if (data.result.length == 3) {
                 $('#features-load').attr('href', data.result[2]);
                 featureData = data.result[2];
             }
@@ -418,8 +420,15 @@ $(document).on("click", function () {
 
 function controlProgressBar(jobId) {
     var stageNumToPercentFullPipe = {"1":"25", "2":"50", "3": "75", "4": "100"};
+    var stageNumToPercentFullPipeWithRedund = {"1":"20", "2":"40", "3": "60", "4": "80", "5": "100"};
     var stageNumToPercentPartialPipe = {"1":"33", "2":"66", "3": "100"};
-    var stageNumToPercent = jobId.split("-")[1] == "f" ? stageNumToPercentFullPipe : stageNumToPercentPartialPipe;
+    var stageNumToPercent = stageNumToPercentFullPipe;
+    var urlParts = jobId.split("-");
+    if (urlParts[1] == "f") {
+        if (urlParts[2] == "r")
+            stageNumToPercent = stageNumToPercentFullPipeWithRedund;
+    } else
+        stageNumToPercent = stageNumToPercentPartialPipe;
     /*moveProgressBar is in fields-processing.js */
     moveProgressBar(stageNumToPercent);
 }

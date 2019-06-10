@@ -36,9 +36,13 @@ function getOptions() {
     var operonTolerance = $('#operon-tolerance').val();
     var domainTolerance = $('#domain-tolerance').val();
 
+
+    var redundancy = $('#reduce-redundancy').prop("checked") ? $('#cd-hit').val() : '';
+
     var protoTreeCookies = setOrGetCookies();
 
     var optionToOptionName = {
+        "redundancy": redundancy,
         "fetchFromIds": fetchFromIds,
         "fetchFromTree": fetchFromTree,
         "enumerate": enumerate,

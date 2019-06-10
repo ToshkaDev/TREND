@@ -44,6 +44,7 @@ public class ConverterMain {
 		protoTreeInternal.setFetchFromTree(checkCheckBox(ParamPrefixes.FETCH_FROM_TREE.getPrefix(), protoTreeRequest.getFetchFromTree()));
 		protoTreeInternal.setFullPipeline(protoTreeRequest.isFullPipeline());
 		protoTreeInternal.setProtoTreeCookies(protoTreeRequest.getProtoTreeCookies());
+		protoTreeInternal.setRedundancy(checkForNullAndGet(ParamPrefixes.REDUNDANCY.getPrefix(), protoTreeRequest.getRedundancy()));
 		return protoTreeInternal;
 	}
 

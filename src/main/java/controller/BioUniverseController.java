@@ -62,7 +62,10 @@ public abstract class BioUniverseController {
         //and files in 'listOfFiles' field of evolutionRequest are got cleared at the end of request processing.
         ProtoTreeInternal protoTreeInternal = pipelineService.storeFilesAndPrepareCommandArguments(protoTreeRequest);
         String fullOrPartialPipe = protoTreeRequest.isFullPipeline().equals("true") ? "f" : "p";
-        String jobId = protoTreeInternal.getJobId() + "-" + fullOrPartialPipe + "-" + protoTreeInternal.getProtoTreeCookies();
+        String reduceOrNotRedundancy = protoTreeRequest.getRedundancy() != null
+                && protoTreeRequest.getSecondFile() == null
+                && protoTreeRequest.getSecondFileArea() == null ? "r" : "n";
+        String jobId = String.format("%d-%s-%s-%s", protoTreeInternal.getJobId(), fullOrPartialPipe, reduceOrNotRedundancy, protoTreeInternal.getProtoTreeCookies());
         pipelineService.runMainProgram(protoTreeInternal);
         return jobId;
     }
@@ -76,7 +79,7 @@ public abstract class BioUniverseController {
         if (jobId != null ) {
             String jobIdSplitted[] = jobId.split("-");
             int id = Integer.valueOf(jobIdSplitted[0]);
-            String cookieId = jobIdSplitted[2];
+            String cookieId = jobIdSplitted[3];
             bioJob = bioUniverseService.getBioJobDao().findByJobId(id);
             if (bioJob != null && bioJob.getCookieId().equals(cookieId)) {
                 if (bioJob.isFinished()) {

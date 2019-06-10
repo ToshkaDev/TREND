@@ -40,6 +40,7 @@ public class ProtoTreeInternal {
     private String protoTreeCookies;
     private String fetchFromIds;
     private String fetchFromTree;
+    private String redundancy;
 
     private List<List<String>> commandsAndArguments;
     private List<String> outputFilesNames = new LinkedList<>();
@@ -349,4 +350,11 @@ public class ProtoTreeInternal {
         this.fetchFromTree = fetchFromTree;
     }
 
+    public String getRedundancy() {
+        return redundancy;
+    }
+
+    public void setRedundancy(String redundancy) {
+        this.redundancy = redundancy;
+    }
 }

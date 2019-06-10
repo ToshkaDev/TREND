@@ -1,0 +1,105 @@
+#*************************#
+#File download configuration#
+#*************************#
+spring.http.multipart.max-file-size=512000KB
+spring.http.multipart.max-request-size=512000KB
+
+spring.thymeleaf.cache=false
+#*************************#
+#Database configuration#
+#*************************#
+spring.datasource.url=jdbc:postgresql://localhost:5432/biouniversedb
+spring.datasource.username=biouniverse
+spring.datasource.password=bioUser17
+spring.datasource.driverClassName=org.postgresql.Driver
+
+
+spring.datasource.testWhileIdle=true
+spring.datasource.validationQuery=SELECT 1
+
+# Show or not log for each sql query
+spring.jpa.show-sql=false
+
+# Hibernate ddl auto (create, create-drop, update)
+spring.jpa.hibernate.ddl-auto=update
+
+# Naming strategy
+spring.jpa.hibernate.naming-strategy=org.hibernate.cfg.ImprovedNamingStrategy
+
+
+# The SQL dialect makes Hibernate generate better SQL for the chosen database
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+#*************************#
+#whitelable page configurations
+server.error.whitelabel.enabled=false
+#*************************#
+
+
+#*************************#
+#mail configuration#
+#*************************#
+spring.mail.host=smtp.gmail.com
+spring.mail.username=RogerJavaTester
+spring.mail.password=******
+
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.socketFactory.port=465
+spring.mail.properties.mail.smtp.socketFactory.class=javax.net.ssl.SSLSocketFactory
+spring.mail.properties.mail.smtp.socketFactory.fallback=false
+
+
+#*************************#
+#programs paths and parameters#
+#*************************#
+program.workingDirLocation=bioinformatics-programs-workingDir
+program.bioProgramsDir=../bioinformatics-programs
+program.pathToMainDirFromBioProgs=../
+
+program.pythonLocation=/usr/bin/python
+program.bashLocation=/bin/bash
+program.blastpLocation=/home/Soft/blast/ncbi-blast-2.6.0+/bin/blastp
+program.resultFilePrefix=proto-tree-
+program.postfix=.txt
+
+
+program.prepareNames=../bioinformatics-programs/prepareNames.py
+program.calculateProteinFeatures=../bioinformatics-programs/getDomainsFromHMMScanOrRpsAndTm.py
+program.alignAndBuildTree=../bioinformatics-programs/alignAndCunstructTree.py
+program.addProtFeaturesToTree=../bioinformatics-programs/orderSequencesBasedOnTree_andAddDomains.py
+program.enumerate=../bioinformatics-programs/orderSequencesBasedOnTree.py
+program.geneNeighbors=../bioinformatics-programs/gene_neighbors.py
+program.reduceWithCdHit=../bioinformatics-programs/runCdHit.py
+
+program.hmmscanDbPath=/home/Soft/hmmer/pfam31_0/
+program.rpsblastDbPath=/ssd2/rpsblastdb/
+program.rpsprocDbPath=/ssd2/rpsbproc/data/
+program.pfam=Pfam-A.hmm
+program.pfamAndMist=Pfam-A_and_Mist-specific.hmm
+program.rpsblastCddSuper=Cdd
+program.rpsblastCddNcbi=Cdd_NCBI
+program.rpsblastCog=Cog
+program.rpsblastKog=Kog
+program.rpsblastPfam=Pfam
+program.rpsblastPrk=Prk
+program.rpsblastSmart=Smart
+program.rpsblastTigr=Tigr
+
+program.hmmscanPath=/usr/local/bin/hmmscan
+program.rpsblastPath=/home/Soft/blast/ncbi-blast-2.6.0+/bin/rpsblast
+program.rpsbprocPath=/home/vadim/bin/rpsbproc
+program.tmhmm2Path=/home/vadim/Soft/tmhmm-2.0c/bin/tmhmm
+program.segmaskerPath=/home/Soft/blast/ncbi-blast-2.6.0+/bin/segmasker
+program.mafft=/usr/bin/mafft
+program.megacc=/usr/bin/megacc
+program.cdhit=/usr/local/bin/cd-hit
+program.cdhitMemory=2000
+
+#Thread and process numbers
+program.geneNeighborsProcessNum=50
+program.megaThreadNum=7
+program.mafftThreadNum=7
+program.hmmscanThreadNum=10
+program.fetchFromMist=true
+program.fetchFromNCBI=true
+program.cdhitThreadNum=4

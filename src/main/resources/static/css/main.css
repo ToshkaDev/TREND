@@ -156,7 +156,7 @@ label.error {
     font-weight: bold;
 }
 
-div.ml-options, div#rpsblast-db, div.cov-cutoff, div.number-of-replicates {
+div.ml-options, div#rpsblast-db, div.cov-cutoff, div.number-of-replicates, #cd-hit, #cdhit-clusters-load, #alignment-load {
     display: none;
 }
 

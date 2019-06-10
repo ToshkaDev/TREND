@@ -3,6 +3,7 @@ package springconfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 
+import java.security.SecureRandom;
 import java.util.UUID;
 
 @ConfigurationProperties("program")
@@ -19,6 +20,7 @@ public class AppProperties {
     private String addProtFeaturesToTree = bioProgramsDir + "/orderSequencesBasedOnTree_andAddDomains.py";
     private String enumerate = bioProgramsDir + "/orderSequencesBasedOnTree.py";
     private String geneNeighbors = bioProgramsDir + "/gene_neighbors.py";
+    private String reduceWithCdHit = bioProgramsDir + "/runCdHit.py";
 
     public String getProtoTreeProgram() {
         return getAddProtFeaturesToTree();
@@ -50,6 +52,10 @@ public class AppProperties {
     private String segmaskerPath = "/home/vadim/Softs/ncbi-blast-2.6.0+/bin/segmasker";
     private String mafft = "/usr/bin/mafft";
     private String megacc = "/usr/bin/megacc";
+    private String cdhit = "/usr/local/bin/cd-hit";
+    private String cdhitThreadNum = "4";
+    //2000 MB
+    private String cdhitMemory = "2000";
 
     private String fetchFromMistProcNum = "50";
     private String megaThreadNum = "7";
@@ -381,5 +387,37 @@ public class AppProperties {
 
     public void setFetchFromNCBI(String fetchFromNCBI) {
         this.fetchFromNCBI = fetchFromNCBI;
+    }
+
+    public String getCdhit() {
+        return cdhit;
+    }
+
+    public void setCdhit(String cdhit) {
+        this.cdhit = cdhit;
+    }
+
+    public String getCdhitThreadNum() {
+        return cdhitThreadNum;
+    }
+
+    public void setCdhitThreadNum(String cdhitThreadNum) {
+        this.cdhitThreadNum = cdhitThreadNum;
+    }
+
+    public String getCdhitMemory() {
+        return cdhitMemory;
+    }
+
+    public void setCdhitMemory(String cdhitMemory) {
+        this.cdhitMemory = cdhitMemory;
+    }
+
+    public String getReduceWithCdHit() {
+        return reduceWithCdHit;
+    }
+
+    public void setReduceWithCdHit(String reduceWithCdHit) {
+        this.reduceWithCdHit = reduceWithCdHit;
     }
 }
