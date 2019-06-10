@@ -128,6 +128,11 @@ function takeCareOfFields() {
         phylogenyTest != "none" ? $(".number-of-replicates").show() : $(".number-of-replicates").hide();
     });
 
+    $("#reduce-redundancy").change(function() {
+        var cdHit = $("#reduce-redundancy").prop("checked");
+        cdHit ? $("#cd-hit").show() : $("#cd-hit").hide();
+    });
+
     $('#filter-clear').click(function() {
         $('#first, #second').trigger('reset');
         $('#lc-value').removeAttr('checked');

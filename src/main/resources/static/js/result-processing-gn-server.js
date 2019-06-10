@@ -24,12 +24,17 @@ function processRetrievedDataAsync(data) {
 
         if (data.result.length >= 1) {
             // Add corresponding links to download buttons
-            if (data.result.length == 3)
-                $('#alignment-load').attr('href', data.result[2]);
-            else
-                $('#alignment-load').hide();
             $('#tree-load').attr('href', data.result[0]);
             $('#json-load').attr('href', data.result[1]);
+            if (data.result.length >= 3 ) {
+                $('#alignment-load').attr('href', data.result[2]);
+                $('#alignment-load').show();
+                if (data.result.length == 4) {
+                    $('#cdhit-clusters-load').show();
+                    $('#cdhit-clusters-load').attr('href', data.result[3]);
+                }
+            }
+
             var newickTree = data.result[0];
             var jsonDomainsAndGenes = data.result[1];
             $.get(newickTree, function(data, status) {
@@ -62,8 +67,15 @@ function onDownload() {
 
 function controlProgressBar(jobId) {
     var stageNumToPercentFullPipe = {"1":"33", "2":"66", "3": "100"};
+    var stageNumToPercentFullPipeWithRedund = {"1":"25", "2":"50", "3": "75", "4": "100"};
     var stageNumToPercentPartialPipe = {"1":"50", "2":"100"};
-    var stageNumToPercent = jobId.split("-")[1] == "f" ? stageNumToPercentFullPipe : stageNumToPercentPartialPipe;
+    var stageNumToPercent = stageNumToPercentFullPipe;
+    var urlParts = jobId.split("-");
+    if (urlParts[1] == "f") {
+        if (urlParts[2] == "r")
+            stageNumToPercent = stageNumToPercentFullPipeWithRedund;
+    } else
+        stageNumToPercent = stageNumToPercentPartialPipe;
     /*moveProgressBar is in fields-processing.js */
     moveProgressBar(stageNumToPercent);
 }

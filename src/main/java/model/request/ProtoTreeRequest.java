@@ -34,6 +34,7 @@ public class ProtoTreeRequest {
     private String protoTreeCookies;
     private String fetchFromIds;
     private String fetchFromTree;
+    private String redundancy;
 
     public MultipartFile getFirstFile() {
         return firstFile;
@@ -261,6 +262,14 @@ public class ProtoTreeRequest {
 
     public void setFetchFromTree(String fetchFromTree) {
         this.fetchFromTree = fetchFromTree;
+    }
+
+    public String getRedundancy() {
+        return redundancy;
+    }
+
+    public void setRedundancy(String redundancy) {
+        this.redundancy = redundancy;
     }
 }
 

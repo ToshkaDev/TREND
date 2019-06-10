@@ -1,6 +1,5 @@
 package serviceimpl;
 
-import biojobs.BioJob;
 import biojobs.BioJobDao;
 import biojobs.BioJobResultDao;
 import enums.Status;
@@ -20,15 +19,23 @@ import java.util.*;
 public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl implements GeneNeighborhoodsService {
     private Map<Integer, String> counterToStageOneInputPartial = new HashMap<>();
     private Map<Integer, String> counterToStageOneInputFull = new HashMap<>();
+    private Map<Integer, String> counterToStageOneInputFullWithRedund = new HashMap<>();
     private final String bootstrapFilePostfix = "_consensus";
 
     public GeneNeighborhoodsServiceImpl(final StorageService storageService, final AppProperties properties, final BioJobDao bioJobDao, final BioJobResultDao bioJobResultDao) {
         super(storageService, properties, bioJobResultDao, bioJobDao);
         counterToStageOneInputPartial.put(0, "['Processing input.']");
         counterToStageOneInputPartial.put(1, "['Processing input.', 'Identifying operons and clustering genes.-last']");
+
         counterToStageOneInputFull.put(0, "['Processing input.']");
         counterToStageOneInputFull.put(1, "['Processing input.', 'Aligning sequences and building phylogenetic tree.']");
         counterToStageOneInputFull.put(2, "['Processing input.', 'Aligning sequences and building phylogenetic tree.'," +
+                "'Identifying operons and clustering genes.-last']");
+
+        counterToStageOneInputFullWithRedund.put(0, "['Processing input.']");
+        counterToStageOneInputFullWithRedund.put(1, "['Processing input.', 'Reducing sequence redundancy.']");
+        counterToStageOneInputFullWithRedund.put(2, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.']" );
+        counterToStageOneInputFullWithRedund.put(3, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.'," +
                 "'Identifying operons and clustering genes.-last']");
     }
 
@@ -70,6 +77,7 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
 
     private ProtoTreeInternal pipelineProcessing(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
         ProtoTreeInternal protoTreeInternal = storeFileAndGetInternalRepresentation(protoTreeRequest);
+        String redundancy = protoTreeInternal.getRedundancy() != null ? protoTreeInternal.getRedundancy() : null;
         List<String> listOfPrograms = new LinkedList<>();
         List<List<String>> listOfArgumentLists = new LinkedList<>();
 
@@ -77,11 +85,24 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
         List<String> argsForAlignmentAndTree = new LinkedList<>();
         List<String> argsForTreeEnumerate = new LinkedList<>();
         List<String> argsForGeneNeighbors = new LinkedList<>();
+        List<String> argsForCdHit = new LinkedList<>();
 
         initArgsForPrepareNames(protoTreeInternal, argsForPrepareNames, listOfPrograms, listOfArgumentLists);
 
-        protoTreeInternal.setFields();
+        String cdHitOutputFile = super.getRandomFileName(null);
+        if (redundancy != null) {
+            argsForCdHit.addAll(Arrays.asList(
+                    protoTreeInternal.getFirstFileName(),
+                    ParamPrefixes.OUTPUT.getPrefix() + cdHitOutputFile,
+                    redundancy,
+                    ParamPrefixes.CDHIT_PATH.getPrefix() + super.getProperties().getCdhit(),
+                    ParamPrefixes.MEMORY.getPrefix() + super.getProperties().getCdhitMemory(),
+                    ParamPrefixes.THREADS_GENERAL.getPrefix() + super.getProperties().getCdhitThreadNum()
+            ));
+            protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + cdHitOutputFile);
+        }
 
+        protoTreeInternal.setFields();
         String outAlgnFile = super.getRandomFileName(".fa");
         String outNewickTree = super.getRandomFileName("noPostfix");
         argsForAlignmentAndTree.addAll(protoTreeInternal.getFieldsForAlignmentAndTreeBuild());
@@ -91,7 +112,7 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
                 ParamPrefixes.OUTPUT_PARAMS.getPrefix() + super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix(),
                 ParamPrefixes.OUTPUT_TREE.getPrefix() + outNewickTree,
                 ParamPrefixes.THREADS_MAFFT.getPrefix() + super.getProperties().getMafftThreadNum(),
-                ParamPrefixes.THREADS_MEGA_HMMSCAN.getPrefix() + super.getProperties().getMegaThreadNum(),
+                ParamPrefixes.THREADS_GENERAL.getPrefix() + super.getProperties().getMegaThreadNum(),
                 ParamPrefixes.OUTPUT.getPrefix() + outAlgnFile
         ));
 
@@ -118,22 +139,27 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
                 ParamPrefixes.PROCESS_NUMBER.getPrefix() + super.getProperties().getFetchFromMistProcNum()
         ));
 
-        protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outJsonFile, outOrderedAlgnFile));
+        if (redundancy == null)
+            protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outJsonFile, outOrderedAlgnFile));
+        else
+            protoTreeInternal.setOutputFilesNames(Arrays.asList(outNewickFile, outJsonFile, outOrderedAlgnFile, cdHitOutputFile+".clstr"));
 
         listOfPrograms.addAll(Arrays.asList(
                 super.getProperties().getAlignAndBuildTree(),
                 super.getProperties().getEnumerate(),
                 super.getProperties().getGeneNeighbors()
         ));
-
-        String[] arrayOfInterpreters = super.prepareInterpreters(listOfPrograms.size());
-        String[] arrayOfPrograms = listOfPrograms.toArray(new String[listOfPrograms.size()]);
-
         listOfArgumentLists.addAll(Arrays.asList(
                 argsForAlignmentAndTree,
                 argsForTreeEnumerate,
                 argsForGeneNeighbors
         ));
+        if (redundancy != null) {
+            listOfPrograms.add(1, super.getProperties().getReduceWithCdHit());
+            listOfArgumentLists.add(1, argsForCdHit);
+        }
+        String[] arrayOfInterpreters = super.prepareInterpreters(listOfPrograms.size());
+        String[] arrayOfPrograms = listOfPrograms.toArray(new String[listOfPrograms.size()]);
 
         super.prepareCommandArgumentsCommon(protoTreeInternal, arrayOfInterpreters, arrayOfPrograms, listOfArgumentLists);
         return protoTreeInternal;
@@ -168,8 +194,12 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
         for (List<String> commandArgument : protoTreeInternal.getCommandsAndArguments()) {
             if (protoTreeInternal.isFullPipeline().equals("false"))
                 super.saveStage(protoTreeInternal, counter++, counterToStageOneInputPartial);
-            else if (protoTreeInternal.isFullPipeline().equals("true"))
-                super.saveStage(protoTreeInternal, counter++, counterToStageOneInputFull);
+            else if (protoTreeInternal.isFullPipeline().equals("true")) {
+                if(protoTreeInternal.getRedundancy() == null)
+                    super.saveStage(protoTreeInternal, counter++, counterToStageOneInputFull);
+                else
+                    super.saveStage(protoTreeInternal, counter++, counterToStageOneInputFullWithRedund);
+            }
             try {
                 super.launchProcess(commandArgument, protoTreeInternal);
             } catch (Exception exception) {

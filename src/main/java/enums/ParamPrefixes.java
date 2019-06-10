@@ -15,6 +15,11 @@ public enum  ParamPrefixes {
     FETCH_FROM_NCBI("-b "),
     REMOVE_DASHES("-d "),
 
+    //cd-hit
+    REDUNDANCY("-c "),
+    MEMORY("-m "),
+    CDHIT_PATH("-A "),
+
 
     //alignment specific parameters
     ALGORITHM("-a "),
@@ -23,7 +28,7 @@ public enum  ParamPrefixes {
 
     //tree building specific parameters
     MEGACC_PATH("-k "),
-    THREADS_MEGA_HMMSCAN("-u "),
+    THREADS_GENERAL("-u "),
     TREE_BUILD_METHOD("-m "),
     AA_SUBST_MODEL("-l "),
     AA_SUBST_RATE("-n "),
