@@ -56,6 +56,7 @@ public class AppProperties {
     private String cdhitThreadNum = "4";
     //2000 MB
     private String cdhitMemory = "2000";
+    private String xvfbrun = "/usr/bin/xvfb-run";
 
     private String fetchFromMistProcNum = "50";
     private String megaThreadNum = "7";
@@ -419,5 +420,13 @@ public class AppProperties {
 
     public void setReduceWithCdHit(String reduceWithCdHit) {
         this.reduceWithCdHit = reduceWithCdHit;
+    }
+
+    public String getXvfbrun() {
+        return xvfbrun;
+    }
+
+    public void setXvfbrun(String xvfbrun) {
+        this.xvfbrun = xvfbrun;
     }
 }

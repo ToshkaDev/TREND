@@ -8,9 +8,9 @@ spring.thymeleaf.cache=false
 #*************************#
 #Database configuration#
 #*************************#
-spring.datasource.url=jdbc:postgresql://localhost:5432/biouniversedb
-spring.datasource.username=biouniverse
-spring.datasource.password=bioUser17
+spring.datasource.url=jdbc:postgresql://localhost:5432/trenddb
+spring.datasource.username=trend
+spring.datasource.password=
 spring.datasource.driverClassName=org.postgresql.Driver
 
 
@@ -52,16 +52,15 @@ spring.mail.properties.mail.smtp.socketFactory.fallback=false
 #*************************#
 #programs paths and parameters#
 #*************************#
-program.workingDirLocation=bioinformatics-programs-workingDir
-program.bioProgramsDir=../bioinformatics-programs
+program.workingDirLocation=/home/bioverse/trend/proto-tree/bioinformatics-programs-workingDir
+program.bioProgramsDir=/home/bioverse/trend/proto-tree/bioinformatics-programs-workingDir
 program.pathToMainDirFromBioProgs=../
 
 program.pythonLocation=/usr/bin/python
 program.bashLocation=/bin/bash
-program.blastpLocation=/home/Soft/blast/ncbi-blast-2.6.0+/bin/blastp
+program.blastpLocation=/home/bioverse/trend/Soft/ncbi-blast-2.6.0+/bin/blastp
 program.resultFilePrefix=proto-tree-
 program.postfix=.txt
-
 
 program.prepareNames=../bioinformatics-programs/prepareNames.py
 program.calculateProteinFeatures=../bioinformatics-programs/getDomainsFromHMMScanOrRpsAndTm.py
@@ -71,11 +70,11 @@ program.enumerate=../bioinformatics-programs/orderSequencesBasedOnTree.py
 program.geneNeighbors=../bioinformatics-programs/gene_neighbors.py
 program.reduceWithCdHit=../bioinformatics-programs/runCdHit.py
 
-program.hmmscanDbPath=/home/Soft/hmmer/pfam31_0/
-program.rpsblastDbPath=/ssd2/rpsblastdb/
-program.rpsprocDbPath=/ssd2/rpsbproc/data/
-program.pfam=Pfam-A.hmm
-program.pfamAndMist=Pfam-A_and_Mist-specific.hmm
+program.hmmscanDbPath=/data/HMM_models/
+program.rpsblastDbPath=/data/Ncbi/CDD_PSSMs/
+program.rpsprocDbPath=/home/bioverse/trend/Soft/rpcbproc/rpsbproc_dir/rpsbproc_data
+program.pfam=Pfam-A32.hmm
+program.pfamAndMist=Pfam-A32_and_Mist-specific.hmm
 program.rpsblastCddSuper=Cdd
 program.rpsblastCddNcbi=Cdd_NCBI
 program.rpsblastCog=Cog
@@ -85,15 +84,18 @@ program.rpsblastPrk=Prk
 program.rpsblastSmart=Smart
 program.rpsblastTigr=Tigr
 
-program.hmmscanPath=/usr/local/bin/hmmscan
-program.rpsblastPath=/home/Soft/blast/ncbi-blast-2.6.0+/bin/rpsblast
-program.rpsbprocPath=/home/vadim/bin/rpsbproc
-program.tmhmm2Path=/home/vadim/Soft/tmhmm-2.0c/bin/tmhmm
-program.segmaskerPath=/home/Soft/blast/ncbi-blast-2.6.0+/bin/segmasker
-program.mafft=/usr/bin/mafft
-program.megacc=/usr/bin/megacc
-program.cdhit=/usr/local/bin/cd-hit
+program.hmmscanPath=/home/bioverse/trend/Soft/hmmer_path/bin/hmmscan
+program.rpsblastPath=/home/bioverse/trend/Soft/ncbi-blast-2.6.0+/bin/rpsblast
+program.rpsbprocPath=/home/bioverse/trend/Soft/rpcbproc/rpsbproc_dir/bin/rpsbproc
+program.tmhmm2Path=/home/bioverse/trend/Soft/tmhmm-2.0c/bin/tmhmm
+program.segmaskerPath=/home/bioverse/trend/Soft/ncbi-blast-2.6.0+/bin/segmasker
+program.mafft=/home/bioverse/trend/Soft/mafft/target_dir/bin/mafft
+program.megacc=/home/bioverse/trend/Soft/megacc/megacc
+program.cdhit=/home/bioverse/trend/Soft/cd-hit-v4.8.1-2019-0228/cd-hit
 program.cdhitMemory=2000
+
+# Xserver Virtual Frame Buffer (Xvfb)
+program.xvfbrun=/usr/bin/xvfb-run
 
 #Thread and process numbers
 program.geneNeighborsProcessNum=50

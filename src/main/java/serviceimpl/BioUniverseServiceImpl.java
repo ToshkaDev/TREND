@@ -139,8 +139,11 @@ public class BioUniverseServiceImpl implements BioUniverseService {
                                               String[] arrayOfPrograms, List<List<String>> listOfArgumentLists) {
         List<List<String>> commandsAndArguments = new LinkedList<>();
 
-        for (int i=0; i< arrayOfPrograms.length; i++) {
+        for (int i=0; i<arrayOfPrograms.length; i++) {
             List<String> listOfCommandsAndArgs= new LinkedList<>();
+            // We need Xserver when rendering ete2 tree on the server
+            if (arrayOfPrograms[i].equals(properties.getAddProtFeaturesToTree()))
+                listOfCommandsAndArgs.add(properties.getXvfbrun());
             listOfCommandsAndArgs.add(arrayOfInterpreters[i]);
             listOfCommandsAndArgs.add(arrayOfPrograms[i]);
             listOfCommandsAndArgs.addAll(listOfArgumentLists.get(i));

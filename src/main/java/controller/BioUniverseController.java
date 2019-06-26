@@ -39,6 +39,8 @@ public abstract class BioUniverseController {
     protected final List<String> statusReady = Arrays.asList("ready");
     protected final List<String> statusNotReady = Arrays.asList("notReady");
     protected final List<String> statusNoSuchBioJob = Arrays.asList("noSuchBioJob");
+    private final String baseUrl = "http://localhost:8080";
+    // private final String baseUrl = "http://trend.zhulinlab.org";
 
     @Autowired
     public BioUniverseController(StorageService storageService) {
@@ -72,7 +74,8 @@ public abstract class BioUniverseController {
 
     public Map<String, List<String>> getFileNameIfReadyCommon(String jobId, BioUniverseService bioUniverseService, String specificPath) {
         BioJob bioJob;
-        String urlPath = ServletUriComponentsBuilder.fromCurrentContextPath().path(specificPath + "/univ_files/").build().toString();
+        // String urlPath = ServletUriComponentsBuilder.fromCurrentContextPath().path(specificPath + "/univ_files/").build().toString();
+        String urlPath = ServletUriComponentsBuilder.fromHttpUrl(baseUrl).path(specificPath + "/univ_files/").build().toString();
         Map<String, List<String>> result = new HashMap<>();
         result.put(Status.status.getStatusEnum(), statusNoSuchBioJob);
         List<String> listOfResultFileNames;
