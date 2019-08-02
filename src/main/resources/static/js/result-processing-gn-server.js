@@ -58,9 +58,13 @@ function processRetrievedDataAsync(data) {
 }
 
 function onDownload() {
+    var svgData = d3.select("#svgContainer>svg>#treeContainer").html();
+    var svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
+    var svgUrl = URL.createObjectURL(svgBlob);
+    console.log("svgUrl " + svgUrl)
     d3.select("#results-load").on("click", function() {
       d3.select(this)
-        .attr("href", 'data:application/octet-stream;base64,' + btoa(d3.select("#svgContainer>svg>#treeContainer").html()))
+        .attr("href", svgUrl)
         .attr("download", "ProtoTree.svg")
     });
 }

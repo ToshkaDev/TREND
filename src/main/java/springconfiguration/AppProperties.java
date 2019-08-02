@@ -12,6 +12,7 @@ public class AppProperties {
 
     private String workingDirLocation = "bioinformatics-programs-workingDir";
     private String bioProgramsDir = "../bioinformatics-programs";
+    private String utilDir = "../util";
     private String pathToMainDirFromBioProgs = "../";
 
     private String prepareNames = bioProgramsDir + "/prepareNames.py";
@@ -54,9 +55,11 @@ public class AppProperties {
     private String megacc = "/usr/bin/megacc";
     private String cdhit = "/usr/local/bin/cd-hit";
     private String cdhitThreadNum = "4";
-    //2000 MB
+    // 2000 MB
     private String cdhitMemory = "2000";
     private String xvfbrun = "/usr/bin/xvfb-run";
+    // safe parallel xvfb-run
+    private String xvfbrunSafe = utilDir + "/xvfb-run-safe.sh";
 
     private String fetchFromMistProcNum = "50";
     private String megaThreadNum = "7";
@@ -84,6 +87,14 @@ public class AppProperties {
 
     public void setBioProgramsDir(String bioProgramsDir) {
         this.bioProgramsDir = bioProgramsDir;
+    }
+
+    public String getUtilDir() {
+        return utilDir;
+    }
+
+    public void setUtilDir(String utilDir) {
+        this.utilDir = utilDir;
     }
 
     public String getPathToMainDirFromBioProgs() {
@@ -428,5 +439,13 @@ public class AppProperties {
 
     public void setXvfbrun(String xvfbrun) {
         this.xvfbrun = xvfbrun;
+    }
+
+    public String getXvfbrunSafe() {
+        return xvfbrunSafe;
+    }
+
+    public void setXvfbrunSafe(String xvfbrunSafe) {
+        this.xvfbrunSafe = xvfbrunSafe;
     }
 }
