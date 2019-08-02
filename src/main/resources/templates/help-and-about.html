@@ -33,6 +33,9 @@
                 BLAST
             </div>
             <div class="credits">
+                CD-HIT
+            </div>
+            <div class="credits">
                 ETE Toolkit
             </div>
             <div class="credits">
@@ -203,7 +206,7 @@
                     <div class="indented-text">
                         <p>
                             Put at the beginning of the tree leaves names NCBI/MiST protein ids/locus tags separated from the rest of the names by
-                            space, underscore( _ ) or vertical bar (|).
+                            space, underscore ( _ ) or vertical bar (|).
                         </p>
                         <p>
                             Tick <span class="proto-tree-text">Retrieve sequences (NCBI and MiST)</span>. Our id analyzer will extract the sequences from NCBI and MiST.
@@ -243,11 +246,11 @@
         <div id="neighborhoods-info" class="collapse">
             <div>
                 <p>
-                    You can easily visualize gene neighborhoods on the phylogenetic tree running our neighborhoods analysis pipeline.
+                    You can cluster genes based on the shared domains of the encoded proteins and visualize the clusters and gene neighborhoods on phylogenetic tree running our neighborhoods analysis pipeline.
                 </p>
                 <p>
                     Protein names in the file with the sequences or the tree should start with protein identifiers
-                    separated from the rest of the name by space, underscore( _ ) or vertical bar (|).
+                    separated from the rest of the name by space, underscore ( _ ) or vertical bar (|).
                 </p>
                     <p>
                         Suitable identifiers:
@@ -275,6 +278,14 @@
                 </p>
                 <p>
                     Bear in mind that refSeq Ids are not organism specific. If you want to explore the neighborhoods of genes from a particular organism you should provide locus tags or MiST Ids.
+                </p>
+                <br/>
+                <p>
+                    <strong>'Operon tolerance'</strong> parameter is a distance in nucleotides between neighboring genes to consider them as being encoded in one operon.
+                </p>
+                <p>
+                    <strong>'Not shared domains tolerance'</strong> parameter is a number of not shared domains between any two proteins that is allowed
+                    for corresponding genes sill to be considered as members of the same cluster.
                 </p>
             </div>
             <div>
