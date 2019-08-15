@@ -18,28 +18,37 @@
     <div class="row">
         <div class="col-md-12 credits-list">
             <div class="credits">
-                MAFFT
+                <a href="https://mafft.cbrc.jp/alignment/software/" target="_blank">MAFFT</a>
             </div>
             <div class="credits">
-                MEGA
+                <a href="https://www.megasoftware.net/" target="_blank">MEGA</a>
             </div>
             <div class="credits">
-                HMMER
+                <a href="http://hmmer.org/" target="_blank">HMMER</a>
             </div>
             <div class="credits">
-                TMHMM
+                <a href="http://www.cbs.dtu.dk/services/TMHMM/" target="_blank">TMHMM</a>
             </div>
             <div class="credits">
-                BLAST
+                <a href="http://weizhongli-lab.org/cd-hit/" target="_blank">CD-HIT</a>
             </div>
             <div class="credits">
-                CD-HIT
+                <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi" target="_blank">BLAST</a>
             </div>
             <div class="credits">
-                ETE Toolkit
+                <a href="https://www.ncbi.nlm.nih.gov/Structure/cdd/cdd.shtml" target="_blank">CDD</a>
             </div>
             <div class="credits">
-                jsPhyloSVG
+                <a href="https://pfam.xfam.org/" target="_blank">Pfam</a>
+            </div>
+            <div class="credits">
+                <a href="https://mistdb.com/" target="_blank">MiST</a>
+            </div>
+            <div class="credits">
+                <a href="http://etetoolkit.org/" target="_blank">ETE Toolkit</a>
+            </div>
+            <div class="credits">
+                 <a href="https://github.com/guyleonard/jsPhyloSVG" target="_blank">jsPhyloSVG</a>
             </div>
 
 
@@ -54,15 +63,15 @@
     </div>
     <div class="row about-div">
         <div class="col-md-4 home-description">
-            <h3 class="h3-about">Align proteins and build a tree</h3>
+            <h3 class="h3-about">Align protein sequences and build a tree</h3>
             Provide protein sequences and start the analysis or use our embedded id parser.
             Use variety of MAFFT alignment algorithms and MEGA tree building options.
             Reorder the alignment according to the tree leaves.
         </div>
         <div class="col-md-4 home-description">
-            <h3 class="h3-about">Predict protein domain architectures</h3>
+            <h3 class="h3-about">Identify protein domain architectures</h3>
             Predict protein domains, transmembrane and low-complexity regions.
-            Make use of Pfam, MiST and CDD models.
+            Make use of Pfam, CDD and MiST models.
         </div>
         <div class="col-md-4 home-description">
             <h3 class="h3-about">Identify gene neighborhoods</h3>
@@ -77,7 +86,7 @@
             Customize the number of not shared domains for genes to be clustered.
         </div>
         <div class="col-md-4 home-description">
-            <h3 class="h3-about">Visualize on the tree</h3>
+            <h3 class="h3-about">Visualize results on the tree</h3>
             Combine the tree and predictions in one interactive picture.
             Explore domain predictions and gene neighborhoods.
             Take advantage of сross-links with Pfam, CDD, NCBI and MiST.
@@ -205,14 +214,14 @@
                 <div><p style="font-weight:bold">Second way:</p>
                     <div class="indented-text">
                         <p>
-                            Put at the beginning of the tree leaves names NCBI/MiST protein ids/locus tags separated from the rest of the names by
+                            a) Put at the beginning of the tree leaves names NCBI/MiST protein ids/locus tags separated from the rest of the names by
                             space, underscore ( _ ) or vertical bar (|).
                         </p>
                         <p>
-                            Tick <span class="proto-tree-text">Retrieve sequences (NCBI and MiST)</span>. Our id analyzer will extract the sequences from NCBI and MiST.
+                            b) Tick <span class="proto-tree-text">Retrieve sequences (NCBI and MiST)</span>. Our id analyzer will extract the sequences from NCBI and MiST.
                         </p>
                         <p>
-                            And then just upload the tree in <a href="https://en.wikipedia.org/wiki/Newick_format" target="_blank">newick</a> format (<span class="proto-tree-text">Choose file with tree (Newick)</span> button) and start the analysis
+                            c) And then just upload the tree in <a href="https://en.wikipedia.org/wiki/Newick_format" target="_blank">newick</a> format (<span class="proto-tree-text">Choose file with tree (Newick)</span> button) and start the analysis
                         </p>
                         <p>
                             If you download sequences from NCBI or MiST and use them to build the tree, the ids will be naturally at the beginning of sequences and you don't have to do anything.
@@ -277,7 +286,7 @@
                     3) by pasting a list of NCBI/MiST protein ids/locus tags (or uploading corresponding file). Don't forget to check <span class="proto-tree-text">Retrieve sequences (NCBI and MiST)</span>
                 </p>
                 <p>
-                    Bear in mind that refSeq Ids are not organism specific. If you want to explore the neighborhoods of genes from a particular organism you should provide locus tags or MiST Ids.
+                    Bear in mind that the refSeq Ids are not organism specific. If you want to explore the neighborhoods of genes from a particular organism you should provide locus tags or MiST Ids.
                 </p>
                 <br/>
                 <p>
@@ -292,6 +301,9 @@
                 <br/>
                 <p>
                     As a result of running <span class="proto-tree-text">Neighborhoods</span> pipeline a phylogenetic tree combined with interactive gene neighborhoods will be produced.
+                </p>
+                <p>
+                    Genes that belong to the same cluster will be colored in the same color. Genes that belong to the same operon will have the borders of the same color.
                 </p>
                 <p>
                     Details of the neighboring genes can be explored by hovering mouse pointer. To zoom in/zoom out use mouse wheel.
