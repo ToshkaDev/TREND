@@ -34,6 +34,7 @@ public class ProtoTreeInternal {
 
     private String domainTolerance;
     private String operonTolerance;
+    private String numberOfNeighbors;
 
     private String  commandToBeProcessedBy;
     private String isFullPipeline;
@@ -268,6 +269,7 @@ public class ProtoTreeInternal {
 
         fieldsForGeneNeighbors.add(getDomainTolerance());
         fieldsForGeneNeighbors.add(getOperonTolerance());
+        fieldsForGeneNeighbors.add(getNumberOfNeighbors());
 
         if (getEnumerate() != null) {
             fieldsForTreeAndDomains.add(getEnumerate());
@@ -324,6 +326,14 @@ public class ProtoTreeInternal {
 
     public void setOperonTolerance(String operonTolerance) {
         this.operonTolerance = operonTolerance;
+    }
+
+    public String getNumberOfNeighbors() {
+        return numberOfNeighbors;
+    }
+
+    public void setNumberOfNeighbors(String numberOfNeighbors) {
+        this.numberOfNeighbors = numberOfNeighbors;
     }
 
     public String getEnumerate() {

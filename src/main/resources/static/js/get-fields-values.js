@@ -35,6 +35,7 @@ function getOptions() {
 
     var operonTolerance = $('#operon-tolerance').val();
     var domainTolerance = $('#domain-tolerance').val();
+    var numberOfNeighbors = $("#numberOf-neighbors").val();
 
 
     var redundancy = $('#reduce-redundancy').prop("checked") ? $('#cd-hit').val() : '';
@@ -48,6 +49,7 @@ function getOptions() {
         "enumerate": enumerate,
         "operonTolerance": operonTolerance,
         "domainTolerance": domainTolerance,
+        "numberOfNeighbors": numberOfNeighbors,
         "protoTreeCookies": protoTreeCookies,
         "isFullPipeline": isFullPipeline,
         "firstFile": firstFile,

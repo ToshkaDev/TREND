@@ -65,6 +65,7 @@ public enum  ParamPrefixes {
     //gene_neighbors.py specific parameters
     NOT_SHARED_DOMAIN_TOLERANCE("-n "),
     OPERON_TOLERANCE("-p "),
+    NUMBER_OF_NEIGHBORS("-b "),
     PROCESS_NUMBER("-c ");
 
     private String paramPrefix;

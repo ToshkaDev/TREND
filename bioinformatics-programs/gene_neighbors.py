@@ -32,7 +32,7 @@ NUMBER_OF_GENERATED_COLORS = 0
 FIRST_COLOR_THRESHOLD = 100
 SECOND_COLOR_THRESHOLD = 1000
 #random seed for color generation
-RANDOM_SEED = 1
+RANDOM_SEED = 2
 RANDOM_STATE = random.getstate()
 
 
@@ -40,7 +40,8 @@ RANDOM_STATE = random.getstate()
 INPUT_FILE = None
 TREE_FILE = None
 NOT_SHARED_DOMAIN_NUMBER_TOLERANCE = 0
-OPERON_TOLERANCE = 150
+OPERON_TOLERANCE = 200
+NUM_OF_NEIGHBORS = 5
 OUTPUT_FILE = None
 
 BASE_URL = "https://api.mistdb.caltech.edu/v1/genes"
@@ -55,9 +56,9 @@ GENE_TO_NEIGHBORS = manager.dict()
 
 def initialize(argv):
 	global INPUT_FILE, TREE_FILE, NOT_SHARED_DOMAIN_NUMBER_TOLERANCE, OPERON_TOLERANCE, OUTPUT_FILE
-	global FIRST_COLOR_THRESHOLD, SECOND_COLOR_THRESHOLD, RANDOM_SEED, RANDOM_STATE, NUMBER_OF_PROCESSES
+	global FIRST_COLOR_THRESHOLD, SECOND_COLOR_THRESHOLD, RANDOM_SEED, RANDOM_STATE, NUMBER_OF_PROCESSES, NUM_OF_NEIGHBORS
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:s:n:f:s:r:p:c:o:",["help", "itree=", "ilist=", "tolerance=", "first_color=", "second_color=", "random_seed=", "operon_tolerance=", "proc_num=", "ofile="])
+		opts, args = getopt.getopt(argv[1:],"hi:s:n:f:s:r:p:b:c:o:",["help", "itree=", "ilist=", "tolerance=", "first_color=", "second_color=", "random_seed=", "operon_tolerance=", "num_ofneighbors=", "proc_num=", "ofile="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
@@ -82,6 +83,12 @@ def initialize(argv):
 				RANDOM_SEED = int(arg)
 			elif opt in ("-p", "--operon_tolerance"):
 				OPERON_TOLERANCE = int(arg)
+			elif opt in ("-b", "--num_ofneighbors"):
+				neighbors = int(arg)
+				if (neighbors >= 5 and neighbors <= 15):
+					NUM_OF_NEIGHBORS = neighbors
+				elif (neighbors > 15):
+					NUM_OF_NEIGHBORS = 15
 			elif opt in ("-c", "--proc_num"):
 				NUMBER_OF_PROCESSES = int(arg)
 			elif opt in ("-o", "--ofile"):
@@ -96,15 +103,8 @@ def initialize(argv):
 def findGene(geneNameOrId):
 	params = urllib.urlencode({'search': geneNameOrId, 'fields': GENE_FIELDS, 'fields.Aseq': PFAM})
 	result = urllib.urlopen(BASE_URL + "?%s" % params)
-	try:
-		result = json.loads(result.read())
-	except Exception as e:
-		result = None
-		print("Exception happened whyle trying to decode json: " + str(e))
-		print("So returning None")
-	finally:
-		return result
-		
+	return json.loads(result.read())
+
 def getGeneAndProcessGeneNeighbors(geneStableIdList):
 	duplicateCounter = 1
 	for geneIndex in xrange(len(geneStableIdList[0])):
@@ -130,7 +130,7 @@ def getGeneNeighborsAndPrepareDomains(mainGeneDict, duplicateCounter, fullProtei
 		mainGeneDomainsWithNoOverlaps, mainGeneDomainWithNoOverlapsNamesOnly = removeOverlapps(mainGeneSortedDomains)
 		mainGeneDict['Aseq']['pfam31'] = mainGeneDomainsWithNoOverlaps
 		mainGeneDict['Aseq']['pfam31NamesOnly'] = mainGeneDomainWithNoOverlapsNamesOnly
-	params = urllib.urlencode({'fields': GENE_FIELDS, 'fields.Aseq': PFAM})
+	params = urllib.urlencode({'fields': GENE_FIELDS, 'fields.Aseq': PFAM, 'amount': NUM_OF_NEIGHBORS})
 	result = urllib.urlopen(BASE_URL + "/" + mainGeneDict["stable_id"] + "/neighbors?%s" % params)
 	genesList = json.loads(result.read())
 

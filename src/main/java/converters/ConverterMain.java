@@ -39,6 +39,7 @@ public class ConverterMain {
 
 		protoTreeInternal.setDomainTolerance(checkForNullAndGet(ParamPrefixes.NOT_SHARED_DOMAIN_TOLERANCE.getPrefix(), protoTreeRequest.getDomainTolerance()));
 		protoTreeInternal.setOperonTolerance(checkForNullAndGet(ParamPrefixes.OPERON_TOLERANCE.getPrefix(), protoTreeRequest.getOperonTolerance()));
+		protoTreeInternal.setNumberOfNeighbors(checkForNullAndGet(ParamPrefixes.NUMBER_OF_NEIGHBORS.getPrefix(), protoTreeRequest.getNumberOfNeighbors()));
 
 		protoTreeInternal.setFetchFromIds(checkCheckBox(ParamPrefixes.FETCH_FROM_IDS.getPrefix(), protoTreeRequest.getFetchFromIds()));
 		protoTreeInternal.setFetchFromTree(checkCheckBox(ParamPrefixes.FETCH_FROM_TREE.getPrefix(), protoTreeRequest.getFetchFromTree()));

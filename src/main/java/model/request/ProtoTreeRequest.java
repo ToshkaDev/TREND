@@ -28,6 +28,7 @@ public class ProtoTreeRequest {
 
     private String domainTolerance;
     private String operonTolerance;
+    private String numberOfNeighbors;
 
     private String commandToBeProcessedBy;
     private String isFullPipeline;
@@ -238,6 +239,14 @@ public class ProtoTreeRequest {
 
     public void setOperonTolerance(String operonTolerance) {
         this.operonTolerance = operonTolerance;
+    }
+
+    public String getNumberOfNeighbors() {
+        return numberOfNeighbors;
+    }
+
+    public void setNumberOfNeighbors(String numberOfNeighbors) {
+        this.numberOfNeighbors = numberOfNeighbors;
     }
 
     public String getEnumerate() {

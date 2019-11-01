@@ -152,9 +152,13 @@
                             <input value="100" id="number-of-replicates" name="number-of-replicates" type="text" class="form-control input-md"/>
                         </div>
                         <h3 class="text-info">Gene neighbors:</h3>
+                        <div class="numberOf-neighbors">
+                            <span>Number of neighboring genes on one side (max 15):</span>
+                            <input type="number" min="5" max="15" step="1" value="5" id="numberOf-neighbors" name="numberOf-neighbors" class="form-control input-md"/>
+                        </div>
                         <div class="operon-tolerance">
                             <span>Operon tolerance:</span>
-                            <input type="number" min="0" max="500" step="10" value="150" id="operon-tolerance" name="operon-tolerance" class="form-control input-md"/>
+                            <input type="number" min="0" max="500" step="10" value="200" id="operon-tolerance" name="operon-tolerance" class="form-control input-md"/>
                         </div>
                         <div class="domain-tolerance">
                             <span>Not shared domains tolerance:</span>

@@ -1,5 +1,5 @@
 //Figure
-svgWidth = 700;
+svgWidth = 800;
 svgHeight = 300;
 
 clusterFrameHeight = svgHeight*0.17;
@@ -40,8 +40,8 @@ textPositionFactorX = 10;
 textPositionFactorXLast = 10;
 xShiftLeft = 0.03;
 xShiftLeftLast = 0.03;
-clusterOffsetLeft = 0.05;
-clusterOffsetRight = 0.084;
+clusterOffsetLeft = 0.02;
+clusterOffsetRight = 0.044;
 
 PROCESSED_STABLE_IDS = [];
 GENE_NEIB_COUNTER = 0;
@@ -52,24 +52,9 @@ function buildGeneTree(nwkObject, jsonDomainsAndGenesData) {
         return false;
     createZoomableBox();
 
-    var reductionFactor = 1;
+    var jsonDomainsAndGenesObj = JSON.parse(jsonDomainsAndGenesData);
+    setSvgSizeAndBuildTree(textCounter, jsonDomainsAndGenesObj)
 
-    // factoring the tree vertical size depending on the number of leaves
-    if (textCounter <= 6) {
-        reductionFactor = 0.43;
-    } else if (textCounter <= 100) {
-        reductionFactor = textCounter/16;
-    } else if (textCounter <= 1000) {
-        reductionFactor = textCounter/20;
-    } else {
-        reductionFactor = textCounter/23;
-    }
-
-    phylocanvas = new Smits.PhyloCanvas(
-        nwkObject,
-        'treeContainer',
-        2500, 1300*reductionFactor
-    );
     d3.select('#treeContainer>svg').select('desc').text("ProtoTree");
     var processed = false;
     textCounter = 0;
@@ -96,8 +81,46 @@ function buildGeneTree(nwkObject, jsonDomainsAndGenesData) {
             } else
                 processed = false;
         });
-    getGenesAndDraw(protIdsToYCoords, longestXCoord, longestXCoordText, JSON.parse(jsonDomainsAndGenesData));
+    getGenesAndDraw(protIdsToYCoords, longestXCoord, longestXCoordText, jsonDomainsAndGenesObj);
     return true;
+}
+
+function setSvgSizeAndBuildTree(textCounter, jsonDomainsAndGenesObj) {
+    var fullSvgWidth = 2800, reductionFactor = 1;
+    // factoring the tree vertical size depending on the number of leaves
+    if (textCounter <= 6) {
+        reductionFactor = 0.43;
+    } else if (textCounter <= 100) {
+        reductionFactor = textCounter/16;
+    } else if (textCounter <= 1000) {
+        reductionFactor = textCounter/20;
+    } else {
+        reductionFactor = textCounter/23;
+    }
+
+    var proteinNum = 0, neighbLengths = [];
+    for (var protein in jsonDomainsAndGenesObj) {
+        if (proteinNum++ > 20)
+            break;
+        neighbLengths.push(jsonDomainsAndGenesObj[protein].length);
+    }
+    var neighbourhoodLength = Math.max(...neighbLengths);
+    if (neighbourhoodLength <= 15) {
+        svgWidth = 800;
+        fullSvgWidth = 2800;
+    } else if (neighbourhoodLength > 15 && neighbourhoodLength <= 23) {
+        svgWidth = 1200;
+        fullSvgWidth = 4200;
+    } else {
+        svgWidth = 2000;
+        fullSvgWidth = 7000;
+    }
+
+    phylocanvas = new Smits.PhyloCanvas(
+        nwkObject,
+        'treeContainer',
+        fullSvgWidth, 1300*reductionFactor
+    );
 }
 
 function createZoomableBox() {
