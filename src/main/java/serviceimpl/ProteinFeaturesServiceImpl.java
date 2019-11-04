@@ -114,6 +114,7 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
 
         List<String> argsForPrepareNames = new LinkedList<>();
         List<String> argsForPrepareNamesSecond = new LinkedList<>();
+
         List<String> argsForProteinFeatures = new LinkedList<>();
         List<String> argsForAlignmentAndTree = new LinkedList<>();
         List<String> argsForTreeWithDomains = new LinkedList<>();
@@ -145,7 +146,6 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
 
         argsForProteinFeatures.addAll(protoTreeInternal.getFieldsForFeaturesPrediction());
         argsForProteinFeatures.addAll(Arrays.asList(
-                protoTreeInternal.getFirstFileName(),
                 getDomainPredictionDb(protoTreeInternal.getDomainPredictionDb()),
                 ParamPrefixes.OUTPUT_FOURTH.getPrefix() + hmmscanOrRpsbOutFile,
                 ParamPrefixes.OUTPUT_FIFTH.getPrefix() + rpsbProcOutFile,
@@ -187,7 +187,6 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         String proteinFeaturesChangedOutFile = super.getRandomFileName(null);
         argsForTreeWithDomains.addAll(protoTreeInternal.getFieldsForTreeAndDomains());
         argsForTreeWithDomains.addAll(Arrays.asList(
-                protoTreeInternal.getFirstFileName(),
                 ParamPrefixes.INPUT_SECOND.getPrefix() + outAlgnFile,
                 ParamPrefixes.INPUT_THIRD.getPrefix() + outNewickTree + ".nwk",
                 ParamPrefixes.INPUT_FOURTH.getPrefix() + proteinFeaturesOutFile,
@@ -275,7 +274,6 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
 
         argsForProteinFeatures.addAll(protoTreeInternal.getFieldsForFeaturesPrediction());
         argsForProteinFeatures.addAll(Arrays.asList(
-                protoTreeInternal.getFirstFileName(),
                 getDomainPredictionDb(protoTreeInternal.getDomainPredictionDb()),
                 ParamPrefixes.OUTPUT_FOURTH.getPrefix() + hmmscanOrRpsbOutFile,
                 ParamPrefixes.OUTPUT_FIFTH.getPrefix() + rpsbProcOutFile,
@@ -298,7 +296,6 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         String proteinFeaturesChangedOutFile = super.getRandomFileName(null);
         argsForTreeWithDomains.addAll(protoTreeInternal.getFieldsForTreeAndDomains());
         argsForTreeWithDomains.addAll(Arrays.asList(
-                protoTreeInternal.getFirstFileName(),
                 protoTreeInternal.getTreeFile(),
                 ParamPrefixes.INPUT_FOURTH.getPrefix() + proteinFeaturesOutFile,
                 ParamPrefixes.OUTPUT_SECOND.getPrefix() + outSvgFile,
@@ -332,35 +329,47 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         return protoTreeInternal;
     }
 
-    private String initFullPipeArgsForPrepareNames(ProtoTreeInternal protoTreeInternal, List<String> argsForPrepareNames, List<String> argsForPrepareNamesSecond,
+    private void initFullPipeArgsForPrepareNames(ProtoTreeInternal protoTreeInternal, List<String> argsForPrepareNames, List<String> argsForPrepareNamesSecond,
                                                    List<String> listOfPrograms, List<List<String>> listOfArgumentLists) {
         protoTreeInternal.setFieldsForPrepareNames();
         String firstPreparedFile = super.getRandomFileName(null);
         argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + firstPreparedFile));
         argsForPrepareNames.add(ParamPrefixes.REMOVE_DASHES.getPrefix() + "true");
         protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + firstPreparedFile);
-        String inputFileNameForProtFeatures = protoTreeInternal.getFirstFileName();
+        protoTreeInternal.setAlignmentFile(ParamPrefixes.INPUT.getPrefix() + firstPreparedFile);
+
+        // If an alignment is provided (doAlign().equals("false")) and no second file is provided
+        // create corresponding output file and give it to the python script as a third file
+        // and also save it in the protoTreeInternal 'alignmentFile' field.
+        // This file will be used to construct phylogenetic tree.
+        if (protoTreeInternal.getDoAlign().equals("-d no") && protoTreeInternal.getSecondFileName() == null) {
+            String donotAlignPreparedFile = super.getRandomFileName(null);
+            argsForPrepareNames.add(ParamPrefixes.OUTPUT_THIRD.getPrefix() + donotAlignPreparedFile);
+            protoTreeInternal.setAlignmentFile(ParamPrefixes.INPUT.getPrefix() + donotAlignPreparedFile);
+        }
         listOfPrograms.add(super.getProperties().getPrepareNames());
 
         if (protoTreeInternal.getSecondFileName() != null) {
             // We don't fetch sequences if a second file with fragments of sequences is provided
             String secondPreparedFile = super.getRandomFileName(null);
             argsForPrepareNamesSecond.addAll(Arrays.asList(protoTreeInternal.getSecondFileName(), ParamPrefixes.OUTPUT.getPrefix() + secondPreparedFile));
-            argsForPrepareNamesSecond.add(ParamPrefixes.REMOVE_DASHES.getPrefix() + "true");
-            protoTreeInternal.setSecondFileName(ParamPrefixes.INPUT.getPrefix() + secondPreparedFile);
-            inputFileNameForProtFeatures = protoTreeInternal.getSecondFileName();
+            if (protoTreeInternal.getDoAlign().equals("-d yes"))
+                argsForPrepareNamesSecond.add(ParamPrefixes.REMOVE_DASHES.getPrefix() + "true");
+            else
+                argsForPrepareNamesSecond.add(ParamPrefixes.REMOVE_DASHES.getPrefix() + "false");
+            protoTreeInternal.setAlignmentFile(ParamPrefixes.INPUT.getPrefix() + secondPreparedFile);
             listOfPrograms.add(super.getProperties().getPrepareNames());
             listOfArgumentLists.add(argsForPrepareNamesSecond);
         } else {
-            // If Second file is null we need to add to argsForPrepareNames additional fields, FETCH_FROM_MIST and FETCH_FROM_NCBI, PROCESS_NUMBER
+            // If Second file is null we need to add to argsForPrepareNames additional fields and also FETCH_FROM_MIST, FETCH_FROM_NCBI, and PROCESS_NUMBER
             argsForPrepareNames.addAll(protoTreeInternal.getFieldsForPrepareNames());
             argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_MIST.getPrefix() + super.getProperties().getFetchFromMist());
             argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_NCBI.getPrefix() + super.getProperties().getFetchFromNCBI());
             argsForPrepareNames.add(ParamPrefixes.PROCESS_NUMBER.getPrefix() + super.getProperties().getFetchFromMistProcNum());
         }
+
         // We adding argsForPrepareNames to listOfArgumentLists
         listOfArgumentLists.add(argsForPrepareNames);
-        return inputFileNameForProtFeatures;
     }
 
     @Override

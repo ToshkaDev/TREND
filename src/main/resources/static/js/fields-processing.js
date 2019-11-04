@@ -96,6 +96,10 @@ function takeCareOfFields() {
         }
     });
 
+    $('#do-align').prop("checked", true);
+    $('#do-align').change(function() {
+        $('#do-align').prop("checked") ? $('.aln-alg').show() : $('.aln-alg').hide();
+    });
 
     treeMethodToPrefix = {"ML": "ml", "ME": "nj_me", "JN": "nj_me"};
 
@@ -121,7 +125,6 @@ function takeCareOfFields() {
     });
 
     $("#ml-phylo-test, #nj_me-phylo-test").change(function() {
-        console.log("Triggered")
         var treeMethod = $('#tree-method').val();
         var prefix = treeMethodToPrefix[treeMethod];
         var phylogenyTest = $("#" + prefix + "-phylo-test").val();

@@ -20,6 +20,7 @@ public class ConverterMain {
 		protoTreeInternal.setTreeFile(checkForNullAndGet(ParamPrefixes.INPUT_SECOND.getPrefix(),treeFileName));
 		protoTreeInternal.setCommandToBeProcessedBy(protoTreeRequest.getCommandToBeProcessedBy());
 
+		protoTreeInternal.setDoAlign(checkForNullAndGet(ParamPrefixes.DO_ALIGN.getPrefix(), protoTreeRequest.getDoAlign()));
         protoTreeInternal.setTreeBuildMethod(checkForNullAndGet(ParamPrefixes.TREE_BUILD_METHOD.getPrefix(), protoTreeRequest.getTreeBuildMethod()));
         protoTreeInternal.setAaSubstModel(checkForNullAndGet(ParamPrefixes.AA_SUBST_MODEL.getPrefix(), protoTreeRequest.getAaSubstModel()));
         protoTreeInternal.setAaSubstRate(checkForNullAndGet(ParamPrefixes.AA_SUBST_RATE.getPrefix(), protoTreeRequest.getAaSubstRate()));

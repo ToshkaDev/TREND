@@ -8,6 +8,7 @@ from subprocess import Popen
 
 USAGE = "\nThis script align proteins using mafft in subporcess and build a phylogenetic tree \n\n" + "python" + sys.argv[0] + '''
 -i || --isequence         -input filew with sequences
+-d || --do_align          -should the input be aligned ("yes", or "no")
 -a || --al_algorithm      -algorithm to align equences; options: --localpair | --genafpair | --globalpair | --retree 2 | --retree 2 --maxiterate 0
 -r || --reorder           -reorder or not (type --reorder if reorder)
 [-k || --megacc]          -full path to megacc
@@ -16,11 +17,11 @@ USAGE = "\nThis script align proteins using mafft in subporcess and build a phyl
 [-o || --oaligned]        -output file with aligned sequences
 [-m || --tree_method]     -method to build a tree; options:  NJ, ML, ME (default is NJ)
 [-l || --subst_model]     -amino acids substitution model (default is Jones-Taylor-Thornton (JTT) model)
-			For NJ and ME trees  -l is one of the following: {"jtt": "Jones-Taylor-Thornton (JTT) model", "nd": "No. of differences", "eim": "Equal input model", 
+			For NJ and ME trees  -l is one of the following: {"jtt": "Jones-Taylor-Thornton (JTT) model", "nd": "No. of differences", "eim": "Equal input model",
 		"pd": "p-distance", "pm": "Poisson model", "dm": "Dayhoff model"}
-			For ML tree: {"jtt": "Jones-Taylor-Thornton (JTT) model", "pm": "Poisson model", "eim": "Equal input model", 
-		"dm": "Dayhoff model", "dmf": "Dayhoff model with Freqs. (F+)", "jttf": "JTT with Freqs. (F+) model", "wm": "WAG model", 
-		"wmf": "WAG with Freqs. (F+) model", "lg": "LG model", "lgf": "LG with Freqs. (F+) model", "grm": "General Reversible Mitochondrial (mtREV)", 
+			For ML tree: {"jtt": "Jones-Taylor-Thornton (JTT) model", "pm": "Poisson model", "eim": "Equal input model",
+		"dm": "Dayhoff model", "dmf": "Dayhoff model with Freqs. (F+)", "jttf": "JTT with Freqs. (F+) model", "wm": "WAG model",
+		"wmf": "WAG with Freqs. (F+) model", "lg": "LG model", "lgf": "LG with Freqs. (F+) model", "grm": "General Reversible Mitochondrial (mtREV)",
 		"grmf": "mtREV with Freqs. (F+) model", "grc": "General Reversible Chloroplast (cpREV)", "grcf": "cpREV with Freqs. (F+) model",
 		"grt": "General Reversible Transcriptase model (rtREV)", "grtf": "rtREV with Freqs. (F+) model"}
 [-g || --gaps_missing]    -how to treat gaps and missing data; one of the following: {"compDel": "Complete deletion", "partDel": "Partial deletion", "pairDel": "Pairwise deletion"}; defaultis "Complete deletion"
@@ -29,7 +30,7 @@ USAGE = "\nThis script align proteins using mafft in subporcess and build a phyl
 [-p || --phylo]           -phylogeny test; for NJ and ME one of the following: {"none": "None", "bm": "Bootstrap method", "ib": "Interior-branch test"};
 		for ML: {"none": "None", "bm": "Bootstrap method"}; default is "None"
 [-b || --bootstrap]       -number of replicates for the bootstrap testing; if not provided the bootstrap test will not run
-[-e || --initial_tree]    -initial tree for ML; on of the following: {"njBio": "Make initial tree automatically (Default - NJ/BioNJ)", "mp": "Make initial tree automatically (Maximum parsimony)", "nj": "Make initial tree automatically (Neighbor joining)", 
+[-e || --initial_tree]    -initial tree for ML; on of the following: {"njBio": "Make initial tree automatically (Default - NJ/BioNJ)", "mp": "Make initial tree automatically (Maximum parsimony)", "nj": "Make initial tree automatically (Neighbor joining)",
 			"Make initial tree automatically (BioNJ)"}; default is "Make initial tree automatically (Default - NJ/BioNJ)"
 [-n || --subst_rate]      -amino acids substitution rate; on of the following: {"ur": "Uniform Rates", "gd": "Gamma Distributed (G)", "ir": "Has Invariant Sites (I)", "gir":"Gamma Distributed With Invariant Sites (G+I)"};
 		default is "Uniform Rates"
@@ -41,6 +42,7 @@ USAGE = "\nThis script align proteins using mafft in subporcess and build a phyl
 
 #Inputs
 INPUT_FILE = "input.fa"
+DO_ALIGN = True
 ALGORITHM = "--localpair"
 REORDER_OR_NOT = ""
 ALIGN_THREADS = "4"
@@ -54,15 +56,15 @@ OUTPUT_FILE_THIRD = "newTree"
 ML_PHYLOGENY_TESTS = {"none": "None", "bm": "Bootstrap method"}
 NJ_ME_PHYLOGENY_TESTS = {"none": "None", "bm": "Bootstrap method", "ib": "Interior-branch test"}
 RATES = {"ur": "Uniform Rates", "gd": "Gamma Distributed (G)", "ir": "Has Invariant Sites (I)", "gir":"Gamma Distributed With Invariant Sites (G+I)"}
-NJ_ME_SUBSTITUTIAN_MODELS = {"jtt": "Jones-Taylor-Thornton (JTT) model", "nd": "No. of differences", "eim": "Equal input model", 
+NJ_ME_SUBSTITUTIAN_MODELS = {"jtt": "Jones-Taylor-Thornton (JTT) model", "nd": "No. of differences", "eim": "Equal input model",
 "pd": "p-distance", "pm": "Poisson model", "dm": "Dayhoff model"}
-ML_SUBSTITUTIAN_MODELS = {"jtt": "Jones-Taylor-Thornton (JTT) model", "pm": "Poisson model", "eim": "Equal input model", 
-"dm": "Dayhoff model", "dmf": "Dayhoff model with Freqs. (F+)", "jttf": "JTT with Freqs. (F+) model", "wm": "WAG model", 
-"wmf": "WAG with Freqs. (F+) model", "lg": "LG model", "lgf": "LG with Freqs. (F+) model", "grm": "General Reversible Mitochondrial (mtREV)", 
+ML_SUBSTITUTIAN_MODELS = {"jtt": "Jones-Taylor-Thornton (JTT) model", "pm": "Poisson model", "eim": "Equal input model",
+"dm": "Dayhoff model", "dmf": "Dayhoff model with Freqs. (F+)", "jttf": "JTT with Freqs. (F+) model", "wm": "WAG model",
+"wmf": "WAG with Freqs. (F+) model", "lg": "LG model", "lgf": "LG with Freqs. (F+) model", "grm": "General Reversible Mitochondrial (mtREV)",
 "grmf": "mtREV with Freqs. (F+) model", "grc": "General Reversible Chloroplast (cpREV)", "grcf": "cpREV with Freqs. (F+) model",
 "grt": "General Reversible Transcriptase model (rtREV)", "grtf": "rtREV with Freqs. (F+) model"}
 GAPS_AND_MISSING_DATA_BEHAVIOUR = {"compDel": "Complete deletion", "partDel": "Partial deletion", "pairDel": "Pairwise deletion"}
-ML_INITIAL_TREE_OPTIONS = {"njBio": "Make initial tree automatically (Default - NJ/BioNJ)", "mp": "Make initial tree automatically (Maximum parsimony)", "nj": "Make initial tree automatically (Neighbor joining)", 
+ML_INITIAL_TREE_OPTIONS = {"njBio": "Make initial tree automatically (Default - NJ/BioNJ)", "mp": "Make initial tree automatically (Maximum parsimony)", "nj": "Make initial tree automatically (Neighbor joining)",
 "bioNj": "Make initial tree automatically (BioNJ)"}
 
 #Parameters
@@ -95,11 +97,11 @@ MEGACC_PROGRAM = None
 
 
 def initialyze(argv):
-	global INPUT_FILE, ALGORITHM, REORDER_OR_NOT, MAFFT_PROGRAM, MEGACC_PROGRAM, ALIGN_THREADS, OUTPUT_FILE_FIRST, TREE_METHOD, SUBST_MODEL, GAPS_MISSING, \
+	global INPUT_FILE, DO_ALIGN, ALGORITHM, REORDER_OR_NOT, MAFFT_PROGRAM, MEGACC_PROGRAM, ALIGN_THREADS, OUTPUT_FILE_FIRST, TREE_METHOD, SUBST_MODEL, GAPS_MISSING, \
 	COVERAGE_CUTOFF, TREE_THREADS, TEST_OF_PHYLOGENY, BOOTSTRAPS, ML_INITIAL_TREE, SUBST_RATE, OUTPUT_FILE_SECOND, OUTPUT_FILE_THIRD, TREE_METHODS, BOOTSTRAP_CPU_NUMBER
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:a:r:k:f:t:o:m:l:g:c:u:p:b:e:n:x:z:",
-		["isequence=", "al_algorithm=", "reorder=", "megacc", "mafft=", "thread=", "oaligned=",
+		opts, args = getopt.getopt(argv[1:],"hi:d:a:r:k:f:t:o:m:l:g:c:u:p:b:e:n:x:z:",
+		["isequence=", "do_align=", "al_algorithm=", "reorder=", "megacc", "mafft=", "thread=", "oaligned=",
 		"tree_method=", "subst_model=", "gaps_missing=", "coverage_cutoff=",
 		"cpu=", "phylotest=" "bootstrap=", "initial_tree=", "subst_rate=", "otree_params", "otree="])
 		if len(opts) == 0:
@@ -117,6 +119,10 @@ def initialyze(argv):
 			param = str(arg).strip()
 			if param in ["--localpair", "--genafpair", "--globalpair", "--retree 2 --maxiterate 1000", "--retree 2 --maxiterate 0"]:
 				ALGORITHM = param
+		elif opt in ("-d", "--do_align"):
+			param = str(arg).strip()
+			if param == "no":
+				DO_ALIGN = False
 		elif opt in ("-r", "--reorder"):
 			param = str(arg).strip()
 			REORDER_OR_NOT = param
@@ -305,9 +311,13 @@ def initializeTreeParams():
 
 def align_sequences():
 	mafft = "mafft"
-	if MAFFT_PROGRAM != None:
-		mafft = MAFFT_PROGRAM
-	runSubProcess(" ".join([mafft, ALGORITHM, REORDER_OR_NOT, "--thread", ALIGN_THREADS, INPUT_FILE, ">", OUTPUT_FILE_FIRST]), "align_sequences()")
+	if DO_ALIGN:
+		if MAFFT_PROGRAM != None:
+			mafft = MAFFT_PROGRAM
+		runSubProcess(" ".join([mafft, ALGORITHM, REORDER_OR_NOT, "--thread", ALIGN_THREADS, INPUT_FILE, ">", OUTPUT_FILE_FIRST]), "align_sequences()")
+	else:
+		with open(INPUT_FILE, "r") as inputFile, open(OUTPUT_FILE_FIRST, "w") as outputFile:
+			outputFile.write(inputFile.read())
 
 def buildTree():
 	megacc = "megacc"
@@ -343,4 +353,3 @@ def main(argv):
 
 if __name__ == "__main__":
 	main(sys.argv)
-

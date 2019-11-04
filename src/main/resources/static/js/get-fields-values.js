@@ -16,6 +16,7 @@ function getOptions() {
     	var secondFileArea = $('#second-file-area').val() ? $('#second-file-area').val().trim() : '';
 	}
 
+    var doAlign = $('#do-align').prop("checked") ? "yes" : "no";
     var alignmentAlg = $('#alignment-alg').val();
     var treeBuildMethod = $('#tree-method').val();
     var aaSubstRate = $('#subst-rate').val();
@@ -56,6 +57,7 @@ function getOptions() {
         "secondFile": secondFile,
         "firstFileArea": firstFileArea,
         "secondFileArea": secondFileArea,
+        "doAlign": doAlign,
         "alignmentFile": alignmentFile,
         "treeFile": treeFile,
         "alignmentAlg": alignmentAlg,

@@ -12,7 +12,7 @@ public enum  ParamPrefixes {
 
     //prepareNames specific parameters
     FETCH_FROM_MIST("-m "),
-    FETCH_FROM_NCBI("-b "),
+    FETCH_FROM_NCBI("-r "),
     REMOVE_DASHES("-d "),
 
     //cd-hit
@@ -22,6 +22,7 @@ public enum  ParamPrefixes {
 
 
     //alignment specific parameters
+    DO_ALIGN("-d "),
     ALGORITHM("-a "),
     THREADS_MAFFT("-t "),
     MAFFT_PATH("-f "),

@@ -59,8 +59,11 @@
                             <input type="number" min="0.4" step="0.01" max="1" value="0.9" id="cd-hit" name="cd-hit" class="form-control input-md"/>
                         </div>
                         <h3 class="text-info" >Alignment (Mafft):</h3>
-                        <span>Alignment Algorithm:</span>
-                        <select id="alignment-alg" class="form-control input-md">
+                        <div class="checkbox">
+                            <label><input id="do-align" type="checkbox" checked="checked">Align</label>
+                        </div>
+                        <span class="aln-alg">Alignment Algorithm:</span>
+                        <select id="alignment-alg" class="form-control input-md aln-alg">
                             <option selected='selected' value="--retree 2 --maxiterate 0">FFT-NS-2</option>
                             <option value="--retree 2 --maxiterate 1000">FFT-NS-i</option>
                             <option value="--localpair">L-INS-i</option>

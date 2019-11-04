@@ -24,6 +24,7 @@ SLEEP_TIME_FOR_NCBI_REQUEST = 0.25
 
 INPUT_FILE = None
 OUTPUT_FILE = None
+OUTPUT_FILE_WITH_DASHES = None
 INPUT_FILE_TREE = None
 OUTPUT_FILE_TREE = None
 FETCH_FROM_IDS = False
@@ -55,20 +56,21 @@ USAGE = "\nThe script makes sequence names and/or tree leaves names newick frien
 	-s || --sfile           - input file with phylogenetic tree in newick format
 	-o || --ofile           - output file with sequences with changed names (and retrieved seqs if id list was given)
 	-n || --nfile           - output file with tree with changed names of leaves
+	-b || --bfile           - output file with sequences with changed names but not removed dashes; this is a ready alignment
 	[-f || --fetchFromIds]  - fetch sequences from ids or not: "true" or "false". Default is "false".
 							 Only "-f" or "-t" (below) can be used. Not both at the same time.
 	[-t || --fetchFromTree] - fetch sequences from tree leaves names or not: "true" or "false". Default is "false"
 	[-c || --proc_num]      - number of processes to run simultaneously, default is 30. The number is big bacause the process is not CPU-intensive
 	[-m || --fetchFromMist] - fetch or not from Mist: "true" or "false". Default is "false".
-	[-b || --fetchFromNCBI] - fetch or not from NCBI: "true" or "false". Default is "true".
+	[-r || --fetchFromNCBI] - fetch or not from NCBI: "true" or "false". Default is "true".
 	[-d || --removeDashes]  - remove or not dashes in sequences: "true" or "false". Default is "true".
 	'''
 
 def initialize(argv):
-	global INPUT_FILE, INPUT_FILE_TREE, OUTPUT_FILE, OUTPUT_FILE_TREE, FETCH_FROM_IDS, FETCH_FROM_TREE
+	global INPUT_FILE, INPUT_FILE_TREE, OUTPUT_FILE, OUTPUT_FILE_WITH_DASHES, OUTPUT_FILE_TREE, FETCH_FROM_IDS, FETCH_FROM_TREE
 	global NUMBER_OF_PROCESSES, FETCH_FROM_MIST, FETCH_FROM_NCBI, REMOVE_DASHES
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:s:o:n:f:t:c:m:b:d:",["help", "ifile=", "sfile=", "ofile=", "nfile=", "fetchFromIds=", \
+		opts, args = getopt.getopt(argv[1:],"hi:s:o:b:n:f:t:c:m:r:d:",["help", "ifile=", "sfile=", "ofile=", "nfile=", "bfile=", "fetchFromIds=", \
 			"fetchFromTree=", "proc_num=", "fetchFromMist=", "fetchFromNCBI=", "removeDashes="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
@@ -84,6 +86,8 @@ def initialize(argv):
 				INPUT_FILE = str(arg).strip()
 			elif opt in ("-o", "--ofile"):
 				OUTPUT_FILE = str(arg).strip()
+			elif opt in ("-b", "--bfile"):
+				OUTPUT_FILE_WITH_DASHES = str(arg).strip()
 			elif opt in ("-s", "--sfile"):
 				INPUT_FILE_TREE = str(arg).strip()
 			elif opt in ("-n", "--nfile"):
@@ -97,7 +101,7 @@ def initialize(argv):
 			elif opt in ("-m", "--fetchFromMist"):
 				if str(arg).strip().lower() == "true":
 					FETCH_FROM_MIST = True
-			elif opt in ("-b", "--fetchFromNCBI"):
+			elif opt in ("-r", "--fetchFromNCBI"):
 				if str(arg).strip().lower() == "false":
 					FETCH_FROM_NCBI = False
 			elif opt in ("-c", "--proc_num"):
@@ -142,33 +146,43 @@ def getChangedNamesForSeqsAndSave(handle=False, proteinIdToSeq=False, proteinIdT
 		return
 	savedIds = set()
 	with open(OUTPUT_FILE, "w") as outputFile:
+		# default case
 		if not handle and not proteinIdToSeq:
-			#default case
-			with open(INPUT_FILE, "r") as inputFile:
-				for sequence in SeqIO.parse(inputFile, "fasta"):
-					protSeq = str(sequence.seq)
-					if REMOVE_DASHES:
-						protSeq = protSeq.replace("-", "")
-					outputFile.write(">" + getChangedName(sequence.description) + "\n")
-					outputFile.write(protSeq + "\n")
+			# if an output file for the alignment with unchanged sequences is not provided:
+			if not OUTPUT_FILE_WITH_DASHES:
+				with open(INPUT_FILE, "r") as inputFile:
+					for sequence in SeqIO.parse(inputFile, "fasta"):
+						protSeq = str(sequence.seq)
+						if REMOVE_DASHES:
+							protSeq = protSeq.replace("-", "")
+						outputFile.write(">" + getChangedName(sequence.description) + "\n")
+						outputFile.write(protSeq + "\n")
+			# else save unchanged sequences to the file provided for the alignment and save sequences after removing dashes
+			# to a separate file:
+			else:
+				with open(INPUT_FILE, "r") as inputFile, open(OUTPUT_FILE_WITH_DASHES, "w") as outputWDashes:
+					for sequence in SeqIO.parse(inputFile, "fasta"):
+						protSeq = str(sequence.seq)
+						outputWDashes.write(">" + getChangedName(sequence.description) + "\n")
+						outputWDashes.write(protSeq + "\n")
+						if REMOVE_DASHES:
+							protSeq = protSeq.replace("-", "")
+						outputFile.write(">" + getChangedName(sequence.description) + "\n")
+						outputFile.write(protSeq + "\n")
 		if handle:
-			#after retrieving seqeunces by Id from NCBI
+			# after retrieving seqeunces by Id from NCBI
 			print("Handle is present")
 			for eachRecord in SeqIO.parse(handle, "fasta"):
 				if eachRecord.id not in savedIds:
 					protSeq = str(eachRecord.seq)
-					if REMOVE_DASHES:
-						protSeq = protSeq.replace("-", "")
 					outputFile.write(">" + getChangedName(eachRecord.description) + "\n")
 					outputFile.write(protSeq + "\n")
 					savedIds.add(eachRecord.id)
 		if proteinIdToSeq:
-			#after retrieving seqeunces by Id from Mist
+			# after retrieving seqeunces by Id from Mist
 			for proteinName, seq in proteinIdToSeq.items():
 				if proteinIdToTrueId[proteinName] not in savedIds:
 					protSeq = seq
-					if REMOVE_DASHES:
-						protSeq = protSeq.replace("-", "")
 					outputFile.write(">" + getChangedName(proteinName) + "\n")
 					outputFile.write(protSeq + "\n")
 					savedIds.add(proteinIdToTrueId[proteinName])

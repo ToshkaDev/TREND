@@ -10,6 +10,7 @@ public class ProtoTreeRequest {
     private MultipartFile treeFile;
     private String treeFileArea;
 
+    private String doAlign;
     private String treeBuildMethod;
     private String aaSubstModel;
     private String aaSubstRate;
@@ -63,6 +64,14 @@ public class ProtoTreeRequest {
 
     public void setSecondFileArea(String secondFileArea) {
         this.secondFileArea = secondFileArea;
+    }
+
+    public String getDoAlign() {
+        return doAlign;
+    }
+
+    public void setDoAlign(String doAlign) {
+        this.doAlign = doAlign;
     }
 
     public MultipartFile getAlignmentFile() {

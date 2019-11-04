@@ -77,7 +77,7 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
 
     private ProtoTreeInternal pipelineProcessing(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
         ProtoTreeInternal protoTreeInternal = storeFileAndGetInternalRepresentation(protoTreeRequest);
-        String redundancy = protoTreeInternal.getRedundancy() != null ? protoTreeInternal.getRedundancy() : null;
+        String redundancy = protoTreeInternal.getRedundancy();
         List<String> listOfPrograms = new LinkedList<>();
         List<List<String>> listOfArgumentLists = new LinkedList<>();
 
@@ -173,15 +173,19 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
             preparedFile = super.getRandomFileName(null);
             argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getFirstFileName(), ParamPrefixes.OUTPUT.getPrefix() + preparedFile));
             argsForPrepareNames.addAll(protoTreeInternal.getFieldsForPrepareNames());
-            argsForPrepareNames.add(ParamPrefixes.REMOVE_DASHES.getPrefix() + "true");
+            if (protoTreeInternal.getDoAlign().equals("-d yes"))
+                argsForPrepareNames.add(ParamPrefixes.REMOVE_DASHES.getPrefix() + "true");
+            else
+                argsForPrepareNames.add(ParamPrefixes.REMOVE_DASHES.getPrefix() + "false");
             argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_MIST.getPrefix() + super.getProperties().getFetchFromMist());
             argsForPrepareNames.add(ParamPrefixes.FETCH_FROM_NCBI.getPrefix() + super.getProperties().getFetchFromNCBI());
             argsForPrepareNames.add(ParamPrefixes.PROCESS_NUMBER.getPrefix() + super.getProperties().getFetchFromMistProcNum());
+            protoTreeInternal.setAlignmentFile(ParamPrefixes.INPUT.getPrefix() + preparedFile);
+            protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + preparedFile);
         } else if (protoTreeInternal.isFullPipeline().equals("false")) {
             preparedFile = super.getRandomFileName(".newick");
             argsForPrepareNames.addAll(Arrays.asList(protoTreeInternal.getTreeFile(), ParamPrefixes.OUTPUT_SECOND.getPrefix() + preparedFile));
         }
-        protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + preparedFile);
         listOfPrograms.add(super.getProperties().getPrepareNames());
         listOfArgumentLists.add(argsForPrepareNames);
         return preparedFile;

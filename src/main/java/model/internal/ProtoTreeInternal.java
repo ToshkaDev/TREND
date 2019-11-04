@@ -15,6 +15,7 @@ public class ProtoTreeInternal {
     private String alignmentAlg;
     private String reorderOrNot;
 
+    private String doAlign;
     private String treeBuildMethod;
     private String aaSubstModel;
     private String aaSubstRate;
@@ -36,7 +37,7 @@ public class ProtoTreeInternal {
     private String operonTolerance;
     private String numberOfNeighbors;
 
-    private String  commandToBeProcessedBy;
+    private String commandToBeProcessedBy;
     private String isFullPipeline;
     private String protoTreeCookies;
     private String fetchFromIds;
@@ -90,6 +91,15 @@ public class ProtoTreeInternal {
 
     public void setSecondFileName(String secondFileName) {
         this.secondFileName = secondFileName;
+    }
+
+    public String getDoAlign() {
+
+        return getFetchFromIds() != null ? "-d yes" : doAlign;
+    }
+
+    public void setDoAlign(String doAlign) {
+        this.doAlign = doAlign;
     }
 
     public String getAlignmentFile() {
@@ -246,10 +256,13 @@ public class ProtoTreeInternal {
     }
 
     public void setFields() {
-        if (getReorderOrNot() != null) {
+        if (getReorderOrNot() != null)
             fieldsForAlignmentAndTreeBuild.add(getReorderOrNot());
-        }
-        fieldsForAlignmentAndTreeBuild.add(getFirstFileName());
+
+        if (getDoAlign() != null)
+            fieldsForAlignmentAndTreeBuild.add(getDoAlign());
+
+        fieldsForAlignmentAndTreeBuild.add(getAlignmentFile());
         fieldsForAlignmentAndTreeBuild.add(getAlignmentAlg());
         fieldsForAlignmentAndTreeBuild.add(getTreeBuildMethod());
         fieldsForAlignmentAndTreeBuild.add(getAaSubstModel());
@@ -260,20 +273,21 @@ public class ProtoTreeInternal {
         fieldsForAlignmentAndTreeBuild.add(getPhylogenyTest());
         fieldsForAlignmentAndTreeBuild.add(getNumberOrReplicates());
 
+        fieldsForFeaturesPrediction.add(getFirstFileName());
         fieldsForFeaturesPrediction.add(geteValue());
         fieldsForFeaturesPrediction.add(getProbability());
-        if (getLcrPrediction() != null) {
+        if (getLcrPrediction() != null)
             fieldsForFeaturesPrediction.add(getLcrPrediction());
-        }
         fieldsForFeaturesPrediction.add(getDomainPredictionProgram());
 
         fieldsForGeneNeighbors.add(getDomainTolerance());
         fieldsForGeneNeighbors.add(getOperonTolerance());
         fieldsForGeneNeighbors.add(getNumberOfNeighbors());
 
-        if (getEnumerate() != null) {
+        if (getDomainPredictionProgram() != null)
+            fieldsForTreeAndDomains.add(getFirstFileName());
+        if (getEnumerate() != null)
             fieldsForTreeAndDomains.add(getEnumerate());
-        }
     }
 
     public List<String> getFieldsForPrepareNames() {

@@ -1,6 +1,5 @@
 $(document).ready(function (){
     var jobId = $('#jobId').text();
-    console.log("jobId  " + jobId)
     renderedClass = null;
     infoPostfix = "_table";
     stageList = [];

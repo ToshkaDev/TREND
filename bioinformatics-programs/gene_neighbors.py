@@ -103,7 +103,14 @@ def initialize(argv):
 def findGene(geneNameOrId):
 	params = urllib.urlencode({'search': geneNameOrId, 'fields': GENE_FIELDS, 'fields.Aseq': PFAM})
 	result = urllib.urlopen(BASE_URL + "?%s" % params)
-	return json.loads(result.read())
+	try:
+		result = json.loads(result.read())
+	except Exception as e:
+		result = None
+		print("Exception happened whyle trying to decode json: " + str(e))
+		print("So returning None")
+	finally:
+		return result
 
 def getGeneAndProcessGeneNeighbors(geneStableIdList):
 	duplicateCounter = 1
@@ -338,7 +345,6 @@ def getNextColour():
 
 	NUMBER_OF_GENERATED_COLORS+=1
 	newColor = hsv_to_rgb(h, s, v)
-	print newColor
 	while newColor in SELECTED_COLORS:
 		h = random.random()
 		s = random.random()
