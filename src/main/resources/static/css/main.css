@@ -126,6 +126,20 @@ div.panel-default {
     width: 20%;
 }
 
+@media screen and (max-width: 1355px) {
+    div.panel-default {
+        margin-right: 7em;
+        width: 30%;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    div.panel-default {
+        margin-right: 7em;
+        width: 95%;
+    }
+}
+
 
 label.error {
     font-size:small;
@@ -186,6 +200,13 @@ div.result-area {
 .my-textarea {
 	max-width: 50%;
 }
+
+@media screen and (max-width: 991px) {
+    .my-textarea {
+        max-width: 95%;
+    }
+}
+
 
 .glyphicon.glyphicon-option-horizontal {
     font-size: 1.5em;

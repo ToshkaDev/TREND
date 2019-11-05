@@ -40,26 +40,26 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         super(storageService, properties, bioJobResultDao, bioJobDao);
 
         counterToStageOneInput.put(0, "['Processing input.']");
-        counterToStageOneInput.put(1, "['Processing input.', 'Predicting proteins features.']");
-        counterToStageOneInput.put(2, "['Processing input.', 'Predicting proteins features.', 'Aligning sequences and building phylogenetic tree.']");
-        counterToStageOneInput.put(3, "['Processing input.', 'Predicting proteins features.', 'Aligning sequences and building phylogenetic tree.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStageOneInput.put(1, "['Processing input.', 'Aligning sequences and building phylogenetic tree.']");
+        counterToStageOneInput.put(2, "['Processing input.', 'Aligning sequences and building phylogenetic tree.', 'Predicting proteins features.']");
+        counterToStageOneInput.put(3, "['Processing input.', 'Aligning sequences and building phylogenetic tree.', 'Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
 
-        counterToStageTwoInputs.put(1, "['Processing input.', 'Predicting proteins features.']");
-        counterToStageTwoInputs.put(2, "['Processing input.', 'Predicting proteins features.']");
-        counterToStageTwoInputs.put(3, "['Processing input.', 'Predicting proteins features.', 'Aligning sequences and building phylogenetic tree.']");
-        counterToStageTwoInputs.put(4, "['Processing input.', 'Predicting proteins features.', 'Aligning sequences and building phylogenetic tree.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStageTwoInputs.put(1, "['Processing input.', 'Aligning sequences and building phylogenetic tree.']");
+        counterToStageTwoInputs.put(2, "['Processing input.', 'Aligning sequences and building phylogenetic tree.']");
+        counterToStageTwoInputs.put(3, "['Processing input.', 'Aligning sequences and building phylogenetic tree.', 'Predicting proteins features.']");
+        counterToStageTwoInputs.put(4, "['Processing input.', 'Aligning sequences and building phylogenetic tree.', 'Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
 
         counterToStageOneInputWithRedund.put(0, "['Processing input.']");
         counterToStageOneInputWithRedund.put(1, "['Processing input.', 'Reducing sequence redundancy.']");
-        counterToStageOneInputWithRedund.put(2, "['Processing input.', 'Reducing sequence redundancy.', 'Predicting proteins features.']");
-        counterToStageOneInputWithRedund.put(3, "['Processing input.', 'Reducing sequence redundancy.', 'Predicting proteins features.', 'Aligning sequences and building phylogenetic tree.']");
-        counterToStageOneInputWithRedund.put(4, "['Processing input.', 'Reducing sequence redundancy.', 'Predicting proteins features.', 'Aligning sequences and building phylogenetic tree.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStageOneInputWithRedund.put(2, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.']");
+        counterToStageOneInputWithRedund.put(3, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.', 'Predicting proteins features.']");
+        counterToStageOneInputWithRedund.put(4, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.', 'Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
 
         counterToStageTwoInputsWithRedund.put(1, "['Processing input.']");
         counterToStageTwoInputsWithRedund.put(2, "['Processing input.', 'Reducing sequence redundancy.']");
-        counterToStageTwoInputsWithRedund.put(3, "['Processing input.', 'Reducing sequence redundancy.', 'Predicting proteins features.']");
-        counterToStageTwoInputsWithRedund.put(4, "['Processing input.', 'Reducing sequence redundancy.', 'Predicting proteins features.', 'Aligning sequences and building phylogenetic tree.']");
-        counterToStageTwoInputsWithRedund.put(5, "['Processing input.', 'Reducing sequence redundancy.', 'Predicting proteins features.', 'Aligning sequences and building phylogenetic tree.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStageTwoInputsWithRedund.put(3, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.']");
+        counterToStageTwoInputsWithRedund.put(4, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.', 'Predicting proteins features.']");
+        counterToStageTwoInputsWithRedund.put(5, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.', 'Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
 
         counterToStageOneInputNoFeatures.put(0, "['Processing input.']");
         counterToStageOneInputNoFeatures.put(1, "['Processing input.', 'Aligning sequences and building phylogenetic tree.']");
@@ -252,20 +252,20 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         if (protoTreeInternal.getDoPredictFeatures().equals("-p yes")) {
             if (redundancy != null) {
                 if (protoTreeInternal.getSecondFileName() != null) {
+                    listOfPrograms.add(4, super.getProperties().getCalculateProteinFeatures());
+                    listOfArgumentLists.add(4, argsForProteinFeatures);
+                } else {
+                    listOfPrograms.add(3, super.getProperties().getCalculateProteinFeatures());
+                    listOfArgumentLists.add(3, argsForProteinFeatures);
+                }
+
+            } else {
+                if (protoTreeInternal.getSecondFileName() != null) {
                     listOfPrograms.add(3, super.getProperties().getCalculateProteinFeatures());
                     listOfArgumentLists.add(3, argsForProteinFeatures);
                 } else {
                     listOfPrograms.add(2, super.getProperties().getCalculateProteinFeatures());
                     listOfArgumentLists.add(2, argsForProteinFeatures);
-                }
-
-            } else {
-                if (protoTreeInternal.getSecondFileName() != null) {
-                    listOfPrograms.add(2, super.getProperties().getCalculateProteinFeatures());
-                    listOfArgumentLists.add(2, argsForProteinFeatures);
-                } else {
-                    listOfPrograms.add(1, super.getProperties().getCalculateProteinFeatures());
-                    listOfArgumentLists.add(1, argsForProteinFeatures);
                 }
 
             }

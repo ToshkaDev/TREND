@@ -65,30 +65,31 @@
         <div class="col-md-4 home-description">
             <h3 class="h3-about">Align protein sequences and build a tree</h3>
             Provide protein sequences and start the analysis or use our embedded id parser.
-            Use variety of MAFFT alignment algorithms and MEGA tree building options.
+            Use a variety of MAFFT alignment algorithms and MEGA tree building options.
             Reorder the alignment according to the tree leaves.
         </div>
         <div class="col-md-4 home-description">
             <h3 class="h3-about">Identify protein domain architectures</h3>
-            Predict protein domains, transmembrane and low-complexity regions.
+            Identify protein domains, transmembrane and low-complexity regions.
             Make use of Pfam, CDD and MiST models.
         </div>
         <div class="col-md-4 home-description">
             <h3 class="h3-about">Identify gene neighborhoods</h3>
             Identify gene neighborhoods and operons for 125000+ genomes.
-            Set your own distance threshold between genes in operons.
+            Set your own distance threshold between the genes in operons.
+            Set the number of neighboring genes to visualize.
         </div>
     </div>
     <div class="row about-div">
         <div class="col-md-4 home-description">
             <h3 class="h3-about">Cluster genes</h3>
-            Cluster genes based on predicted shared domains of encoded proteins.
+            Cluster genes based on identified shared domains of encoded proteins.
             Customize the number of not shared domains for genes to be clustered.
         </div>
         <div class="col-md-4 home-description">
             <h3 class="h3-about">Visualize results on the tree</h3>
-            Combine the tree and predictions in one interactive picture.
-            Explore domain predictions and gene neighborhoods.
+            Combine the tree and identified domains or gene neighborhoods in one interactive picture.
+            Explore domains and gene neighborhoods.
             Take advantage of сross-links with Pfam, CDD, NCBI and MiST.
             Save SVG figure and detailed results of each step.
         </div>
@@ -105,7 +106,7 @@
         <h2 class="info-header">Analysis</h2>
         <div>
             <p>Study of evolutionary history and function(s) of a protein is an intriguing but not a trivial task.</p>
-            <p>The bioinformatics analysis usually starts with collecting homologues proteins.</p>
+            <p>The computational analysis usually starts with collecting homologues proteins.</p>
             <p>Consequent steps include: </p>
             <ul>
                 <li class="info">
@@ -115,10 +116,10 @@
                     building phylogenetic tree;
                 </li>
                 <li class="info">
-                    predicting protein domains;
+                    identifying protein domains;
                 </li>
                 <li class="info">
-                    predicting transmembrane regions and other protein features;
+                    identifying transmembrane regions and other protein features;
                 </li>
                 <li class="info">
                     determining gene neighborhoods.
@@ -161,7 +162,7 @@
                     </p>
                 </div>
                 <h4  class="text-head4" style="font-weight: bold">
-                    2. Building phylogenetic tree using fragments of protein sequences and predicting protein features using full-length sequences.
+                    2. Building phylogenetic tree using fragments of protein sequences and identifying protein features using full-length sequences.
                 </h4>
                 <div class="indented-text">
                     <p>
@@ -174,13 +175,22 @@
                         b) Put fragments of sequences into the first area (or choose a file). Protein sequences in this area will be used for alignment and building phylogentic tree.
                     </p>
                     <p>
-                        c) Put full-length sequences or list of protein ids/locus tags into the second area (or choose a file). Protein features will be predicted using these sequences.
+                        c) Put full-length sequences or list of protein ids/locus tags into the second area (or choose a file). Protein features will be identified using these sequences.
                     </p>
                     <p>
                         Important: sequence names in two areas should be identical.
                     </p>
                     <p>
                         If you downloaded sequences from the same database or were changing sequence names consistently in all the files this will happen naturally.
+                    </p>
+                </div>
+                <div class="indented-text">
+                    <br/>
+                    <p>
+                        If you have your own alignment that you already prepared and edited you may skip the alignment step of the pipeline and use your alignment instead. Just uncheck <span class="proto-tree-text">Align</span> option.
+                    </p>
+                    <p>
+                        If you want to use TREND just to align your sequences and build a tree you may skip domains identification step unchecking <span class="proto-tree-text">Identify Features</span> option.
                     </p>
                 </div>
             </div>
@@ -236,7 +246,7 @@
                     As a result of running <span class="proto-tree-text">Domains</span> pipeline a phylogenetic tree combined with interactive protein features will be produced.
                 </p>
                 <p>
-                    Details of prediction can be explored by clicking on protein features. To zoom in/zoom out use mouse wheel.
+                    Details of the analysis can be explored by clicking on protein features. To zoom in/zoom out use mouse wheel.
                 </p>
                 <p>
                     All the produced data is downloadable.
@@ -295,6 +305,10 @@
                 <p>
                     <strong>'Not shared domains tolerance'</strong> parameter is a number of not shared domains between any two proteins that is allowed
                     for corresponding genes sill to be considered as members of the same cluster.
+                </p>
+                <p>
+                    <strong>'Number of neighboring genes on one side (max 15)'</strong> parameter is a number of neighboring genes on each side of a gene of interest. Maximum is 15, i.e.
+                    30 neighboring genes in sum will be displayed.
                 </p>
             </div>
             <div>
