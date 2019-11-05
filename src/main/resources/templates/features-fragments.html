@@ -289,18 +289,22 @@
                 <span id="isFullPipeline">true</span>
                 <div class="form-group">
                     <h3 class="text-info">Protein Features:</h3>
+                    <div class="checkbox">
+                        <label><input id="do-predict-features" type="checkbox" >Identify Features</label>
+                    </div>
                     <form id="second">
-                        <div class="radio">
+                        <span class="predict-features">Algorithm:</span>
+                        <div class="radio predict-features">
                             <label>
                                 <input id="hmmscan" name="dom-prediction-program" type="radio" value="hmmscan" checked="checked" />HMMER3
                             </label>
                         </div>
-                        <div class="radio">
+                        <div class="radio predict-features">
                             <label>
                                 <input id="rpsblast" name="dom-prediction-program" type="radio" value="rpsblast"  />RPSBLAST
                             </label>
                         </div>
-                        <div id="hmmer-db">
+                        <div id="hmmer-db" class="predict-features">
                             <span>HMMER Databse:</span>
                             <select class="form-control input-md hmmer-db">
                                 <option id="pfam-only" selected='selected' value="pfam-only">Pfam 32</option>
@@ -311,7 +315,7 @@
                             <span>Domain Score:</span>
                             <input id="probability" type="number" min="0" value="20" class="form-control input-md"  >
                         </div>
-                        <div id="rpsblast-db">
+                        <div id="rpsblast-db" class="predict-features">
                             <span>RPSBLAST Database:</span>
                             <select class="form-control input-md rpsblast-db">
                                 <option id="cdd" selected='selected' value="cdd">CDD SuperSet</option>
@@ -327,7 +331,7 @@
                             <input id="evalue-threshold-rpsblast" type="number" min="0" max="1" step="0.01" value="0.1" name="evalue-threshold" class="form-control input-md"/>
                         </div>
                         <hr/>
-                        <div class="switcher">
+                        <div class="switcher predict-features">
                             <span class="switch-text">Low Complexity:</span>
                             <label class="switch">
                                 <input id="lc-value" type="checkbox"/>

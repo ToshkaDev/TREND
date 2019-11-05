@@ -17,6 +17,7 @@ function getOptions() {
 	}
 
     var doAlign = $('#do-align').prop("checked") ? "yes" : "no";
+    var doPredictFeatures = $('#do-predict-features').prop("checked") ? "yes" : "no";
     var alignmentAlg = $('#alignment-alg').val();
     var treeBuildMethod = $('#tree-method').val();
     var aaSubstRate = $('#subst-rate').val();
@@ -69,6 +70,7 @@ function getOptions() {
         "gapsAndMissingData": gapsAndMissingData,
         "siteCovCutOff": siteCovCutOff,
         "numberOrReplicates": numberOrReplicates,
+        "doPredictFeatures": doPredictFeatures,
         "domainPredictionProgram": domainPredictionProgram,
         "lcrPrediction": lcrPrediction
     }

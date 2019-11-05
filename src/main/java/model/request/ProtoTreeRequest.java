@@ -20,6 +20,8 @@ public class ProtoTreeRequest {
     private String phylogenyTest;
     private String numberOrReplicates;
     private String alignmentAlg;
+
+    private String doPredictFeatures;
     private String domainPredictionProgram;
     private String domainPredictionDb;
     private String eValue;
@@ -168,6 +170,14 @@ public class ProtoTreeRequest {
 
     public void setNumberOrReplicates(String numberOrReplicates) {
         this.numberOrReplicates = numberOrReplicates;
+    }
+
+    public String getDoPredictFeatures() {
+        return doPredictFeatures;
+    }
+
+    public void setDoPredictFeatures(String doPredictFeatures) {
+        this.doPredictFeatures = doPredictFeatures;
     }
 
     public String getDomainPredictionProgram() {

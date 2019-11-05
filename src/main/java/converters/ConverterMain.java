@@ -31,6 +31,7 @@ public class ConverterMain {
         protoTreeInternal.setNumberOrReplicates(checkForNullAndGet(ParamPrefixes.NUMBER_OF_REPLICATES.getPrefix(), protoTreeRequest.getNumberOrReplicates()));
 		protoTreeInternal.setAlignmentAlg(checkForNullAndGet(ParamPrefixes.ALGORITHM.getPrefix(), protoTreeRequest.getAlignmentAlg()));
 
+		protoTreeInternal.setDoPredictFeatures(checkForNullAndGet(ParamPrefixes.DO_PREDICT_FETURES.getPrefix(), protoTreeRequest.getDoPredictFeatures()));
 		protoTreeInternal.setDomainPredictionProgram(checkForNullAndGet(ParamPrefixes.DOMAINS_PREDICTION_PROGRAM.getPrefix(), protoTreeRequest.getDomainPredictionProgram()));
 		protoTreeInternal.setDomainPredictionDb(checkForNullAndGet(ParamPrefixes.DOMAINS_PREDICTION_DB.getPrefix(), protoTreeRequest.getDomainPredictionDb()));
 		protoTreeInternal.seteValue(checkEvalueAndGet(ParamPrefixes.EVAL_THRESH.getPrefix(), protoTreeRequest.geteValue()));

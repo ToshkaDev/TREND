@@ -1,16 +1,19 @@
-function getIfReady(jobId) {
+function getIfReady() {
     fileGetter = setInterval(function() {
-        tryToGetFileName(jobId)
+        tryToGetFileName()
     }, 2000);
 }
 
-function tryToGetFileName(jobId) {
+function tryToGetFileName() {
+    pathList = location.pathname.split("/");
+    // global object 'paramsOfTrend' is used
+    paramsOfTrend["jobId"] = pathList[pathList.length-1];
     $.ajax({
       type: 'GET',
       url: 'get-filename',
       dataType:'json',
       contentType: 'application/json',
-      data: {"jobId": jobId},
+      data: paramsOfTrend,
       success: processRetrievedDataAsync,
       error: error
     });
@@ -58,6 +61,15 @@ function processStageMessage(stage) {
         $('#result-stage').append("<div class='stage-element' id=" + alnTreeStage + "><h4>" + stage + "</h4></div>");
     }
     stageList.push(stage);
+}
+
+function initializeLocationParams() {
+    paramsOfTrend = {};
+    var paramsList = location.search.replace(/^\?/, '').split('&');
+    for (var i = 0; i < paramsList.length; i++) {
+        var pair = paramsList[i].split('=');
+        paramsOfTrend[pair[0]] = decodeURIComponent(pair[1]);
+    }
 }
 
 function moveProgressBar(stageNumToPercent) {

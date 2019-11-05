@@ -14,6 +14,7 @@ USAGE = "\nThis script enumerates protein sequence names on the provided phyloge
 [-o || --oaligned]         -output file with aligned sequences with changed protein names
 [-n || --osecond]          -output file with prepared tree with domains and changed protein names in svg format
 [-b || --othird]           -output file with prepared tree with changed protein and no domains in newick format
+[-p || --predictFeatures]  -predict potein features or not: "yes" or "no"
 [-r || --ojson]            -output fiel with json, unchenaged or with not overallped domains if --removeOverlaps is "yes"
 [-v || --removeOverlaps]   -remove overlaps: "yes" or "no"
 [-e || --enumerate]        -should the sequence names and leaf names be enumerated: "true" or "false"; default is 'false';
@@ -25,6 +26,7 @@ SEQS = None                                          #file with sequencesdomains
 SEQS_ALIGNED = None          	                     #file with aligned sequences
 TREE_FILE = None    			                     #file with tree
 DOMAINS = None                                       #file with protein domains information
+PREDICT_FEATURES = True
 OUTPUT_ALIGNED_FILENAME = "alignerProteins.fa"       #file with aligned sequences with changed protein names
 OUTPUT_TREE_SVG_FILENAME = "newTree.svg"             #file with prepared tree with domains in svg format
 OUTPUT_TREE_NEWICK_FILENAME = "newTree.newick"       #file with prepared tree with no domains in newick format
@@ -50,7 +52,7 @@ REMOVE_OVERLAPS = True
 ENUMERATE = False
 # Maximum number of domains in then merged domain syt to be displayed
 MAX_DOMAIN_COUNT = 6
-# Allowed overlap between adjacent domains. If the overlap precentage is bigger than this value the domains will be merged together 
+# Allowed overlap between adjacent domains. If the overlap precentage is bigger than this value the domains will be merged together
 ALLOWED_OVERLAP = 0.2
 # seq.start, seq.end, shape, width, height, fgcolor, bgcolor
 THIN_LINE = [0, 9, "[]", 0.2, 0.7, "black", "gray", ""]
@@ -67,10 +69,10 @@ APP_URL = "http://trend.zhulinlab.org"
 
 def initialyze(argv):
 	global SEQS, SEQS_ALIGNED, TREE_FILE, DOMAINS, OUTPUT_ALIGNED_FILENAME, OUTPUT_TREE_SVG_FILENAME, OUTPUT_TREE_NEWICK_FILENAME
-	global OUTPUT_PROTEIN_DOMAINS_JSON, REMOVE_OVERLAPS, ENUMERATE
+	global PREDICT_FEATURES, OUTPUT_PROTEIN_DOMAINS_JSON, REMOVE_OVERLAPS, ENUMERATE
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:s:d:f:o:n:b:r:v:e:",["isequence=", "ialigned=", "ithird=", "ifourth=", "oaligned=", \
-		 "osecond=", "othird=", "ojson=", "removeOverlaps=", "enumerate="])
+		opts, args = getopt.getopt(argv[1:],"hi:s:d:f:o:n:b:r:p:v:e:",["isequence=", "ialigned=", "ithird=", "ifourth=", "oaligned=", \
+		 "osecond=", "othird=", "predictFeatures=", "ojson=", "removeOverlaps=", "enumerate="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Options are required\n")
 	except getopt.GetoptError as e:
@@ -91,11 +93,15 @@ def initialyze(argv):
 		elif opt in ("-o", "--oaligned"):
 			OUTPUT_ALIGNED_FILENAME = str(arg).strip()
 		elif opt in ("-n", "--osecond"):
-			OUTPUT_TREE_SVG_FILENAME = str(arg).strip()   
+			OUTPUT_TREE_SVG_FILENAME = str(arg).strip()
 		elif opt in ("-b", "--othird"):
 			OUTPUT_TREE_NEWICK_FILENAME = str(arg).strip()
 		elif opt in ("-r", "--ojson"):
 			OUTPUT_PROTEIN_DOMAINS_JSON = str(arg).strip()
+		elif opt in ("-p", "--predictFeatures"):
+			val = str(arg).strip()
+			if val != "yes":
+				PREDICT_FEATURES = False
 		elif opt in ("-v", "--removeOverlaps"):
 			val = str(arg).strip()
 			if val == "yes" or val == "y":
@@ -105,7 +111,7 @@ def initialyze(argv):
 		elif opt in ("-e", "--enumerate"):
 			if str(arg).strip() == "true":
 				ENUMERATE = True
-						
+
 def prepareProteinToDomainsDict():
 	for proteinName, proteinData in PROTEIN_DOMAINS.items():
 		if proteinData["domains"] or "tmRegions" in proteinData["tmInfo"] or proteinData["lowComplexity"]:
@@ -120,7 +126,7 @@ def prepareProteinToDomainsDict():
 				prepareDomainsWithNoOverlapps(proteinName, proteinData, domains, aliEnds, aliStarts, startsToDomainList)
 			else:
 				prepareDomainsWithOverlapps(proteinName, proteinData, domains, aliEnds, aliStarts, startsToDomainList)
-								
+
 			##### Prepare TM Regions ######
 			if "tmRegions" in proteinData["tmInfo"]:
 				for region in proteinData["tmInfo"]["tmRegions"]:
@@ -128,27 +134,27 @@ def prepareProteinToDomainsDict():
 					tms.append([correctedCoords[0], correctedCoords[1], "[]", None, 35, TM_COLOR, TM_COLOR, ""])
 					startsToDomainList[correctedCoords[0]].append(correctedCoords[1])
 				domains.extend(tms)
-				
-			#Prepare Low Complexity Regions	
+
+			#Prepare Low Complexity Regions
 			for region in proteinData["lowComplexity"]:
 				correctedCoords = addToCoordinateLists(aliStarts, aliEnds, int(region["start"])-1, int(region["end"])-1)
 				lowComplexityRegions.append([correctedCoords[0], correctedCoords[1], "[]", None, 35, LCR_COLOR, LCR_COLOR, ""])
 				startsToDomainList[correctedCoords[0]].append(correctedCoords[1])
 			domains.extend(lowComplexityRegions)
-				
+
 			addThinLines(proteinName, domains, startsToDomainList)
 			takeCareOfEdgeCoords(proteinName, aliEnds, aliStarts, domains)
 			PROTEIN_TO_DOMAINS[proteinName].extend(domains)
-	
+
 def prepareDomainsWithNoOverlapps(proteinName, proteinData, domains, aliEnds, aliStarts, startsToDomainList):
 	domainToCoords = dict()
-	domainsOK = set()		
+	domainsOK = set()
 	#Sort domains by alisStart to use for merging or removing overlaps
-	if len(proteinData["domains"]):	 
+	if len(proteinData["domains"]):
 		domainsSorted = sorted(proteinData["domains"], key=lambda x: x["aliStart"], reverse=False)
 		domainsWithNoOverlaps = removeOverlapps(domainsSorted)
 		PROTEIN_DOMAINS_FINAL[proteinName]["domainsWithNoOverlaps"] = []
-					
+
 		for region in domainsWithNoOverlaps:
 			correctedCoords = addToCoordinateLists(aliStarts, aliEnds, region["aliStart"]-1, region["aliEnd"]-1)
 			aliStart, aliEnd = (correctedCoords[0], correctedCoords[1])
@@ -158,7 +164,7 @@ def prepareDomainsWithNoOverlapps(proteinName, proteinData, domains, aliEnds, al
 			domainsOK.add(domainName)
 			domainToCoords[domainName] = [aliStart, aliEnd, domainSpan]
 			PROTEIN_DOMAINS_FINAL[proteinName]["domainsWithNoOverlaps"] \
-				.append({"domainName": region["domainName"], "start": region["aliStart"]-1, "end": region["aliEnd"]-1})	
+				.append({"domainName": region["domainName"], "start": region["aliStart"]-1, "end": region["aliEnd"]-1})
 		processSeparateDomains(domainsOK, domainToCoords, domains, startsToDomainList)
 
 def prepareDomainsWithOverlapps(proteinName, proteinData, domains, aliEnds, aliStarts, startsToDomainList):
@@ -166,27 +172,27 @@ def prepareDomainsWithOverlapps(proteinName, proteinData, domains, aliEnds, aliS
 	domToMergeGrpNames = collections.defaultdict(set)
 	domToMergeGrpStarts = collections.defaultdict(set)
 	domToMergeGrpEnds = collections.defaultdict(set)
-	domainsOK = set()		
-	
+	domainsOK = set()
+
 	##### Prepare Domains ######
 	#Sort domains by alisStart to use for merging or removing overlaps
-	if len(proteinData["domains"]):	 
+	if len(proteinData["domains"]):
 		domainsSorted = sorted(proteinData["domains"], key=lambda x: x["aliStart"], reverse=False)
 		# Doing the following to shift starts if diferent domains have the same starts
 		dmainStartsProcessed = []
-		dmainStartToDomainInfo = {}				
+		dmainStartToDomainInfo = {}
 		for region in domainsSorted:
 			if region["aliStart"]-1 not in dmainStartsProcessed:
-				dmainStartToDomainInfo[region["aliStart"]-1] = region						
+				dmainStartToDomainInfo[region["aliStart"]-1] = region
 			# taking care of possible domains with same starts but different names
 			elif region["aliStart"]-1 in dmainStartsProcessed:
-				region["aliStart"] = region["aliStart"]+1 
-				dmainStartToDomainInfo[region["aliStart"]-1] = region					
-			dmainStartsProcessed.append(region["aliStart"]-1)	
-			
+				region["aliStart"] = region["aliStart"]+1
+				dmainStartToDomainInfo[region["aliStart"]-1] = region
+			dmainStartsProcessed.append(region["aliStart"]-1)
+
 		# Here addToCoordinateLists will increment the coordinates if they are repeated for domains and/or tms, lcr
 		# And if the same domain was identified in several places in the protein unique names are generated
-		# domainsOK with not overalpped domains is generated and will be used to draw separate domains. 
+		# domainsOK with not overalpped domains is generated and will be used to draw separate domains.
 		for key in dmainStartToDomainInfo:
 			region = dmainStartToDomainInfo[key]
 			correctedCoords = addToCoordinateLists(aliStarts, aliEnds, region["aliStart"]-1, region["aliEnd"]-1)
@@ -194,15 +200,15 @@ def prepareDomainsWithOverlapps(proteinName, proteinData, domains, aliEnds, aliS
 			# taking care of domains with the same names but different coordinates
 			domainName = str(region["domainName"])+"&"+str(aliStart)+str(aliEnd)
 			domainSpan = correctedCoords[2]
-			createMergeGrps(aliStart, aliEnd, domainName, domainSpan, domainToCoords, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domainsOK)							
+			createMergeGrps(aliStart, aliEnd, domainName, domainSpan, domainToCoords, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domainsOK)
 			if domainName not in domToMergeGrpNames:
 				domainsOK.add(domainName)
 			domainToCoords[domainName] = [aliStart, aliEnd, domainSpan]
-			
+
 		processSeparateDomains(domainsOK, domainToCoords, domains, startsToDomainList)
 		processDomainsForMerge(domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domains, startsToDomainList)
-		
-def removeOverlapps(domainsSorted):				
+
+def removeOverlapps(domainsSorted):
 	tolerance = 10
 	pfam31Final = []
 	pfam1 = domainsSorted[0]
@@ -214,9 +220,9 @@ def removeOverlapps(domainsSorted):
 		if pfam1["aliEnd"] > pfam2["aliStart"]:
 			overlapLength = pfam1["aliEnd"] - pfam2["aliStart"]
 			if overlapLength > tolerance:
-				significantPfam = compareEvalues(pfam1, pfam2)  
+				significantPfam = compareEvalues(pfam1, pfam2)
 				# if the previously added is pfam1 and it's less significant than pfam 2
-				# then remove this previously added and add pfam 2 
+				# then remove this previously added and add pfam 2
 				if lastAdded == pfam1 and lastAdded != significantPfam:
 					pfam31Final.remove(lastAdded)
 					pfam31Final.append(significantPfam)
@@ -231,7 +237,7 @@ def removeOverlapps(domainsSorted):
 			lastAdded = pfam2
 			significantPfam = pfam2
 			pfam1 = significantPfam
-	return pfam31Final					
+	return pfam31Final
 
 def compareEvalues(pfam1, pfam2):
 	if "ieValue" in pfam1:
@@ -251,7 +257,7 @@ def compareEvalues(pfam1, pfam2):
 		else:
 			significantPfam = pfam2
 	return significantPfam
-		
+
 def addToCoordinateLists(starts, ends, regionStart, regionEnd):
 	start = regionStart
 	end = regionEnd
@@ -266,7 +272,7 @@ def addToCoordinateLists(starts, ends, regionStart, regionEnd):
 		end = regionEnd + 1
 		ends.add(end)
 	return (start, end, end - start)
-	                 
+
 def takeCareOfEdgeCoords(proteinName, aliEnds, aliStarts, domains):
 	# If len of a protein is bigger than the last coordinate do the following:
 	endOfLastDomain = max(aliEnds)
@@ -278,7 +284,7 @@ def takeCareOfEdgeCoords(proteinName, aliEnds, aliStarts, domains):
 	if startOfFirstDomain > 0:
 		thisThinLine = makeThinLine(0, startOfFirstDomain-1)
 		domains.append(thisThinLine)
-	
+
 def createMergeGrps(aliStart, aliEnd, domainName, domainSpan, domainToCoords, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domainsOK):
 	for processedDomain, domainCoords in domainToCoords.items():
 		if aliStart < domainCoords[1]:
@@ -288,7 +294,7 @@ def createMergeGrps(aliStart, aliEnd, domainName, domainSpan, domainToCoords, do
 					domToMergeGrpNames[processedDomain] = set((domainName, processedDomain))
 					domToMergeGrpNames[domainName] = domToMergeGrpNames[processedDomain]
 					domToMergeGrpStarts[processedDomain] = set((aliStart, domainCoords[0]))
-					domToMergeGrpStarts[domainName] = domToMergeGrpStarts[processedDomain]	
+					domToMergeGrpStarts[domainName] = domToMergeGrpStarts[processedDomain]
 					domToMergeGrpEnds[processedDomain] = set((aliEnd, domainCoords[1]))
 					domToMergeGrpEnds[domainName] = domToMergeGrpEnds[processedDomain]
 				elif processedDomain in domToMergeGrpNames and domainName in domToMergeGrpNames:
@@ -301,7 +307,7 @@ def createMergeGrps(aliStart, aliEnd, domainName, domainSpan, domainToCoords, do
 					mergeIfOneIsInMergeGrp(domainName, processedDomain, aliStart, aliEnd, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds)
 				if processedDomain in domainsOK:
 					domainsOK.remove(processedDomain)
-					
+
 def mergeIfOneIsInMergeGrp(domainName1, domainName2, aliStart, aliEnd, domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds):
 	domToMergeGrpNames[domainName1].add(domainName2)
 	domToMergeGrpNames[domainName2] = domToMergeGrpNames[domainName1]
@@ -309,14 +315,14 @@ def mergeIfOneIsInMergeGrp(domainName1, domainName2, aliStart, aliEnd, domToMerg
 	domToMergeGrpStarts[domainName2] = domToMergeGrpStarts[domainName1]
 	domToMergeGrpEnds[domainName1].add(aliEnd)
 	domToMergeGrpEnds[domainName2] = domToMergeGrpEnds[domainName1]
-	
+
 def processSeparateDomains(domainsOK, domainToCoords, domains, startsToDomainList):
 	for domainName in domainsOK:
 		domains.append([domainToCoords[domainName][0], domainToCoords[domainName][1], "o", None, 35, DOMAIN_BORDER_COLOR, DOMAIN_COLOR, "arial|8|#008B8B|" + domainName.split("&")[0]])
 		startsToDomainList[domainToCoords[domainName][0]].append(domainToCoords[domainName][1])
-        	
+
 def processDomainsForMerge(domToMergeGrpNames, domToMergeGrpStarts, domToMergeGrpEnds, domains, startsToDomainList):
-	processedDomains = set()	
+	processedDomains = set()
 	for domain, mergeGroup in domToMergeGrpNames.items():
 		if domain in processedDomains:
 			continue
@@ -335,7 +341,7 @@ def processDomainsForMerge(domToMergeGrpNames, domToMergeGrpStarts, domToMergeGr
 			mergeDomainInd+=1
 		domains.append([aliStart, aliEnd, "()", None, 35, DOMAIN_BORDER_COLOR, DOMAIN_COLOR, domainName.rstrip(", |\n")])
 		startsToDomainList[aliStart].append(aliEnd)
-		
+
 def addThinLines(proteinName, domains, startsToDomainList):
 	domsStartsSorted = sorted(startsToDomainList.keys())
 	# Used for taking care of situations when transmembrane domain is in the protein domain
@@ -366,11 +372,11 @@ def addThinLines(proteinName, domains, startsToDomainList):
 				# this is the end of a larger domain inside which a second domain is placed
 				tempDom1End = dom1End
 				lastSmallDomainInBiggerDomain = True
-					
+
 			else:
 				tempDom1End = None
-				# we don't assign 'lastSmallDomainInBiggerDomain = True' because 
-				# at next satge based on the dom2 and lastSmallDomainInBiggerDomain 
+				# we don't assign 'lastSmallDomainInBiggerDomain = True' because
+				# at next satge based on the dom2 and lastSmallDomainInBiggerDomain
 				# the thin line will be drown using the immdiate below clause
 			if dom2Start > dom1End:
 				if lastSmallDomainInBiggerDomain:
@@ -379,12 +385,12 @@ def addThinLines(proteinName, domains, startsToDomainList):
 					domains.append(thisThinLine)
 				thisThinLine = makeThinLine(dom1End+1, dom2Start-1)
 				domains.append(thisThinLine)
-			# case: dom1 is a large domain and dom2 is domain inside dom1 and 
+			# case: dom1 is a large domain and dom2 is domain inside dom1 and
 			# dom2 is the last domain
 			elif tempDom1End and ind == (len(domsStartsSorted)-2):
 				thisThinLine = makeThinLine(dom2End+1, tempDom1End, False)
 				domains.append(thisThinLine)
-				
+
 def makeThinLine(startPosition, endPosition, notInsideDomain=True):
 	if notInsideDomain:
 		thisThinLine = THIN_LINE[::]
@@ -401,12 +407,12 @@ def processFileWithDomains():
 		global PROTEIN_DOMAINS
 		global PROTEIN_DOMAINS_FINAL
 		PROTEIN_DOMAINS = json.load(domainsFile)
-	
+
 def processFileWithSeqs():
 	with open(SEQS, "r") as seqs:
 		for sequence in SeqIO.parse(seqs, "fasta"):
 			PROTEIN_NAME_TO_SEQ[sequence.description.strip()] = str(sequence.seq)
-	if SEQS_ALIGNED != None:		
+	if SEQS_ALIGNED != None:
 		with open(SEQS_ALIGNED, "r") as alignedSeqs:
 			for sequence in SeqIO.parse(alignedSeqs, "fasta"):
 				ALIGNED_PROTEIN_NAME_TO_SEQ[sequence.description.strip()] = str(sequence.seq)                   #
@@ -421,10 +427,10 @@ def layout(node):
 
 def saveChangedDomainsJSON():
 	with open(OUTPUT_PROTEIN_DOMAINS_JSON, "w") as proteinToDomainsJson:
-		json.dump(PROTEIN_DOMAINS_FINAL, proteinToDomainsJson, 
-		default=lambda o: o.__dict__, 
+		json.dump(PROTEIN_DOMAINS_FINAL, proteinToDomainsJson,
+		default=lambda o: o.__dict__,
 		sort_keys=True, indent=4)
-	       
+
 def writeSeqsAndTree():
 	prepareNameDict()
 	tree = Tree(TREE_FILE)
@@ -432,7 +438,7 @@ def writeSeqsAndTree():
 	#{0:['featureName, 'protSeqNames', 'alignSeqName']}
 	indexToName = collections.defaultdict(list)
 
-	# Change protein names in datas sctrucuters and write protein sequences with changed names to file 					
+	# Change protein names in datas sctrucuters and write protein sequences with changed names to file
 	if SEQS_ALIGNED != None:
 		with open(OUTPUT_ALIGNED_FILENAME, "w") as outputFile:
 			for i in xrange(len(terminals)):
@@ -441,7 +447,7 @@ def writeSeqsAndTree():
 				if processedName in PROCESSED_TO_ALIGNED_NAMES:
 					if ENUMERATE:
 						terminals[i].name = str(i+1) + "_" + proteinName
-						if processedName in PROCESSED_TO_FEATURE_NAMES:
+						if PREDICT_FEATURES and processedName in PROCESSED_TO_FEATURE_NAMES:
 							featureName = PROCESSED_TO_FEATURE_NAMES[processedName]
 							PROTEIN_DOMAINS[terminals[i].name] = PROTEIN_DOMAINS[featureName]
 							indexToName[i].append(featureName)
@@ -464,9 +470,10 @@ def writeSeqsAndTree():
 				terminals[i].name = str(i+1) + "_" + proteinName
 				if processedName in PROCESSED_TO_FEATURE_NAMES:
 					featureName = PROCESSED_TO_FEATURE_NAMES[processedName]
-					PROTEIN_DOMAINS[terminals[i].name] = PROTEIN_DOMAINS[featureName]
-					indexToName[i].append(featureName)
-					proteinSeqName = PROCESSED_TO_PROTEIN_NAMES[processedName]
+					if PREDICT_FEATURES:
+						PROTEIN_DOMAINS[terminals[i].name] = PROTEIN_DOMAINS[featureName]
+						indexToName[i].append(featureName)
+						proteinSeqName = PROCESSED_TO_PROTEIN_NAMES[processedName]
 					PROTEIN_NAME_TO_SEQ[terminals[i].name] = PROTEIN_NAME_TO_SEQ[proteinSeqName]
 					indexToName[i].append(proteinSeqName)
 			else:
@@ -474,21 +481,24 @@ def writeSeqsAndTree():
 
 
 	#Delete old names
-	if ENUMERATE:
+	if ENUMERATE and PREDICT_FEATURES:
 		for key, val in indexToName.items():
 			if val[0] in PROTEIN_DOMAINS:
 				del PROTEIN_DOMAINS[val[0]]
 				del PROTEIN_NAME_TO_SEQ[val[1]]
 				if len(PROCESSED_TO_ALIGNED_NAMES):
 					del ALIGNED_PROTEIN_NAME_TO_SEQ[val[2]]
+
 	#clear memory
 	indexToName = None
-	global PROTEIN_DOMAINS_FINAL
-	PROTEIN_DOMAINS_FINAL = copy.deepcopy(PROTEIN_DOMAINS)
-	prepareProteinToDomainsDict()
+	if PREDICT_FEATURES:
+		global PROTEIN_DOMAINS_FINAL
+		PROTEIN_DOMAINS_FINAL = copy.deepcopy(PROTEIN_DOMAINS)
+		prepareProteinToDomainsDict()
 	tree.write(outfile=OUTPUT_TREE_NEWICK_FILENAME)
 	treeStyle = TreeStyle()
-	treeStyle.layout_fn = layout
+	if PREDICT_FEATURES:
+		treeStyle.layout_fn = layout
 	treeStyle.show_branch_support = True
 	tree.render(OUTPUT_TREE_SVG_FILENAME, w=800, dpi=400, tree_style=treeStyle)
 	# Replacing default title and desc in svg file to 'TREND' with its url address
@@ -501,15 +511,17 @@ def writeSeqsAndTree():
 		outSvg.truncate()
 
 def prepareNameDict():
-	for protein in PROTEIN_DOMAINS:
-		processdName = prepareName(protein)
-		PROCESSED_TO_FEATURE_NAMES[processdName] = protein
+	if PREDICT_FEATURES:
+		for protein in PROTEIN_DOMAINS:
+			processdName = prepareName(protein)
+			PROCESSED_TO_FEATURE_NAMES[processdName] = protein
+		for protein in PROTEIN_NAME_TO_SEQ:
+			processdName = prepareName(protein)
+			PROCESSED_TO_PROTEIN_NAMES[processdName] = protein
 	for protein in ALIGNED_PROTEIN_NAME_TO_SEQ:
 		processdName = prepareName(protein)
 		PROCESSED_TO_ALIGNED_NAMES[processdName] = protein
-	for protein in PROTEIN_NAME_TO_SEQ:
-		processdName = prepareName(protein)
-		PROCESSED_TO_PROTEIN_NAMES[processdName] = protein
+
 
 REGEX_UNDERSCORE = re.compile(r"(\W|_)")
 REGEX_UNDERSCORE_SUBST = ""
@@ -519,10 +531,12 @@ def prepareName(line):
 
 def main(argv):
 	initialyze(argv)
-	processFileWithDomains()
+	if PREDICT_FEATURES:
+		processFileWithDomains()
 	processFileWithSeqs()
 	writeSeqsAndTree()
-	saveChangedDomainsJSON()
+	if PREDICT_FEATURES:
+		saveChangedDomainsJSON()
 
 if __name__ == "__main__":
 	main(sys.argv)

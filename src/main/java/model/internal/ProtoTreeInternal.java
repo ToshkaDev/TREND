@@ -25,6 +25,7 @@ public class ProtoTreeInternal {
     private String phylogenyTest;
     private String numberOrReplicates;
 
+    private String doPredictFeatures;
     private String domainPredictionProgram;
     private String domainPredictionDb;
 	//e-value for Hmmscan and RpsBlast
@@ -204,6 +205,14 @@ public class ProtoTreeInternal {
 
     public void setReorderOrNot(String reorderOrNot) {
         this.reorderOrNot = reorderOrNot;
+    }
+
+    public String getDoPredictFeatures() {
+        return doPredictFeatures;
+    }
+
+    public void setDoPredictFeatures(String doPredictFeatures) {
+        this.doPredictFeatures = doPredictFeatures;
     }
 
     public String getDomainPredictionProgram() {

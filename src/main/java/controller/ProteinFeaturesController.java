@@ -48,7 +48,8 @@ public class ProteinFeaturesController extends BioUniverseController {
     }
 
     @GetMapping(value={"tree/{jobId:.+}"})
-    public String result(@PathVariable String jobId, Model model) {
+    public String result(@PathVariable String jobId, @RequestParam("pipeline") String pipeline, @RequestParam("reduce") String reduce,
+                         @RequestParam("features") String features, @RequestParam("eon") String eon, Model model) {
         model.addAttribute("sendOrGiveResult", "/js/result-processing.js");
         model.addAttribute("resultProcessingCommon", "/js/result-processing-common.js");
         model.addAttribute("jobId", jobId);
@@ -65,8 +66,9 @@ public class ProteinFeaturesController extends BioUniverseController {
 
     @GetMapping(value="tree/get-filename", produces="application/json")
     @ResponseBody
-    public Map<String, List<String>> getFileNameIfReady(@RequestParam("jobId") String jobId) {
-        return getFileNameIfReadyCommon(jobId, (BioUniverseService) proteinFeaturesService, "domains");
+    public Map<String, List<String>> getFileNameIfReady(@RequestParam("jobId") String jobId, @RequestParam("pipeline") String pipeline, @RequestParam("reduce") String reduce,
+                                                        @RequestParam("features") String features, @RequestParam("eon") String eon, Model model) {
+        return getFileNameIfReadyCommon(jobId, eon, (BioUniverseService) proteinFeaturesService, "domains");
     }
 
     @GetMapping("univ_files/{filename:.+}")

@@ -59,8 +59,9 @@ public class GeneNeighborhoodsController extends BioUniverseController {
 
     @GetMapping(value="tree/get-filename", produces="application/json")
     @ResponseBody
-    public Map<String, List<String>> getFileNameIfReady(@RequestParam("jobId") String jobId) {
-        return getFileNameIfReadyCommon(jobId, (BioUniverseService) geneNeighborhoodsService, "gene-neighborhoods");
+    public Map<String, List<String>> getFileNameIfReady(@RequestParam("jobId") String jobId, @RequestParam("pipeline") String pipeline, @RequestParam("reduce") String reduce,
+                                                        @RequestParam("features") String features, @RequestParam("eon") String eon, Model model)  {
+        return getFileNameIfReadyCommon(jobId, eon, (BioUniverseService) geneNeighborhoodsService, "gene-neighborhoods");
     }
 
     @GetMapping("univ_files/{filename:.+}")

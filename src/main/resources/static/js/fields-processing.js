@@ -144,6 +144,11 @@ function takeCareOfFields() {
         $('input[name="dom-prediction-program"]').trigger('change')
     });
 
+    $('#do-predict-features').prop("checked", true);
+    $('#do-predict-features').change(function() {
+        $('#do-predict-features').prop("checked") ? $('.predict-features').show() : $('.predict-features').hide();
+    });
+
     lcrStates = {"checked": true, "undefined": false};
     $('#lc-value').click(function() {
         var lcValue = $('#lc-value').attr("checked");

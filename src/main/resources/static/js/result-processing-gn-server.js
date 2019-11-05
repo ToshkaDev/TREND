@@ -1,9 +1,10 @@
 $(document).ready(function(){
-    var jobId = $('#jobId').text();
+    // global paramsOfTrend object is created as a result
+    initializeLocationParams();
     stageList = [];
-    controlProgressBar(jobId);
+    controlProgressBar();
     // getIfReady(jobId) is in result-processing-common.js
-    getIfReady(jobId);
+    getIfReady();
 });
 
 function processRetrievedDataAsync(data) {
@@ -68,17 +69,18 @@ function onDownload() {
     });
 }
 
-function controlProgressBar(jobId) {
+function controlProgressBar() {
     var stageNumToPercentFullPipe = {"1":"33", "2":"66", "3": "100"};
     var stageNumToPercentFullPipeWithRedund = {"1":"25", "2":"50", "3": "75", "4": "100"};
     var stageNumToPercentPartialPipe = {"1":"50", "2":"100"};
     var stageNumToPercent = stageNumToPercentFullPipe;
-    var urlParts = jobId.split("-");
-    if (urlParts[1] == "f") {
-        if (urlParts[2] == "r")
+
+    if (paramsOfTrend["pipeline"] === "full") {
+        if (paramsOfTrend["reduce"] === "true")
             stageNumToPercent = stageNumToPercentFullPipeWithRedund;
     } else
         stageNumToPercent = stageNumToPercentPartialPipe;
+
     /*moveProgressBar is in fields-processing.js */
     moveProgressBar(stageNumToPercent);
 }

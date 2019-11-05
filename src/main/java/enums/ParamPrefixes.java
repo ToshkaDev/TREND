@@ -42,6 +42,7 @@ public enum  ParamPrefixes {
     OUTPUT_TREE("-z "),
 
     //protein features prediction specific parameters
+    DO_PREDICT_FETURES("-p "),
     DOMAINS_PREDICTION_PROGRAM("-p "),
     DOMAINS_PREDICTION_DB("-D "),
     OUTPUT_SECOND("-n "),

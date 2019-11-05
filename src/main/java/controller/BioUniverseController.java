@@ -11,11 +11,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 import service.BioUniverseService;
 import service.PipelineService;
 import service.StorageService;
@@ -63,16 +65,20 @@ public abstract class BioUniverseController {
         //Split it to several functions because 'PROTO_TREE' method is asynchronous
         //and files in 'listOfFiles' field of evolutionRequest are got cleared at the end of request processing.
         ProtoTreeInternal protoTreeInternal = pipelineService.storeFilesAndPrepareCommandArguments(protoTreeRequest);
-        String fullOrPartialPipe = protoTreeRequest.isFullPipeline().equals("true") ? "f" : "p";
+
+        String fullOrPartialPipe = protoTreeRequest.isFullPipeline().equals("true") ? "pipeline=full" : "pipeline=partial";
         String reduceOrNotRedundancy = protoTreeRequest.getRedundancy() != null
                 && protoTreeRequest.getSecondFile() == null
-                && protoTreeRequest.getSecondFileArea() == null ? "r" : "n";
-        String jobId = String.format("%d-%s-%s-%s", protoTreeInternal.getJobId(), fullOrPartialPipe, reduceOrNotRedundancy, protoTreeInternal.getProtoTreeCookies());
+                && protoTreeRequest.getSecondFileArea() == null ? "reduce=true" : "reduce=false";
+        String predictProteinFeatures = protoTreeRequest.getDoPredictFeatures().equals("yes") ? "features=true" : "features=false";
+        String cookies = "eon=" + protoTreeInternal.getProtoTreeCookies();
+
+        String jobId = String.format("%d?%s&%s&%s&%s", protoTreeInternal.getJobId(), fullOrPartialPipe, reduceOrNotRedundancy, predictProteinFeatures, cookies);
         pipelineService.runMainProgram(protoTreeInternal);
         return jobId;
     }
 
-    public Map<String, List<String>> getFileNameIfReadyCommon(String jobId, BioUniverseService bioUniverseService, String specificPath) {
+    public Map<String, List<String>> getFileNameIfReadyCommon(String jobId, String cookies, BioUniverseService bioUniverseService, String specificPath) {
         BioJob bioJob;
         // String urlPath = ServletUriComponentsBuilder.fromCurrentContextPath().path(specificPath + "/univ_files/").build().toString();
         String urlPath = ServletUriComponentsBuilder.fromHttpUrl(baseUrl).path(specificPath + "/univ_files/").build().toString();
@@ -80,11 +86,9 @@ public abstract class BioUniverseController {
         result.put(Status.status.getStatusEnum(), statusNoSuchBioJob);
         List<String> listOfResultFileNames;
         if (jobId != null ) {
-            String jobIdSplitted[] = jobId.split("-");
-            int id = Integer.valueOf(jobIdSplitted[0]);
-            String cookieId = jobIdSplitted[3];
-            bioJob = bioUniverseService.getBioJobDao().findByJobId(id);
-            if (bioJob != null && bioJob.getCookieId().equals(cookieId)) {
+            MultiValueMap<String, String> parameters = UriComponentsBuilder.fromUriString(jobId).build().getQueryParams();
+            bioJob = bioUniverseService.getBioJobDao().findByJobId(Integer.valueOf(jobId));
+            if (bioJob != null && bioJob.getCookieId().equals(cookies)) {
                 if (bioJob.isFinished()) {
                     listOfResultFileNames = bioJob.getBioJobResultList().stream().map(bjResult -> urlPath + bjResult.getResultFileName()).collect(Collectors.toList());
                     result.put(Status.result.getStatusEnum(), listOfResultFileNames);

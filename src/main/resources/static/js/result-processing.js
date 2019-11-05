@@ -1,5 +1,7 @@
 $(document).ready(function (){
-    var jobId = $('#jobId').text();
+    // global paramsOfTrend object is created as a result
+    initializeLocationParams();
+
     renderedClass = null;
     infoPostfix = "_table";
     stageList = [];
@@ -9,9 +11,9 @@ $(document).ready(function (){
     buttonIdToTableClass = {"Domains": "domain-table", "TMs": "tm-table", "LCRs": "lcr-table", "Sequence": "sequence-table", "Additional": "additional-table"};
     entityToButton = {"domainOrganizedData": buttonIds[0], 'tmOrganizedData': buttonIds[1],
     "lcrOrganized": buttonIds[2], "sequenceData": buttonIds[3], "additionalOrganizedData": buttonIds[4]};
-    controlProgressBar(jobId);
+    controlProgressBar();
     // getIfReady(jobId) is in result-processing-common.js
-    getIfReady(jobId);
+    getIfReady();
 });
 
 function prepareTreeContainer() {
@@ -60,7 +62,12 @@ function processRetrievedDataAsync(data) {
             // if all the files were provided for the pipeline
             if (data.result.length >= 4) {
                 $('#alignment-load').attr('href', data.result[2]);
-                $('#features-load').attr('href', data.result[3]);
+                if (paramsOfTrend["features"] === "true")
+                    $('#features-load').attr('href', data.result[3]);
+                else {
+                    $('#cdhit-clusters-load').show();
+                    $('#cdhit-clusters-load').attr('href', data.result[3]);
+                }
                 $('#alignment-load').show();
                 if (data.result.length == 5) {
                     $('#cdhit-clusters-load').show();
@@ -68,24 +75,29 @@ function processRetrievedDataAsync(data) {
                 }
                 featureData = data.result[3];
             }  else if (data.result.length == 3) {
-                $('#features-load').attr('href', data.result[2]);
+                if (paramsOfTrend["features"] === "true")
+                    $('#features-load').attr('href', data.result[2]);
                 featureData = data.result[2];
             }
             prepareTreeContainer();
             d3.xml(data.result[1]).then(function(xml) {
                 svgPicture = xml.documentElement
                 document.getElementById("treeContainer").appendChild(svgPicture);
-                $.get(featureData, function(data, status){
-                    addEventListeners(data);
-                });
+                if (paramsOfTrend["features"] === "true") {
+                    $.get(featureData, function(data, status){
+                        addEventListeners(data);
+                    });
+                }
             });
             $(window).resize(function() {
                 d3.select('#svgContainer>svg').remove();
                 prepareTreeContainer();
                 document.getElementById("treeContainer").appendChild(svgPicture);
-                $.get(featureData, function(data, status){
-                    addEventListeners(data);
-                });
+                if (paramsOfTrend["features"] === "true") {
+                    $.get(featureData, function(data, status){
+                        addEventListeners(data);
+                    });
+                }
             });
         }
         $('.result-container').show();
@@ -417,17 +429,29 @@ $(document).on("click", function () {
     $("." + renderedClass + infoPostfix).hide();
 });
 
-function controlProgressBar(jobId) {
+function controlProgressBar() {
     var stageNumToPercentFullPipe = {"1":"25", "2":"50", "3": "75", "4": "100"};
+    var stageNumToPercentFullPipeNoFeatures = {"1":"33", "2":"66", "3": "100"};
     var stageNumToPercentFullPipeWithRedund = {"1":"20", "2":"40", "3": "60", "4": "80", "5": "100"};
+    var stageNumToPercentFullPipeNoFeaturesWithRedund = {"1":"25", "2":"50", "3": "75", "4": "100"};
     var stageNumToPercentPartialPipe = {"1":"33", "2":"66", "3": "100"};
     var stageNumToPercent = stageNumToPercentFullPipe;
-    var urlParts = jobId.split("-");
-    if (urlParts[1] == "f") {
-        if (urlParts[2] == "r")
-            stageNumToPercent = stageNumToPercentFullPipeWithRedund;
+
+    if (paramsOfTrend["pipeline"] === "full") {
+        if (paramsOfTrend["reduce"] === "true") {
+            if (paramsOfTrend["features"] === "true")
+                stageNumToPercent = stageNumToPercentFullPipeWithRedund;
+            else
+                stageNumToPercent = stageNumToPercentFullPipeNoFeaturesWithRedund;
+        } else {
+            if (paramsOfTrend["features"] === "true")
+                stageNumToPercent = stageNumToPercentFullPipe;
+            else
+                stageNumToPercent = stageNumToPercentFullPipeNoFeatures;
+        }
     } else
         stageNumToPercent = stageNumToPercentPartialPipe;
+
     /*moveProgressBar is in fields-processing.js */
     moveProgressBar(stageNumToPercent);
 }

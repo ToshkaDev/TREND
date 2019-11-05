@@ -108,7 +108,6 @@ function checkFileAndSubmit(options, firstFile, firstInsuffSeqsMessageId, firstM
     fileReader.readAsText(options.get(firstFile));
     fileReader.onloadend = function() {
 		var firstInputStatus = fastaIsCorrect(fileReader.result, firstInsuffSeqsMessageId, firstMalformedMessageId, cannotHaveIdsAndSeqs);
-		console.log(firstInputStatus)
         if (firstInputStatus) {
 			if (options.get(secondFile)) {
 				var secondFileReader = new FileReader();
