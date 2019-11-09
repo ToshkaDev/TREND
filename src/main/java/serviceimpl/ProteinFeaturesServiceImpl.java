@@ -41,25 +41,25 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
 
         counterToStageOneInput.put(0, "['Processing input.']");
         counterToStageOneInput.put(1, "['Processing input.', 'Aligning sequences and building phylogenetic tree.']");
-        counterToStageOneInput.put(2, "['Processing input.', 'Aligning sequences and building phylogenetic tree.', 'Predicting proteins features.']");
-        counterToStageOneInput.put(3, "['Processing input.', 'Aligning sequences and building phylogenetic tree.', 'Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStageOneInput.put(2, "['Processing input.', 'Aligning sequences and building phylogenetic tree.', 'Identifying proteins features.']");
+        counterToStageOneInput.put(3, "['Processing input.', 'Aligning sequences and building phylogenetic tree.', 'Identifying proteins features.', 'Ordering alignment and putting features and tree together.-last']");
 
         counterToStageTwoInputs.put(1, "['Processing input.', 'Aligning sequences and building phylogenetic tree.']");
         counterToStageTwoInputs.put(2, "['Processing input.', 'Aligning sequences and building phylogenetic tree.']");
-        counterToStageTwoInputs.put(3, "['Processing input.', 'Aligning sequences and building phylogenetic tree.', 'Predicting proteins features.']");
-        counterToStageTwoInputs.put(4, "['Processing input.', 'Aligning sequences and building phylogenetic tree.', 'Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStageTwoInputs.put(3, "['Processing input.', 'Aligning sequences and building phylogenetic tree.', 'Identifying proteins features.']");
+        counterToStageTwoInputs.put(4, "['Processing input.', 'Aligning sequences and building phylogenetic tree.', 'Identifying proteins features.', 'Ordering alignment and putting features and tree together.-last']");
 
         counterToStageOneInputWithRedund.put(0, "['Processing input.']");
         counterToStageOneInputWithRedund.put(1, "['Processing input.', 'Reducing sequence redundancy.']");
         counterToStageOneInputWithRedund.put(2, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.']");
-        counterToStageOneInputWithRedund.put(3, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.', 'Predicting proteins features.']");
-        counterToStageOneInputWithRedund.put(4, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.', 'Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStageOneInputWithRedund.put(3, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.', 'Identifying proteins features.']");
+        counterToStageOneInputWithRedund.put(4, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.', 'Identifying proteins features.', 'Ordering alignment and putting features and tree together.-last']");
 
         counterToStageTwoInputsWithRedund.put(1, "['Processing input.']");
         counterToStageTwoInputsWithRedund.put(2, "['Processing input.', 'Reducing sequence redundancy.']");
         counterToStageTwoInputsWithRedund.put(3, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.']");
-        counterToStageTwoInputsWithRedund.put(4, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.', 'Predicting proteins features.']");
-        counterToStageTwoInputsWithRedund.put(5, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.', 'Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStageTwoInputsWithRedund.put(4, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.', 'Identifying proteins features.']");
+        counterToStageTwoInputsWithRedund.put(5, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.', 'Identifying proteins features.', 'Ordering alignment and putting features and tree together.-last']");
 
         counterToStageOneInputNoFeatures.put(0, "['Processing input.']");
         counterToStageOneInputNoFeatures.put(1, "['Processing input.', 'Aligning sequences and building phylogenetic tree.']");
@@ -80,12 +80,12 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         counterToStageTwoInputsNoFeaturesWithRedund.put(4, "['Processing input.', 'Reducing sequence redundancy.', 'Aligning sequences and building phylogenetic tree.', 'Ordering alignment and putting features and tree together.-last']");
 
         counterToStagePartialOneInput.put(0, "['Processing input.']");
-        counterToStagePartialOneInput.put(1, "['Processing input.', 'Predicting proteins features.']");
-        counterToStagePartialOneInput.put(2, "['Processing input.', 'Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStagePartialOneInput.put(1, "['Processing input.', 'Identifying proteins features.']");
+        counterToStagePartialOneInput.put(2, "['Processing input.', 'Identifying proteins features.', 'Ordering alignment and putting features and tree together.-last']");
 
         counterToStagePartialTwoInputs.put(1, "['Processing input.']");
-        counterToStagePartialTwoInputs.put(2, "['Processing input.', 'Predicting proteins features.']");
-        counterToStagePartialTwoInputs.put(3, "['Processing input.', 'Predicting proteins features.', 'Ordering alignment and putting features and tree together.-last']");
+        counterToStagePartialTwoInputs.put(2, "['Processing input.', 'Identifying proteins features.']");
+        counterToStagePartialTwoInputs.put(3, "['Processing input.', 'Identifying proteins features.', 'Ordering alignment and putting features and tree together.-last']");
     }
 
     private String getDomainPredictionDb(String dbName) {

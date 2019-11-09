@@ -36,7 +36,7 @@ reverseGeneInfoBoxY = reverseGeneFigureTopY-89;
 textPositionFactorDirectY = 95;
 textPositionFactorReverseY = 68;
 textPositionZoomCorrection = 1;
-textPositionFactorX = 10;
+textPositionFactorX = 1;
 textPositionFactorXLast = 10;
 xShiftLeft = 0.03;
 xShiftLeftLast = 0.03;
@@ -108,12 +108,15 @@ function setSvgSizeAndBuildTree(textCounter, jsonDomainsAndGenesObj) {
     if (neighbourhoodLength <= 15) {
         svgWidth = 800;
         fullSvgWidth = 2800;
+        textPositionFactorX = 1;
     } else if (neighbourhoodLength > 15 && neighbourhoodLength <= 23) {
         svgWidth = 1200;
         fullSvgWidth = 4200;
+        textPositionFactorX = -9;
     } else {
         svgWidth = 2000;
         fullSvgWidth = 7000;
+        textPositionFactorX = -17;
     }
 
     phylocanvas = new Smits.PhyloCanvas(
