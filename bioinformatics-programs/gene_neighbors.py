@@ -28,7 +28,7 @@ manager = multiprocessing.Manager()
 NUMBER_OF_PROCESSES = 50
 OPERON_COLOR_DICT = manager.list(["#ff4d4d", "#1a75ff", "#cc33ff", "#00cc00", "#ff9900", "#993333", "#000099", "#00b3b3", "#660033", "#00b386", \
 "#663399", "#B22222", "#9ACD32", "#0000FF", "#D2691E", "#778899", "#2F4F4F", "#FFD700", "#FF1493", "#00FA9A", "#4682B4", "#00BFFF", \
-"#7FFFD4", "#191970", "#993399", "#CCCC66", "#FF9933", "#6699FF", "#99FF33", "#66FFFF", "#99CCFF"])
+"#7FFFD4", "#191970", "#993399", "#CCCC66", "#FF9933", "#6699FF", "#99FF33", "#66FFFF", "#99CCFF" ])
 SELECTED_COLORS = set()
 NUMBER_OF_GENERATED_COLORS = 0
 FIRST_COLOR_THRESHOLD = 100
@@ -347,10 +347,18 @@ def getNextColour():
 
 	NUMBER_OF_GENERATED_COLORS+=1
 	newColor = hsv_to_rgb(h, s, v)
+	colourCounter = 0
 	while newColor in SELECTED_COLORS:
 		h = random.random()
 		s = random.random()
 		newColor = hsv_to_rgb(h, s, v)
+		colourCounter+=1
+		if colourCounter == 2:
+			v = random.random()
+			newColor = hsv_to_rgb(h, s, v)
+			colourCounter = 0
+			print "Colour counter exhausted!"
+
 	SELECTED_COLORS.add(newColor)
 
 	RANDOM_STATE = random.getstate()
