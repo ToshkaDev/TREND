@@ -117,7 +117,7 @@ def initialyze(argv):
 			INPUT_FILE = str(arg).strip()
 		elif opt in ("-a", "--al_algorithm"):
 			param = str(arg).strip()
-			if param in ["--localpair", "--genafpair", "--globalpair", "--retree 2 --maxiterate 1000", "--retree 2 --maxiterate 0"]:
+			if param in ["--maxiterate 1000 --localpair", "--maxiterate 1000 --genafpair", "--maxiterate 1000 --globalpair", "--retree 2 --maxiterate 1000", "--retree 2 --maxiterate 0"]:
 				ALGORITHM = param
 		elif opt in ("-d", "--do_align"):
 			param = str(arg).strip()
