@@ -77,7 +77,9 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
 
     private ProtoTreeInternal pipelineProcessing(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
         ProtoTreeInternal protoTreeInternal = storeFileAndGetInternalRepresentation(protoTreeRequest);
-        String redundancy = protoTreeInternal.getRedundancy();
+        String redundancy = protoTreeInternal.getRedundancy() != null
+                && protoTreeInternal.getDoAlign().equals("-d yes") ? protoTreeInternal.getRedundancy() : null;
+
         List<String> listOfPrograms = new LinkedList<>();
         List<List<String>> listOfArgumentLists = new LinkedList<>();
 
@@ -100,6 +102,7 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
                     ParamPrefixes.THREADS_GENERAL.getPrefix() + super.getProperties().getCdhitThreadNum()
             ));
             protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + cdHitOutputFile);
+            protoTreeInternal.setAlignmentFile(ParamPrefixes.INPUT.getPrefix() + cdHitOutputFile);
         }
 
         protoTreeInternal.setFields();

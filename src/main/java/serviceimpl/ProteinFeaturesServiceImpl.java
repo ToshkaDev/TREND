@@ -135,7 +135,10 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
 
     private ProtoTreeInternal fullPipelineProcessing(ProtoTreeRequest protoTreeRequest) throws IncorrectRequestException {
         ProtoTreeInternal protoTreeInternal = super.storeFileAndGetInternalRepresentation(protoTreeRequest);
-        String redundancy = protoTreeInternal.getRedundancy() != null && protoTreeInternal.getSecondFileName() == null ? protoTreeInternal.getRedundancy() : null;
+        String redundancy = protoTreeInternal.getRedundancy() != null
+                && protoTreeInternal.getSecondFileName() == null
+                && protoTreeInternal.getDoAlign().equals("-d yes") ? protoTreeInternal.getRedundancy() : null;
+
         List<String> listOfPrograms = new LinkedList<>();
         List<List<String>> listOfArgumentLists = new LinkedList<>();
 
@@ -150,7 +153,7 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         initFullPipeArgsForPrepareNames(protoTreeInternal, argsForPrepareNames, argsForPrepareNamesSecond, listOfPrograms, listOfArgumentLists);
 
         String cdHitOutputFile = super.getRandomFileName(null);
-        if (redundancy != null && protoTreeInternal.getSecondFileName() == null) {
+        if (redundancy != null) {
             argsForCdHit.addAll(Arrays.asList(
                     protoTreeInternal.getFirstFileName(),
                     ParamPrefixes.OUTPUT.getPrefix() + cdHitOutputFile,
@@ -160,7 +163,9 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
                     ParamPrefixes.THREADS_GENERAL.getPrefix() + super.getProperties().getCdhitThreadNum()
             ));
             protoTreeInternal.setFirstFileName(ParamPrefixes.INPUT.getPrefix() + cdHitOutputFile);
+            protoTreeInternal.setAlignmentFile(ParamPrefixes.INPUT.getPrefix() + cdHitOutputFile);
         }
+
         protoTreeInternal.setFields();
 
         String hmmscanOrRpsbOutFile = super.getRandomFileName(null);

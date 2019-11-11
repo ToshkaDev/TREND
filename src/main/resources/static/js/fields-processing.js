@@ -98,7 +98,15 @@ function takeCareOfFields() {
 
     $('#do-align').prop("checked", true);
     $('#do-align').change(function() {
-        $('#do-align').prop("checked") ? $('.aln-alg').show() : $('.aln-alg').hide();
+        if ($('#do-align').prop("checked")) {
+            $("#reduce-redundancy").prop("disabled", false);
+            $('.aln-alg').show();
+        } else {
+            $('.aln-alg').hide();
+            $("#reduce-redundancy").prop("checked", false);
+            $("#cd-hit").hide();
+            $("#reduce-redundancy").prop("disabled", true);
+        }
     });
 
     treeMethodToPrefix = {"ML": "ml", "ME": "nj_me", "JN": "nj_me"};
