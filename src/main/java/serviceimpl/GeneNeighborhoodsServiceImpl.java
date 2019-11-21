@@ -20,7 +20,6 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
     private Map<Integer, String> counterToStageOneInputPartial = new HashMap<>();
     private Map<Integer, String> counterToStageOneInputFull = new HashMap<>();
     private Map<Integer, String> counterToStageOneInputFullWithRedund = new HashMap<>();
-    private final String bootstrapFilePostfix = "_consensus";
 
     public GeneNeighborhoodsServiceImpl(final StorageService storageService, final AppProperties properties, final BioJobDao bioJobDao, final BioJobResultDao bioJobResultDao) {
         super(storageService, properties, bioJobResultDao, bioJobDao);
@@ -118,10 +117,6 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
                 ParamPrefixes.THREADS_GENERAL.getPrefix() + super.getProperties().getMegaThreadNum(),
                 ParamPrefixes.OUTPUT.getPrefix() + outAlgnFile
         ));
-
-        if (!protoTreeRequest.getPhylogenyTest().equals("none")) {
-            outNewickTree = outNewickTree + bootstrapFilePostfix;
-        }
 
         String outNewickFile = super.getRandomFileName(".newick");
         String outOrderedAlgnFile = super.getRandomFileName(".fa");
