@@ -48,6 +48,7 @@ spring.mail.properties.mail.smtp.socketFactory.port=465
 spring.mail.properties.mail.smtp.socketFactory.class=javax.net.ssl.SSLSocketFactory
 spring.mail.properties.mail.smtp.socketFactory.fallback=false
 
+
 #*************************#
 #programs paths and parameters#
 #*************************#
@@ -58,7 +59,7 @@ program.pathToMainDirFromBioProgs=../
 program.pythonLocation=/usr/bin/python
 program.bashLocation=/bin/bash
 program.blastpLocation=/home/bioverse/trend/Soft/ncbi-blast-2.6.0+/bin/blastp
-program.resultFilePrefix=proto-tree-
+program.resultFilePrefix=TREND-
 program.postfix=.txt
 
 
@@ -69,7 +70,6 @@ program.addProtFeaturesToTree=../bioinformatics-programs/orderSequencesBasedOnTr
 program.enumerate=../bioinformatics-programs/orderSequencesBasedOnTree.py
 program.geneNeighbors=../bioinformatics-programs/gene_neighbors.py
 program.reduceWithCdHit=../bioinformatics-programs/runCdHit.py
-
 
 program.hmmscanDbPath=/data/HMM_models/
 program.rpsblastDbPath=/data/Ncbi/CDD_PSSMs/
@@ -99,7 +99,7 @@ program.cdhitMemory=2000
 program.xvfbrun=/usr/bin/xvfb-run
 program.xvfbrunSafe=../util/xvfb-run-safe.sh
 
-#Thread and process numbers
+# Thread and process numbers
 program.geneNeighborsProcessNum=50
 program.megaThreadNum=7
 program.mafftThreadNum=7
