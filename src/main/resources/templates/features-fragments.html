@@ -5,12 +5,15 @@
 <body>
     <div th:fragment="proto-tree">
         <form class="col-md-8 my-textarea full-pipe">
-            <div class="row features-example">
-                <div style="margin-right: 3px">
+            <div class="row pipelines-examples">
+                <div>
                     <a class="pipelines-example1">Example1</a>
                 </div>
                 <div>
                     <a class="pipelines-example2">Example2</a>
+                </div>
+                <div>
+                    <a class="pipelines-example3">Example3</a>
                 </div>
             </div>
             <div class="row">
@@ -22,7 +25,7 @@
                     Add Second Area
                 </button>
                 <label class="btn btn-primary btn-md proto-tree-button">
-                    Choose file with protein sequences <input id="first-file" type="file" style="display: none" multiple/>
+                    Choose file <input id="first-file" type="file" style="display: none" multiple/>
                 </label>
                 <span class='label label-info' id="first-file-info"></span>
                 <button id="GoAsync" class="btn btn-primary btn-md pull-right proto-tree-button" type="button">
@@ -50,7 +53,7 @@
             <br />
             <div class="row">
                 <label class="btn btn-primary btn-md proto-tree-button">
-                    Choose file with protein sequences <input id="second-file" type="file" style="display: none" multiple/>
+                    Choose file <input id="second-file" type="file" style="display: none" multiple/>
                 </label>
                 <span class='label label-info' id="second-file-info"></span>
             </div>

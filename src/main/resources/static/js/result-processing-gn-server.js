@@ -65,7 +65,7 @@ function onDownload() {
     d3.select("#results-load").on("click", function() {
       d3.select(this)
         .attr("href", svgUrl)
-        .attr("download", "ProtoTree.svg")
+        .attr("download", "TREND.svg")
     });
 }
 

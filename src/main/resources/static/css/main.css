@@ -603,13 +603,14 @@ input:checked + .slider:before {
 
 /*Examples*/
 
-.features-example {
+.pipelines-examples {
     display: flex;
     justify-content: flex-start;
 }
 
-.pipelines-example1, .pipelines-example2, .pipelines-example3 {
+.pipelines-example1, .pipelines-example2, .pipelines-example3, .pipelines-example4 {
     cursor: pointer;
+    margin-right: 4px;
 }
 
 /*Examples end*/

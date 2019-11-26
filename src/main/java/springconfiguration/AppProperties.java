@@ -30,7 +30,7 @@ public class AppProperties {
     private String pythonLocation = "/usr/bin/python";
     private String bashLocation = "/bin/bash";
     private String blastpLocation = "/usr/bin/blastp";
-    private String resultFilePrefix = "proto-tree-";
+    private String resultFilePrefix = "TREND-";
     private String postfix = ".txt";
 
     private String hmmscanDbPath = "/home/vadim/UTOakRidge/Soft/hmmer3_data/";

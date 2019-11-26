@@ -160,6 +160,12 @@
                     <p>
                         Just don't forget to tick <span class="proto-tree-text">Retrieve sequences (NCBI and MiST)</span>.
                     </p>
+                    <p>
+                        If you have your own alignment that you already prepared and edited you may skip the alignment step of the pipeline and use your alignment instead. Just paste your alignment and uncheck <span class="proto-tree-text">Align</span> option.
+                    </p>
+                    <p>
+                        If you want to use TREND just to align your sequences and build a tree you may skip domains identification step unchecking <span class="proto-tree-text">Identify Features</span> option.
+                    </p>
                 </div>
                 <h4  class="text-head4" style="font-weight: bold">
                     2. Building phylogenetic tree using fragments of protein sequences and identifying protein features using full-length sequences.
@@ -184,13 +190,6 @@
                         If you downloaded sequences from the same database or were changing sequence names consistently in all the files this will happen naturally.
                     </p>
                 </div>
-                <br/>
-                <p>
-                    If you have your own alignment that you already prepared and edited you may skip the alignment step of the pipeline and use your alignment instead. Just uncheck <span class="proto-tree-text">Align</span> option.
-                </p>
-                <p>
-                    If you want to use TREND just to align your sequences and build a tree you may skip domains identification step unchecking <span class="proto-tree-text">Identify Features</span> option.
-                </p>
             </div>
             <div>
                 <p class="text-head3"> Partial pipeline mode. </p>
@@ -198,7 +197,7 @@
                     If you have your own phylogenetic tree and protein sequences used to produce the tree use this mode.
                 </p>
                 <p>
-                    Important: sequence names in all areas should be identical.
+                    <span style="font-weight: bold"> Important </span>: sequence names in all areas should be identical.
                 </p>
                 <p>
                     If you downloaded sequences from the same database or were changing sequence names consistently in all the files this will happen naturally.
@@ -292,6 +291,9 @@
                 </p>
                 <p>
                     3) by pasting a list of NCBI/MiST protein ids/locus tags (or uploading corresponding file). Don't forget to check <span class="proto-tree-text">Retrieve sequences (NCBI and MiST)</span>
+                </p>
+                <p>
+                    4) by pasting an alignment in <a href="https://en.wikipedia.org/wiki/FASTA_format" target="_blank">FASTA format</a> (or uploading corresponding file)
                 </p>
                 <p>
                     Bear in mind that the refSeq Ids are not organism specific. If you want to explore the neighborhoods of genes from a particular organism you should provide locus tags or MiST Ids.
