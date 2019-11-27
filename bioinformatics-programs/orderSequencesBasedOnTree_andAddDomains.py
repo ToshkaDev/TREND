@@ -409,9 +409,10 @@ def processFileWithDomains():
 		PROTEIN_DOMAINS = json.load(domainsFile)
 
 def processFileWithSeqs():
-	with open(SEQS, "r") as seqs:
-		for sequence in SeqIO.parse(seqs, "fasta"):
-			PROTEIN_NAME_TO_SEQ[sequence.description.strip()] = str(sequence.seq)
+	if SEQS != None:
+		with open(SEQS, "r") as seqs:
+			for sequence in SeqIO.parse(seqs, "fasta"):
+				PROTEIN_NAME_TO_SEQ[sequence.description.strip()] = str(sequence.seq)
 	if SEQS_ALIGNED != None:
 		with open(SEQS_ALIGNED, "r") as alignedSeqs:
 			for sequence in SeqIO.parse(alignedSeqs, "fasta"):

@@ -293,7 +293,7 @@ public class ProtoTreeInternal {
         fieldsForGeneNeighbors.add(getOperonTolerance());
         fieldsForGeneNeighbors.add(getNumberOfNeighbors());
 
-        if (getDomainPredictionProgram() != null)
+        if (getDomainPredictionProgram() != null && getFirstFileName() != null)
             fieldsForTreeAndDomains.add(getFirstFileName());
         if (getEnumerate() != null)
             fieldsForTreeAndDomains.add(getEnumerate());

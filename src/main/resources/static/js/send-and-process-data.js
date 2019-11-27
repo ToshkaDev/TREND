@@ -49,6 +49,10 @@ $(document).ready(function (){
         $('#partial-pipeline').removeClass('pipeline-button-selected');
         $('#partial-pipeline').addClass('pipeline-button');
         $('#isFullPipeline').text("true");
+
+        $(".predict-features").show();
+        $("#do-predict-features").prop("checked", true);
+        $("#do-predict-features").prop("disabled", false);
     });
     $('#partial-pipeline').click(function() {
         $('.full-pipe').hide();
@@ -59,6 +63,10 @@ $(document).ready(function (){
         $('#partial-pipeline').removeClass('pipeline-button');
         $('#partial-pipeline').addClass('pipeline-button-selected');
         $('#isFullPipeline').text("false");
+
+        $(".predict-features").hide();
+        $("#do-predict-features").prop("checked", false);
+        $("#do-predict-features").prop("disabled", true);
     });
 });
 
@@ -92,24 +100,31 @@ function fastaIsCorrect(fasta, malformedMessageId,  notFastaMessageId, cannotHav
 }
 
 function submitIfNewickTreeIsOK(newickFile, options) {
-	var fileReader = new FileReader();
-	fileReader.readAsText(newickFile);
-	fileReader.onloadend = function() {
-		var textCounter = Newick.parse(fileReader.result)[1]
-		var newickEndIsOK = fileReader.result.trim().slice(-1) == ";"
-		textCounter < 3 || !newickEndIsOK ? $("#malformed-newick").show() : getDataAsync(options);
+    var fileReader = new FileReader();
+    fileReader.readAsText(newickFile);
+    fileReader.onloadend = function() {
+	    try {
+	        var textCounter = Newick.parse(fileReader.result)[1]
+	        var newickEndIsOK = fileReader.result.trim().slice(-1) == ";"
+	        textCounter < 3 || !newickEndIsOK ? $("#malformed-newick").show() : getDataAsync(options);
+	    } catch(error) {
+	        $("#malformed-newick").show()
+	    }
 	}
 }
 
-function checkFileAndSubmit(options, firstFile, firstInsuffSeqsMessageId, firstMalformedMessageId,
+function checkFileAndSubmit(options, firstFile=null, firstInsuffSeqsMessageId, firstMalformedMessageId,
 							secondFile=null, secondInsuffSeqsMessageId=null, secondMalformedMessageId=null,
 							areaStatus=null, cannotHaveIdsAndSeqs=null) {
     var fileReader = new FileReader();
-    fileReader.readAsText(options.get(firstFile));
+    fileReader.readAsText(options.get(firstFile ? firstFile : secondFile));
     fileReader.onloadend = function() {
-		var firstInputStatus = fastaIsCorrect(fileReader.result, firstInsuffSeqsMessageId, firstMalformedMessageId, cannotHaveIdsAndSeqs);
-        if (firstInputStatus) {
-			if (options.get(secondFile)) {
+        if (firstFile)
+		    var inputStatus = fastaIsCorrect(fileReader.result, firstInsuffSeqsMessageId, firstMalformedMessageId, cannotHaveIdsAndSeqs);
+		else if (secondFile)
+		    var inputStatus = fastaIsCorrect(fileReader.result, secondInsuffSeqsMessageId, secondMalformedMessageId, cannotHaveIdsAndSeqs);
+        if (inputStatus) {
+			if (firstFile && options.get(secondFile)) {
 				var secondFileReader = new FileReader();
 				secondFileReader.readAsText(options.get(secondFile));
 				secondFileReader.onloadend = function() {
@@ -139,17 +154,18 @@ function checkFileAndSubmit(options, firstFile, firstInsuffSeqsMessageId, firstM
 function checkAndSubmit(options, secondFile) {
 	var firstAreaStatus = null, secondAreaStatus = null;
     if (secondFile === "alignmentFile") {
-        if (!options.get("fetchFromTree")) {
-            if (!(options.get("firstFile") && options.get("treeFile")) || (options.get("firstFile") && !options.get("treeFile"))) {
-                $("#partial-pipeline-message").show();
-                return;
-            }
-        } else {
-            if (options.get("treeFile")) {
-                getDataAsync(options);
-                return;
-            }
+        if (!options.get("treeFile")) {
+            $("#partial-pipeline-message").show();
+            return;
         }
+        if (options.get("fetchFromTree")) {
+            submitIfNewickTreeIsOK(options.get("treeFile"), options);
+            return;
+        } else if (!options.get("firstFile") && !options.get("alignmentFile")) {
+            $("#partial-pipeline-message").show();
+            return;
+        }
+
     }
     if (secondFile === "secondFile") {
 		if ($(".second-area").is(':hidden') && !options.get("firstFileArea") && !options.get("firstFile")) {
@@ -183,9 +199,12 @@ function checkAndSubmit(options, secondFile) {
 		else if (secondFile === "secondFile")
 			checkFileAndSubmit(options, "firstFile", "malformed-fasta", "first-area-message",
 				secondFile, "malformed-fasta-second", "second-area-message", secondAreaStatus, "cannot-have-ids-and-seqs");
+	} else if (secondFile === "alignmentFile") {
+            checkFileAndSubmit(options, null, "malformed-fasta-partialP", "first-area-message-partialP",
+                secondFile, "malformed-fasta-second-partialP", "second-area-message-partialP", null);
 	} else if (options.get("secondFile")) {
 		// nulls in the argument list below because sending request with second input specified by the user and empty first input
-		// is invalid (we are ending up in this condition only if the previous is false; but the first area can be speicified).
+		// is invalid (we are ending up in this condition only if the previous is false; but the first area can be specified).
 		checkFileAndSubmit(options, secondFile, "malformed-fasta-second", "second-area-message",
 				null, null, null, firstAreaStatus);
 	} else if (!$(".second-area").is(':hidden') && firstAreaStatus === null && secondAreaStatus === null) {

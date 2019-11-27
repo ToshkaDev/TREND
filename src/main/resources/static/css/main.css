@@ -150,6 +150,9 @@ label.error {
     display: none;
 }
 
+.trend-text-colour {
+    color: #3F7C7A;
+}
 #first-area-message, #second-area-message,
 #both-areas-message, #one-area-message,
 #partial-pipeline-message, #second-area-message-partialP,

@@ -74,11 +74,17 @@ function processRetrievedDataAsync(data) {
                     $('#cdhit-clusters-load').attr('href', data.result[4]);
                 }
                 featureData = data.result[3];
-            }  else if (data.result.length == 3) {
-                if (paramsOfTrend["features"] === "true")
+            } else if (data.result.length == 3) {
+                if (paramsOfTrend["features"] === "true") {
                     $('#features-load').attr('href', data.result[2]);
-                featureData = data.result[2];
+                    featureData = data.result[2];
+                } else {
+                    $('#features-load').hide();
+                    $('#alignment-load').show();
+                    $('#alignment-load').attr('href', data.result[2]);
+                }
             }
+
             prepareTreeContainer();
             d3.xml(data.result[1]).then(function(xml) {
                 svgPicture = xml.documentElement
@@ -435,6 +441,7 @@ function controlProgressBar() {
     var stageNumToPercentFullPipeWithRedund = {"1":"20", "2":"40", "3": "60", "4": "80", "5": "100"};
     var stageNumToPercentFullPipeNoFeaturesWithRedund = {"1":"25", "2":"50", "3": "75", "4": "100"};
     var stageNumToPercentPartialPipe = {"1":"33", "2":"66", "3": "100"};
+    var stageNumToPercentPartialPipeNoFeatures = {"1":"50", "2":"100"};
     var stageNumToPercent = stageNumToPercentFullPipe;
 
     if (paramsOfTrend["pipeline"] === "full") {
@@ -449,8 +456,13 @@ function controlProgressBar() {
             else
                 stageNumToPercent = stageNumToPercentFullPipeNoFeatures;
         }
-    } else
-        stageNumToPercent = stageNumToPercentPartialPipe;
+    } else {
+        if (paramsOfTrend["features"] === "true")
+            stageNumToPercent = stageNumToPercentPartialPipe;
+        else
+            stageNumToPercent = stageNumToPercentPartialPipeNoFeatures;
+    }
+
 
     /*moveProgressBar is in fields-processing.js */
     moveProgressBar(stageNumToPercent);

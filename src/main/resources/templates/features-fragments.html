@@ -64,10 +64,26 @@
             <br /> <br />
         </form>
         <div class="col-md-8 my-textarea partial-pipe">
-            <div class="row partial-pipe-file">
+            <p class="trend-text-colour">Protein names in the provided files should be matched.</p>
+            <p class="trend-text-colour">The following combinations of the files can be provided depending on the task:</p>
+            <ul class="trend-text-colour">
+                <li>
+                    File with the tree + File with the alignment + File with initial protein sequences.
+                    <p>Protein features will be identified and mapped on the tree, the alignment will be reordered according to the tree leaves.</p>
+                </li>
+                <li>
+                    File with the tree + File with the alignment.
+                    <p>The alignment will be reordered according to the tree leaves.</p>
+                </li>
+                <li>
+                    Just a file with the tree. "Retrieve sequences (NCBI and MiST)" box should be checked.
+                    <p>Corresponding proteins will be fetched from <a href="https://www.ncbi.nlm.nih.gov/" target="_blank">NCBI</a> and/or <a href="https://mistdb.com/" target="_blank">MiST</a> databases, protein features will be identified and mapped on the tree.</p>
+                </li>
+            </ul>
+            <div class="row partial-pipe-file partial-opt">
                 <div class="partial-pipe-interior">
                     <label class="btn btn-primary btn-md proto-tree-button">
-                        Choose file with protein sequences (optional if retrieving) <input id="sequence-file" type="file" style="display: none" multiple/>
+                        Choose file with protein sequences (FASTA) <input id="sequence-file" type="file" style="display: none" multiple/>
                     </label>
                     <span class='label label-info' id="sequence-file-info"></span>
                 </div>
@@ -76,10 +92,10 @@
                 <span id="first-area-message-partialP">Wrong format. The fasta format is expected to begin with '>' sign.</span>
                 <span id="malformed-fasta-partialP">There should be at least 3 protein sequences to start the analysis.</span>
             </div>
-            <div class="row partial-pipe-file">
+            <div class="row partial-pipe-file partial-opt">
                 <div class="partial-pipe-interior">
                     <label class="btn btn-primary btn-md proto-tree-button">
-                        Choose file with alignment (optional) <input id="alignment-file" type="file" style="display: none" multiple/>
+                        Choose file with alignment (FASTA) <input id="alignment-file" type="file" style="display: none" multiple/>
                     </label>
                     <span class='label label-info' id="alignment-file-info"></span>
                 </div>
@@ -92,13 +108,13 @@
                 <div class="partial-pipe-file">
                     <div class="partial-pipe-interior">
                         <label class="btn btn-primary btn-md proto-tree-button">
-                            Choose file with tree (newick) <input id="tree-file" type="file" style="display: none" multiple/>
+                            Choose file with tree (Newick) <input id="tree-file" type="file" style="display: none" multiple/>
                         </label>
                         <span class='label label-info' id="tree-file-info"></span>
                     </div>
                 </div>
                 <div>
-                    <span id="partial-pipeline-message">To start the analysis both a file with protein sequences and a file with phylogenetic tree should be provided.</span>
+                    <span id="partial-pipeline-message">To start the analysis both a file with phylogenetic tree and a file with protein sequences and/or a file with the alignment should be provided. <p>Another option is to provide a file with phylogenetic tree and check "Retrieve sequences" below.</p></span>
                     <span id="malformed-newick">Malformed newick tree. Please correct the tree.</span>
                 </div>
                 <button id="GoAsyncPartial" class="btn btn-primary btn-md pull-right proto-tree-button" type="button">
@@ -160,7 +176,7 @@
                         Download Protein Features (JSON) <span class="glyphicon glyphicon-download-alt"> </span>
                     </a>
                     <a id="cdhit-clusters-load" class="btn btn-info btn-md proto-tree-button" href="#">
-                        CD-HIT clusters (TXT) <span class="glyphicon glyphicon-download-alt"> </span>
+                        CD-HIT clusters (.clstr) <span class="glyphicon glyphicon-download-alt"> </span>
                     </a>
                 </div>
             </div>
