@@ -36,8 +36,8 @@ USAGE = "\n\nThe script extracts domain information from the results of hmmscan 
 	[-n || --osecond]      - output file with counts of each domain architecture variant in tab delimited text format
 	[-b || --othird]       - output file  with domain information for each protein in json format
 	'''
-	
-	
+
+
 #Programs with full paths
 HMMSCAN_PROGRAM = None
 RPSBLAST_PROGRAM = None
@@ -89,9 +89,9 @@ PROT_NAME_TO_LENGTH = dict()
 DOMAIN_ARCHITECT_TO_COUNT_DICT = collections.defaultdict(int)
 PROTEIN_TO_SITES = collections.defaultdict(list)
 PROTEINS_TO_SEQUENCES = dict()
-    
+
 def initialyze(argv):
-	global HMMSCAN_PROGRAM, RPSBLAST_PROGRAM, RPSBPROC_PROGRAM, TMHMMSCAN_PROGRAM, INPUT_FILE_FASTA, PROCESS_TYPE, OUTPUT_RPSBLAST_OR_HMMSCAN, \
+	global HMMSCAN_PROGRAM, RPSBLAST_PROGRAM, RPSBPROC_PROGRAM, TMHMMSCAN_PROGRAM, SEGMASKER_PROGRAM, INPUT_FILE_FASTA, PROCESS_TYPE, OUTPUT_RPSBLAST_OR_HMMSCAN, \
 	OUTPUT_RPSBPROC, OUTPUT_TMHMMSCAN, OUTPUT_SEGMASKER, HMMSCAN_DB_PATH, RPSBLAST_DB_PATH, RPSBPROC_DB_PATH, DB_NAME, CPU, EVAL_THRESHOLD, HMMSCAN_PROBABILITY, \
 	GET_TAB, GET_JSON, RUN_SEGMASKER, PROTEIN_TO_DOMAININFO_FILE, DOMAIN_ARCHITECT_TO_COUNT_FILE, PROTEIN_TO_DOMAININFO_JSONFILE, PROTEIN_SITES_INCLUDE
 	try:
@@ -142,10 +142,10 @@ def initialyze(argv):
 			elif opt in ("-T", "--tmhmm2Path"):
 				TMHMMSCAN_PROGRAM = str(arg).strip()
 			elif opt in ("-S", "--segmaskerPath"):
-				SEGMASKER_PROGRAM = str(arg).strip()	
+				SEGMASKER_PROGRAM = str(arg).strip()
 			elif opt in ("-E", "--runSegmasker"):
 				if str(arg).strip() == "true":
-					RUN_SEGMASKER = True	
+					RUN_SEGMASKER = True
 			elif opt in ("-e", "--evalue"):
 				EVAL_THRESHOLD = float(arg)
 			elif opt in ("-y", "--probability"):
@@ -191,7 +191,7 @@ class Protein(object):
 		self.sequence = ""
 	def setRpsRegion(self, regionData, regionType):
 		if regionType == DOMAIN:
-			region = RpsDomainRegion()	
+			region = RpsDomainRegion()
 			region.domainName = regionData[9]
 			region.aliStart = int(regionData[4])
 			region.aliEnd = int(regionData[5])
@@ -222,11 +222,11 @@ class Protein(object):
 			self.sites.append(region)
 	def setHmmscanRegion(self, regionData, domain, description, regionType):
 		if regionType == DOMAIN:
-			region = HmmscanDomainRegion()	
+			region = HmmscanDomainRegion()
 			alignmentToModelType = regionData[8]
 			modelStart = int(regionData[6])
 			modelEnd = int(regionData[7])
-			modelLen = modelEnd - modelStart + 1 
+			modelLen = modelEnd - modelStart + 1
 			region.modelStart = modelStart
 			region.modelEnd = modelEnd
 			region.aliStart = int(regionData[9])
@@ -255,7 +255,7 @@ class Protein(object):
 		self.lowComplexity.append(LowComplexityRegion(lowCompStart, lowCompEnd))
 	def setSequence(sequence):
 		self.sequence = sequence
-		
+
 class HmmscanDomainRegion(object):
 	def __init__(self):
 		self.domainName = None
@@ -283,7 +283,7 @@ class RpsSiteRegion(object):
 		self.mapped_size = None
 		self.source_domain_pssmId = None
 		self.sitePositions = []
-		
+
 class RpsDomainRegion(object):
 	def __init__(self):
 		self.domainName = None
@@ -304,12 +304,12 @@ class TmRegion(object):
 	def __init__(self, tmSart, tmEnd):
 		self.tmSart = tmSart
 		self.tmEnd = tmEnd
-		
+
 class LowComplexityRegion(object):
 	def __init__(self, lowCompSart, lowCompEnd):
 		self.start = lowCompSart
-		self.end = lowCompEnd	
-		
+		self.end = lowCompEnd
+
 def processHmmscan():
 	domainListBegan = False
 	hitFound = False
@@ -317,7 +317,7 @@ def processHmmscan():
 	proteinObject = None
 	proteinName = None
 	regex = re.compile(r"\s")
-	try:	
+	try:
 		with open(OUTPUT_RPSBLAST_OR_HMMSCAN, "r") as hmmscanFile:
 			for record in hmmscanFile:
 				#Will work only if words in protein names do not have spaces
@@ -350,7 +350,7 @@ def processHmmscan():
 						currentQueryOld = currentQuery
 						currentQuery = currentQuery + " " + record.strip()
 					PROT_NAME_TO_LENGTH[currentQuery] = PROT_NAME_TO_LENGTH[currentQueryOld]
-					del PROT_NAME_TO_LENGTH[currentQueryOld]	
+					del PROT_NAME_TO_LENGTH[currentQueryOld]
 					if GET_JSON:
 						PROTREF_TO_DOMAINS[currentQuery] = proteinObject
 						del PROTREF_TO_DOMAINS[currentQueryOld]
@@ -371,7 +371,7 @@ def processHmmscan():
 							PROTREF_TO_DOMAIN_INFO[currentQuery].append([domain, envStart, envEnd])
 					if record == "Alignments for each domain:" or record == "Internal pipeline statistics summary:":
 						hitFound = False
-						domainListBegan = False		
+						domainListBegan = False
 	except Exception, e:
 		print "Problem happened: ", traceback.print_exc()
 		print "record", record
@@ -424,7 +424,7 @@ def processRpsbproc():
 					proteinObject.setRpsRegion(recordList, PROTEIN_SITE)
 			elif PROTEIN_SITES_INCLUDE and recordList[0] == "ENDSITES":
 				siteListBegan = False
-				
+
 def processTmscan():
 	with open(OUTPUT_TMHMMSCAN, "r") as tmmscanFile:
 		for line in tmmscanFile:
@@ -445,7 +445,7 @@ def processTmscan():
 				tm = "yes"
 				tmTopology = line[5].split("=")[1].replace("o", "i").strip("i")
 				topologyCoords = tmTopology.split("i")
-				#set Tm info on the existing protein object			
+				#set Tm info on the existing protein object
 				PROTREF_TO_DOMAINS[query].setTmInfo(first60, possibSigPep, tm, tmTopology)
 				for coordPair in topologyCoords:
 					PROTREF_TO_DOMAINS[query].setTmRegions(coordPair.split("-")[0], coordPair.split("-")[1])
@@ -460,18 +460,18 @@ def processSegmasker():
 				coords = record.strip().split(" - ")
 				PROTREF_TO_DOMAINS[currentProtein].setLowComplexityRegions(int(coords[0]) + 1, int(coords[1]) + 1)
 
-def formatSequence(sequence):	
+def formatSequence(sequence):
 	stringWithSpaceChars = ""
 	piece = int(math.floor(len(sequence)/SEQUENCE_LINE_LEN))
 	for ind in xrange(piece):
 		stringWithSpaceChars = stringWithSpaceChars + " " + sequence[ind*SEQUENCE_LINE_LEN:(ind+1)*SEQUENCE_LINE_LEN]
 	return (stringWithSpaceChars + " " + sequence[(ind+1)*SEQUENCE_LINE_LEN:]).strip()
-					
+
 def addFastaToDict():
 	with open(INPUT_FILE_FASTA, "r") as seqs:
 		for sequence in SeqIO.parse(seqs, "fasta"):
 			PROTEINS_TO_SEQUENCES[sequence.description.strip()] = formatSequence(str(sequence.seq))
-			
+
 def main(argv):
 	initialyze(argv)
 	addFastaToDict()
@@ -501,11 +501,11 @@ def main(argv):
 			for protein in PROTEIN_TO_SITES:
 				for site in PROTEIN_TO_SITES[protein]:
 					proteinToSitesFile.write(protein + "\t" +  "\t".join(site) + "\n")
-			
+
 	if GET_JSON:
 		with open(PROTEIN_TO_DOMAININFO_JSONFILE, "w") as proteinToDomainJson:
-				json.dump(PROTREF_TO_DOMAINS, proteinToDomainJson, 
-				default=lambda o: o.__dict__, 
+				json.dump(PROTREF_TO_DOMAINS, proteinToDomainJson,
+				default=lambda o: o.__dict__,
 				sort_keys=True, indent=4)
 
 def getSortedListOfDomains(proteint, protRefToDomainInfo):
@@ -530,7 +530,7 @@ def hmmscan():
 	if HMMSCAN_PROGRAM != None:
 		hmmscan = HMMSCAN_PROGRAM
 	runSubProcess(" ".join([hmmscan, "--noali", "--cpu", str(CPU), HMMSCAN_DB_PATH+DB_NAME, INPUT_FILE_FASTA, ">", OUTPUT_RPSBLAST_OR_HMMSCAN]))
-	
+
 def rpsBlast():
 	rpsblast = "rpsblast"
 	rpsbproc = "rpsbproc"
@@ -538,16 +538,16 @@ def rpsBlast():
 		rpsblast = RPSBLAST_PROGRAM
 	if RPSBPROC_PROGRAM != None:
 		rpsbproc = RPSBPROC_PROGRAM
-		
+
 	runSubProcess(" ".join([rpsblast, "-num_threads", CPU, "-evalue", "0.01", "-seg", "no", "-outfmt", "5", "-db", RPSBLAST_DB_PATH+DB_NAME, "-query", INPUT_FILE_FASTA, "-out", OUTPUT_RPSBLAST_OR_HMMSCAN]))
 	runSubProcess(" ".join([rpsbproc, "-d", RPSBPROC_DB_PATH, "-i", OUTPUT_RPSBLAST_OR_HMMSCAN, "-o", OUTPUT_RPSBPROC]))
-	
+
 def tmhmm2scan():
 	tmhmm = "/home/vadim/Softs/tmhmm-2.0c/bin/tmhmm"
 	if TMHMMSCAN_PROGRAM != None:
 		tmhmm = TMHMMSCAN_PROGRAM
 	runSubProcess(" ".join([tmhmm, "--short", INPUT_FILE_FASTA, ">", OUTPUT_TMHMMSCAN]))
-	
+
 def segMasker():
 	segmasker = "segmasker"
 	if SEGMASKER_PROGRAM != None:
@@ -560,32 +560,7 @@ def runSubProcess(command):
 	except OSError, osError:
 		print "osError " + osError
 		print traceback.print_exc()
-		
-		
+
+
 if __name__ == "__main__":
 	main(sys.argv)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
