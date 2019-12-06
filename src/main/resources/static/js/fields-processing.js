@@ -154,7 +154,12 @@ function takeCareOfFields() {
 
     $('#do-predict-features').prop("checked", true);
     $('#do-predict-features').change(function() {
-        $('#do-predict-features').prop("checked") ? $('.predict-features').show() : $('.predict-features').hide();
+        if ($('#do-predict-features').prop("checked")) {
+            $('.predict-features').show();
+            $('#hmmscan').prop("checked", true);
+            $('#rpsblast-db').hide();
+        } else
+            $('.predict-features').hide();
     });
 
     lcrStates = {"checked": true, "undefined": false};
@@ -173,6 +178,8 @@ function takeCareOfFields() {
         $("#first-area-message-partialP, #malformed-fasta-partialP, #second-area-message-partialP, #malformed-fasta-second-partialP, #partial-pipeline-message, malformed-newick").hide();
         if ($("#fetch-fromTree-value").prop("checked")) {
             $(".predict-features").show();
+            $('#hmmscan').prop("checked", true);
+            $('#rpsblast-db').hide();
             $(".partial-opt").hide();
             $("#alignment-file").val('');
             $("#alignment-file-info").html('');
@@ -191,6 +198,8 @@ function takeCareOfFields() {
     $("#sequence-file").change(function() {
         if($("#sequence-file").val() != null && $("#sequence-file").val() != "undefined") {
             $(".predict-features").show();
+            $('#rpsblast-db').hide();
+            $('#hmmscan').prop("checked", true);
             $("#do-predict-features").prop("checked", true);
             $("#do-predict-features").prop("disabled", true);
         } else {

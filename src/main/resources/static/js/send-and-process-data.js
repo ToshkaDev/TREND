@@ -51,6 +51,7 @@ $(document).ready(function (){
         $('#isFullPipeline').text("true");
 
         $(".predict-features").show();
+        $('#rpsblast-db').hide();
         $("#do-predict-features").prop("checked", true);
         $("#do-predict-features").prop("disabled", false);
     });
