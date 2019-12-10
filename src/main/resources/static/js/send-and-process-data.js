@@ -26,6 +26,7 @@ $(document).ready(function (){
         $('#options').hide();
     });
 
+    $('.active-second-area').hide();
     $('#addSecondArea').click(function() {
         $('.full-pipe, .second-area').trigger('reset');
         $('#first-file-info, #second-file-info').empty();
@@ -34,10 +35,12 @@ $(document).ready(function (){
         if ($('.second-area').css("display") !== "none") {
             $('#addSecondArea').html("Close Second Area");
             $('.fetch-fromIds1').hide();
+            $('.active-second-area').fadeIn();
         }
         else {
             $('#addSecondArea').html("Add Second Area");
             $('.fetch-fromIds1').show();
+            $('.active-second-area').fadeOut();
         }
     });
 

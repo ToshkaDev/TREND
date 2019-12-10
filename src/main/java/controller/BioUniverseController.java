@@ -93,7 +93,7 @@ public abstract class BioUniverseController {
                     listOfResultFileNames = bioJob.getBioJobResultList().stream().map(bjResult -> urlPath + bjResult.getResultFileName()).collect(Collectors.toList());
                     result.put(Status.result.getStatusEnum(), listOfResultFileNames);
                     result.put(Status.status.getStatusEnum(), statusReady);
-                } else if (bioJob.getStage().contains(Status.error.getStatusEnum())) {
+                } else if (bioJob.getStage() != null && bioJob.getStage().contains(Status.error.getStatusEnum())) {
                     List<String> statusError = new ArrayList<>(Arrays.asList(Status.error.getStatusEnum()));
                     if (bioJob.getStage().contains(Status.megaError.getStatusEnum()))
                         statusError.add(bioJob.getStage());

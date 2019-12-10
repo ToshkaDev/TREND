@@ -39,6 +39,9 @@
                 <span id="malformed-fasta">There should be at least 3 protein sequences to start the analysis.</span>
                 <span id="cannot-have-ids-and-seqs">You can't both provide sequences and check 'Retrieve sequences'</span>
             </div>
+            <div class="row active-second-area trend-text-colour">
+                <p>Full-length protein sequences go here.</p>
+            </div>
             <div class="row fetch-fromIds1">
                 <div class="checkbox">
                     <label><input id="fetch-fromIds-value1" type="checkbox">Retrieve sequences (NCBI and MiST)</label>
@@ -60,6 +63,9 @@
             <div class="row">
                 <span id="second-area-message">Wrong format. The fasta format is expected to begin with '>' sign.</span>
                 <span id="malformed-fasta-second">There should be at least 3 protein sequences to start the analysis.</span>
+            </div>
+            <div class="row active-second-area trend-text-colour">
+                <p>Fragments of protein sequences go here.</p>
             </div>
             <br /> <br />
         </form>
@@ -155,9 +161,21 @@
             If you are sure your input is correct please contact us providing the details of your analysis and the input.
         </div>
         <div class="col-md-12 text-center result-container">
-            <div class="btn-group" role="group" aria-label="...">
-                <a id="results-load" class="btn btn-info btn-lg proto-tree-button" href="#">
-                    Download Tree (SVG) <span class="glyphicon glyphicon-download-alt "> </span>
+            <div class="result-download-buttons">
+                <a id="results-load" class="btn btn-info btn-md proto-tree-button" href="#">
+                    Tree (SVG) <span class="glyphicon glyphicon-download-alt "> </span>
+                </a>
+                <a id="tree-load" class="btn btn-info btn-md proto-tree-button" href="#">
+                    Tree (Newick) <span class="glyphicon glyphicon-download-alt"> </span>
+                </a>
+                <a id="alignment-load" class="btn btn-info btn-md proto-tree-button" href="#">
+                    Alignment (FASTA) <span class="glyphicon glyphicon-download-alt"> </span>
+                </a>
+                <a id="features-load" class="btn btn-info btn-md proto-tree-button" href="#">
+                    Protein Features (JSON) <span class="glyphicon glyphicon-download-alt"> </span>
+                </a>
+                <a id="cdhit-clusters-load" class="btn btn-info btn-md proto-tree-button" href="#">
+                    CD-HIT clusters (.clstr) <span class="glyphicon glyphicon-download-alt"> </span>
                 </a>
             </div>
         </div>
@@ -166,24 +184,6 @@
                 <span id="jobId" th:text="${jobId}"></span>
             </div>
             <div id="svgContainer"></div>
-        </div>
-        <div class="row">
-            <div class="col-md-12 text-center result-container raw-files-containers">
-                <div class="secondary-buttons">
-                    <a id="tree-load" class="btn btn-info btn-md proto-tree-button" href="#">
-                        Download Tree (Newick) <span class="glyphicon glyphicon-download-alt"> </span>
-                    </a>
-                    <a id="alignment-load" class="btn btn-info btn-md proto-tree-button" href="#">
-                        Download Alignment (FASTA) <span class="glyphicon glyphicon-download-alt"> </span>
-                    </a>
-                    <a id="features-load" class="btn btn-info btn-md proto-tree-button" href="#">
-                        Download Protein Features (JSON) <span class="glyphicon glyphicon-download-alt"> </span>
-                    </a>
-                    <a id="cdhit-clusters-load" class="btn btn-info btn-md proto-tree-button" href="#">
-                        CD-HIT clusters (.clstr) <span class="glyphicon glyphicon-download-alt"> </span>
-                    </a>
-                </div>
-            </div>
         </div>
     </div>
 
