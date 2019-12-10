@@ -26,7 +26,6 @@ $(document).ready(function (){
         $('#options').hide();
     });
 
-    $('.active-second-area').hide();
     $('#addSecondArea').click(function() {
         $('.full-pipe, .second-area').trigger('reset');
         $('#first-file-info, #second-file-info').empty();
