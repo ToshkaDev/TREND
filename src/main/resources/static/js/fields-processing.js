@@ -109,6 +109,17 @@ function takeCareOfFields() {
         }
     });
 
+    $('input[name="tree-soft"]').change(function() {
+        var checkedOption = $('input[name="tree-soft"]:checked').val();
+        if (checkedOption === "fast-tree") {
+            $('.mega-tree').hide();
+            $('.fast-tree').show();
+        } else if (checkedOption === "mega-tree") {
+            $('.fast-tree').hide();
+            $('.mega-tree').show();
+        }
+    });
+
     treeMethodToPrefix = {"ML": "ml", "ME": "nj_me", "JN": "nj_me"};
 
     $('#tree-method').change(function() {
@@ -139,6 +150,10 @@ function takeCareOfFields() {
         phylogenyTest != "none" ? $(".number-of-replicates").show() : $(".number-of-replicates").hide();
     });
 
+    $("#phylo-test-ft").change(function() {
+        $("#phylo-test-ft").val() != "-nosupport" ? $(".number-of-replicates-ft").show() : $(".number-of-replicates-ft").hide();
+    });
+
     $("#reduce-redundancy").change(function() {
         var cdHit = $("#reduce-redundancy").prop("checked");
         cdHit ? $("#cd-hit").show() : $("#cd-hit").hide();
@@ -150,6 +165,7 @@ function takeCareOfFields() {
         $('#enumerate-value').removeAttr('checked');
         $('#tree-method, #ml-phylo-test, #nj_me-phylo-test, #gaps-missing').trigger('change');
         $('input[name="dom-prediction-program"]').trigger('change')
+        $('input[name="tree-soft"]').trigger('change')
     });
 
     $('#do-predict-features').prop("checked", true);

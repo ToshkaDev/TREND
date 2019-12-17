@@ -28,6 +28,7 @@ public enum  ParamPrefixes {
     MAFFT_PATH("-f "),
 
     //tree building specific parameters
+    TREE_BUILDING_PROGRAM("-B "),
     MEGACC_PATH("-k "),
     THREADS_GENERAL("-u "),
     TREE_BUILD_METHOD("-m "),

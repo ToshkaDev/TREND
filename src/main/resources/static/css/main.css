@@ -360,6 +360,10 @@ div.result-area {
 a, a:hover, a:focus, a:active {
     color: #cb2e2e;
 }
+
+.mega-tree {
+    display: none;
+}
 /*End of main area and filter options styles*/
 
 

@@ -52,6 +52,10 @@ OUTPUT_FILE_FIRST = "aligned_proteins.fa"
 OUTPUT_FILE_SECOND = "paramsForTree.mao"
 OUTPUT_FILE_THIRD = "newTree"
 
+
+TREE_BUILDING_PROGRAM = "fast-tree"
+FAST_TREE_PROGRAM = "FstTreeMP"
+
 #Options
 ML_PHYLOGENY_TESTS = {"none": "None", "bm": "Bootstrap method"}
 NJ_ME_PHYLOGENY_TESTS = {"none": "None", "bm": "Bootstrap method", "ib": "Interior-branch test"}
@@ -95,15 +99,27 @@ MAFFT_PROGRAM = None
 MEGACC_PROGRAM = None
 
 
+#FastTree options:
+#default test is Shimodaira-Hasegawa test
+PHYLOGENY_TEST_FT = ""
+SUBST_MODEL_FT = ""
+#deafult is not to use
+GAMMA_TWENTY_FT = ""
+PSEUDOCOUNTS_FT = ""
+NUMBER_OF_REPLICATES_FT = 1000
+
+
 
 def initialyze(argv):
 	global INPUT_FILE, DO_ALIGN, ALGORITHM, REORDER_OR_NOT, MAFFT_PROGRAM, MEGACC_PROGRAM, ALIGN_THREADS, OUTPUT_FILE_FIRST, TREE_METHOD, SUBST_MODEL, GAPS_MISSING, \
 	COVERAGE_CUTOFF, TREE_THREADS, TEST_OF_PHYLOGENY, BOOTSTRAPS, ML_INITIAL_TREE, SUBST_RATE, OUTPUT_FILE_SECOND, OUTPUT_FILE_THIRD, TREE_METHODS, BOOTSTRAP_CPU_NUMBER
+	global PHYLOGENY_TEST_FT, SUBST_MODEL_FT, GAMMA_TWENTY_FT, PSEUDOCOUNTS_FT, NUMBER_OF_REPLICATES_FT, TREE_BUILDING_PROGRAM
 	try:
-		opts, args = getopt.getopt(argv[1:],"hi:d:a:r:k:f:t:o:m:l:g:c:u:p:b:e:n:x:z:",
+		opts, args = getopt.getopt(argv[1:],"hi:d:a:r:k:f:t:o:m:l:g:c:u:p:b:e:n:x:z:P:M:G:S:R:B:",
 		["isequence=", "do_align=", "al_algorithm=", "reorder=", "megacc", "mafft=", "thread=", "oaligned=",
 		"tree_method=", "subst_model=", "gaps_missing=", "coverage_cutoff=",
-		"cpu=", "phylotest=" "bootstrap=", "initial_tree=", "subst_rate=", "otree_params", "otree="])
+		"cpu=", "phylotest=" "bootstrap=", "initial_tree=", "subst_rate=", "otree_params", "otree=", "phylotest_ft=",
+		"subst_model_ft=", "gamm20_ft=", "pseudocounts_ft=", "bootstrap_ft=", "tree_program="])
 		if len(opts) == 0:
 			raise getopt.GetoptError("Parameters are required\n")
 	except getopt.GetoptError as e:
@@ -174,7 +190,18 @@ def initialyze(argv):
 			OUTPUT_FILE_SECOND = str(arg).strip()
 		elif opt in ("-z", "--otree"):
 			OUTPUT_FILE_THIRD = str(arg).strip()
-
+		elif opt in ("-P", "--phylotest_ft"):
+			PHYLOGENY_TEST_FT = str(arg).strip()
+		elif opt in ("-M", "--subst_model_ft"):
+			SUBST_MODEL_FT = str(arg).strip()
+		elif opt in ("-G", "--gamm20_ft"):
+			GAMMA_TWENTY_FT = str(arg).strip()
+		elif opt in ("-S", "--pseudocounts_ft"):
+			PSEUDOCOUNTS_FT = str(arg).strip()
+		elif opt in ("-R", "--bootstrap_ft"):
+			NUMBER_OF_REPLICATES_FT = str(arg).strip()
+		elif opt in ("-B", "--tree_program"):
+			TREE_BUILDING_PROGRAM = str(arg).strip()
 	if TEST_OF_PHYLOGENY == "None":
 		BOOTSTRAPS = NOT_APPLICABLE
 	# if bootsrap test was set up use TREE_THREADS number of threads for bootstrapping
@@ -319,7 +346,7 @@ def align_sequences():
 		with open(INPUT_FILE, "r") as inputFile, open(OUTPUT_FILE_FIRST, "w") as outputFile:
 			outputFile.write(inputFile.read())
 
-def buildTree():
+def buildMegaTree():
 	megacc = "megacc"
 	if MEGACC_PROGRAM != None:
 		megacc = MEGACC_PROGRAM
@@ -332,6 +359,12 @@ def buildTree():
 			for param, val in subelement.items():
 				paramOutputFile.write(" = ".join([param, val]) + "\n")
 	runSubProcess(" ".join([megacc, "-a", OUTPUT_FILE_SECOND, "-d", OUTPUT_FILE_FIRST, "-n", "-o", OUTPUT_FILE_THIRD]), "buildTree()")
+
+def buildFastTree():
+	fastTree = "FastTreeMP"
+	if FAST_TREE_PROGRAM != None:
+		fastTree = FAST_TREE_PROGRAM
+	runSubProcess(" ".join([fastTree, PHYLOGENY_TEST_FT, SUBST_MODEL_FT, GAMMA_TWENTY_FT, PSEUDOCOUNTS_FT, "-boot ", NUMBER_OF_REPLICATES_FT, OUTPUT_FILE_FIRST, ">", OUTPUT_FILE_THIRD]), "buildTree()")
 
 def runSubProcess(command, processName):
 	try:
@@ -349,7 +382,10 @@ def runSubProcess(command, processName):
 def main(argv):
 	initialyze(argv)
 	align_sequences()
-	buildTree()
+	if TREE_BUILDING_PROGRAM == "fast-tree":
+		buildFastTree()
+	else:
+		buildMegaTree()
 
 if __name__ == "__main__":
 	main(sys.argv)

@@ -16,6 +16,9 @@ function getOptions() {
     	var secondFileArea = $('#second-file-area').val() ? $('#second-file-area').val().trim() : '';
 	}
 
+    var treeBuildingProgram = $('input[name="tree-soft"]:checked').val();
+
+    // Mega
     var doAlign = $('#do-align').prop("checked") ? "yes" : "no";
     var doPredictFeatures = $('#do-predict-features').prop("checked") ? "yes" : "no";
     var alignmentAlg = $('#alignment-alg').val();
@@ -27,6 +30,15 @@ function getOptions() {
     var numberOrReplicates = $('#number-of-replicates').val();
     var phylogenyTest = getOption("phylo-test");
     var aaSubstModel = getOption("subst-model");
+
+
+    //FastTree
+    var aaSubstModelFt = $('#subst-model-ft').val();
+    var gammaTwentyFt = $('#gamma-twenty-ft').prop("checked") ? "-gamma" : "";
+    var pseudoCountsFt = $('#pseudo-counts-ft').prop("checked") ? "-pseudo" : "";
+    var phylogenyTestFt = $('#phylo-test-ft').val();
+    var numberOrReplicatesFt = $('#number-of-replicates-ft').val();
+
 
     var domainPredictionProgram = $('input[name="dom-prediction-program"]:checked').val();
 
