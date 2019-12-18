@@ -46,7 +46,6 @@ public enum  ParamPrefixes {
     //FastTree params
     PHYLOGENY_TEST_FT("-P "),
     SUBST_MODEL_FT("-M "),
-    GAMMA_TWENTY_FT("-G "),
     PSEUDOCOUNTS_FT("-S "),
     NUMBER_OF_REPLICATES_FT("-R "),
     FAST_TREE_PATH("-K "),

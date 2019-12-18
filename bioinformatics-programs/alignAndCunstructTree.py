@@ -37,10 +37,10 @@ USAGE = "\nThis script align proteins using mafft in subporcess and build a phyl
 [-x || --otree_params]    -output file with parameters for megacc tree building (extension is '.mao')
 [-z || --otree]           -output file with the constuctred tree
 [-P || --phylotest_ft]    -phylogeny test for FastTree: 'nome' (Minimum-evolution bootstrap), 'nosupport', '' (deafult: Shimodaira-Hasegawa test<)
-[-M || --subst_model_ft]  -amino acid substitution model for FastTree: '' (default is JTT), 'wag' or 'lg'
+[-M || --subst_model_ft]  -amino acid substitution model for FastTree: 'jtt' (default is JTT), 'wag' or 'lg'
 [-S || --pseudocounts_ft] -psudocounts; use when there are a lot of gaps in the alignment: 'yes' or 'no'
 [-R || --bootstrap_ft]    -number of phylogeny test replicates (FastTree)
--B 	|| --tree_program     -tree building program to use: Mega or FastTree: FastTree or Mega
+-B 	|| --tree_program     -tree building program to use: FastTree or Mega
 -K  || --fast_tree_program -full path to FastTree program
 '''
 
