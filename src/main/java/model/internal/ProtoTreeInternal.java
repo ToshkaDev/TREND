@@ -1,6 +1,7 @@
 package model.internal;
 
-import org.springframework.web.multipart.MultipartFile;
+import enums.MiscEnum;
+import enums.ParamPrefixes;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -27,7 +28,6 @@ public class ProtoTreeInternal {
     private String numberOrReplicates;
 
     private String aaSubstModelFt;
-    private String gammaTwentyFt;
     private String pseudoCountsFt;
     private String phylogenyTestFt;
     private String numberOrReplicatesFt;
@@ -222,14 +222,6 @@ public class ProtoTreeInternal {
         this.aaSubstModelFt = aaSubstModelFt;
     }
 
-    public String getGammaTwentyFt() {
-        return gammaTwentyFt;
-    }
-
-    public void setGammaTwentyFt(String gammaTwentyFt) {
-        this.gammaTwentyFt = gammaTwentyFt;
-    }
-
     public String getPseudoCountsFt() {
         return pseudoCountsFt;
     }
@@ -325,17 +317,25 @@ public class ProtoTreeInternal {
 
         if (getDoAlign() != null)
             fieldsForAlignmentAndTreeBuild.add(getDoAlign());
-
         fieldsForAlignmentAndTreeBuild.add(getAlignmentFile());
         fieldsForAlignmentAndTreeBuild.add(getAlignmentAlg());
-        fieldsForAlignmentAndTreeBuild.add(getTreeBuildMethod());
-        fieldsForAlignmentAndTreeBuild.add(getAaSubstModel());
-        fieldsForAlignmentAndTreeBuild.add(getAaSubstRate());
-        fieldsForAlignmentAndTreeBuild.add(getInitialTreeForMl());
-        fieldsForAlignmentAndTreeBuild.add(getGapsAndMissingData());
-        fieldsForAlignmentAndTreeBuild.add(getSiteCovCutOff());
-        fieldsForAlignmentAndTreeBuild.add(getPhylogenyTest());
-        fieldsForAlignmentAndTreeBuild.add(getNumberOrReplicates());
+        fieldsForAlignmentAndTreeBuild.add(getTreeBuildingProgram());
+        if (getTreeBuildingProgram().equals(ParamPrefixes.TREE_BUILDING_PROGRAM.getPrefix() + MiscEnum.MEGA.getProgram())) {
+            fieldsForAlignmentAndTreeBuild.add(getTreeBuildMethod());
+            fieldsForAlignmentAndTreeBuild.add(getAaSubstModel());
+            fieldsForAlignmentAndTreeBuild.add(getAaSubstRate());
+            fieldsForAlignmentAndTreeBuild.add(getInitialTreeForMl());
+            fieldsForAlignmentAndTreeBuild.add(getGapsAndMissingData());
+            fieldsForAlignmentAndTreeBuild.add(getSiteCovCutOff());
+            fieldsForAlignmentAndTreeBuild.add(getPhylogenyTest());
+            fieldsForAlignmentAndTreeBuild.add(getNumberOrReplicates());
+        } else if (getTreeBuildingProgram().equals(ParamPrefixes.TREE_BUILDING_PROGRAM.getPrefix() + MiscEnum.FAST_TREE.getProgram())) {
+            fieldsForAlignmentAndTreeBuild.add(getPhylogenyTestFt());
+            fieldsForAlignmentAndTreeBuild.add(getPseudoCountsFt());
+            fieldsForAlignmentAndTreeBuild.add(getAaSubstModelFt());
+            fieldsForAlignmentAndTreeBuild.add(getNumberOrReplicatesFt());
+        }
+
 
         fieldsForFeaturesPrediction.add(getFirstFileName());
         fieldsForFeaturesPrediction.add(geteValue());

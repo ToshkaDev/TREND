@@ -92,6 +92,7 @@ program.tmhmm2Path=/home/bioverse/trend/Soft/tmhmm-2.0c/bin/tmhmm
 program.segmaskerPath=/home/bioverse/trend/Soft/ncbi-blast-2.6.0+/bin/segmasker
 program.mafft=/home/bioverse/trend/Soft/mafft/target_dir/bin/mafft
 program.megacc=/home/bioverse/trend/Soft/megacc/megacc
+program.fastTree=/home/bioverse/trend/Soft/FastTreeMP
 program.cdhit=/home/bioverse/trend/Soft/cd-hit-v4.8.1-2019-0228/cd-hit
 program.cdhitMemory=2000
 

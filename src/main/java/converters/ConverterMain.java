@@ -31,12 +31,11 @@ public class ConverterMain {
         protoTreeInternal.setNumberOrReplicates(checkForNullAndGet(ParamPrefixes.NUMBER_OF_REPLICATES.getPrefix(), protoTreeRequest.getNumberOrReplicates()));
 		protoTreeInternal.setAlignmentAlg(checkForNullAndGet(ParamPrefixes.ALGORITHM.getPrefix(), protoTreeRequest.getAlignmentAlg()));
 
-		protoTreeInternal.setTreeBuildingProgram(checkForNullAndGet(ParamPrefixes.TREE_BUILDING_PROGRAM.getPrefix(), protoTreeInternal.getTreeBuildingProgram()));
-		protoTreeInternal.setAaSubstModelFt(checkForNullAndGet("", protoTreeInternal.getAaSubstModelFt()));
-		protoTreeInternal.setGammaTwentyFt(checkForNullAndGet("", protoTreeInternal.getGammaTwentyFt()));
-		protoTreeInternal.setPseudoCountsFt(checkForNullAndGet("", protoTreeInternal.getPseudoCountsFt()));
-		protoTreeInternal.setPhylogenyTestFt(checkForNullAndGet("", protoTreeInternal.getPhylogenyTestFt()));
-		protoTreeInternal.setNumberOrReplicatesFt(checkForNullAndGet(ParamPrefixes.NUMBER_OF_REPLICATES.getPrefix(), protoTreeInternal.getNumberOrReplicatesFt()));
+		protoTreeInternal.setTreeBuildingProgram(checkForNullAndGet(ParamPrefixes.TREE_BUILDING_PROGRAM.getPrefix(), protoTreeRequest.getTreeBuildingProgram()));
+		protoTreeInternal.setAaSubstModelFt(checkForNullAndGet(ParamPrefixes.SUBST_MODEL_FT.getPrefix(), protoTreeRequest.getAaSubstModelFt()));
+		protoTreeInternal.setPseudoCountsFt(checkForNullAndGet(ParamPrefixes.PSEUDOCOUNTS_FT.getPrefix(), protoTreeRequest.getPseudoCountsFt()));
+		protoTreeInternal.setPhylogenyTestFt(checkForNullAndGet(ParamPrefixes.PHYLOGENY_TEST_FT.getPrefix(), protoTreeRequest.getPhylogenyTestFt()));
+		protoTreeInternal.setNumberOrReplicatesFt(checkForNullAndGet(ParamPrefixes.NUMBER_OF_REPLICATES_FT.getPrefix(), protoTreeRequest.getNumberOrReplicatesFt()));
 
 		protoTreeInternal.setDoPredictFeatures(checkForNullAndGet(ParamPrefixes.DO_PREDICT_FETURES.getPrefix(), protoTreeRequest.getDoPredictFeatures()));
 		protoTreeInternal.setDomainPredictionProgram(checkForNullAndGet(ParamPrefixes.DOMAINS_PREDICTION_PROGRAM.getPrefix(), protoTreeRequest.getDomainPredictionProgram()));

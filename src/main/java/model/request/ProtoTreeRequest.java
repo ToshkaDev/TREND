@@ -23,7 +23,6 @@ public class ProtoTreeRequest {
     private String alignmentAlg;
 
     private String aaSubstModelFt;
-    private String gammaTwentyFt;
     private String pseudoCountsFt;
     private String phylogenyTestFt;
     private String numberOrReplicatesFt;
@@ -193,14 +192,6 @@ public class ProtoTreeRequest {
 
     public void setAaSubstModelFt(String aaSubstModelFt) {
         this.aaSubstModelFt = aaSubstModelFt;
-    }
-
-    public String getGammaTwentyFt() {
-        return gammaTwentyFt;
-    }
-
-    public void setGammaTwentyFt(String gammaTwentyFt) {
-        this.gammaTwentyFt = gammaTwentyFt;
     }
 
     public String getPseudoCountsFt() {

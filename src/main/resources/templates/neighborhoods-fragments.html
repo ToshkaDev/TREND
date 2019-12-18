@@ -73,89 +73,124 @@
                             <option value="--maxiterate 1000 --genafpair">E-INS-i</option>
                             <option value="--maxiterate 1000 --globalpair">G-INS-i</option>
                         </select>
-                        <h3 class="text-info">Tree Building (Mega):</h3>
-                        <span>Tree Building Method:</span>
-                        <select id="tree-method" class="form-control input-md">
-                            <option selected='selected' value="JN">Neighbour Joining</option>
-                            <option value="ML">Maximum Likelihood</option>
-                            <option value="ME">Minimum Evolution</option>
-                        </select>
-                        <div class="ml-options">
+                        <h3 class="text-info">Tree Building:</h3>
+                        <div class="radio tree-soft">
+                            <label>
+                                <input id="fast-tree-soft" name="tree-soft" type="radio" value="FastTree" checked="checked" />FastTree
+                            </label>
+                        </div>
+                        <div class="radio tree-soft">
+                            <label>
+                                <input id="mega-soft" name="tree-soft" type="radio" value="Mega"/>Mega
+                            </label>
+                        </div>
+                        <div class="fast-tree">
                             <span>A.A. Substitution Model:</span>
-                            <select id="ml-subst-model" class="form-control input-md">
-                                <option selected='selected' value="jtt">Jones-Taylor-Thornton (JTT) model</option>
-                                <option value="pm">Poisson model</option>
-                                <option value="eim">Equal input model</option>
-                                <option value="dm">Dayhoff model</option>
-                                <option value="dmf">Dayhoff model with Freqs. (F+)</option>
-                                <option value="jttf">JTT with Freqs. (F+) model</option>
-                                <option value="wm">WAG model</option>
-                                <option value="wmf">WAG with Freqs. (F+) model</option>
-                                <option value="lg">LG model</option>
-                                <option value="lgf">LG with Freqs. (F+) model</option>
-                                <option value="grm">General Reversible Mitochondrial (mtREV)</option>
-                                <option value="grmf">mtREV with Freqs. (F+) model</option>
-                                <option value="grc">General Reversible Chloroplast (cpREV)</option>
-                                <option value="grcf">cpREV with Freqs. (F+) model</option>
-                                <option value="grt">General Reversible Transcriptase model (rtREV)</option>
-                                <option value="grtf">rtREV with Freqs. (F+) model</option>
+                            <select id="subst-model-ft" class="form-control input-md">
+                                <option selected='selected' value="jtt">JTT+CAT</option>
+                                <option value="wag">WAG+CAT</option>
+                                <option value="lg">LG+CAT</option>
                             </select>
+                            <div class="ft-options">
+                                <span>Phylogeny Test:</span>
+                                <select id="phylo-test-ft" class="form-control input-md">
+                                    <option value="nosupport">None</option>
+                                    <option selected='selected' value="sh">Shimodaira-Hasegawa test</option>
+                                    <option value="nome">Minimum-evolution bootstrap</option>
+                                </select>
+                            </div>
+                            <div class="number-of-replicates-ft">
+                                <span>Number of replicates:</span>
+                                <input min="50" max="10000" value="1000" id="number-of-replicates-ft" name="number-of-ft-replicates" type="number" class="form-control input-md"/>
+                            </div>
+                            <div class="checkbox">
+                                <label><input id="pseudo-counts-ft" type="checkbox">Use pseudocounts (recommended for highly gapped sequences)</label>
+                            </div>
                         </div>
-                        <div class="nj-and-me-options">
-                            <span>A.A. Substitution Model:</span>
-                            <select id="nj_me-subst-model" class="form-control input-md">
-                                <option selected='selected' value="jtt">Jones-Taylor-Thornton (JTT) model</option>
-                                <option value="nd">No. of differences</option>
-                                <option value="pd">p-distance</option>
-                                <option value="pm">Poisson model</option>
-                                <option value="eim">Equal input model</option>
-                                <option value="dm">Dayhoff model</option>
+                        <div class="mega-tree">
+                            <span>Tree Building Method:</span>
+                            <select id="tree-method" class="form-control input-md">
+                                <option selected='selected' value="JN">Neighbour Joining</option>
+                                <option value="ML">Maximum Likelihood</option>
+                                <option value="ME">Minimum Evolution</option>
                             </select>
-                        </div>
-                        <span>A.A. Substitution Rate:</span>
-                        <select id="subst-rate" class="form-control input-md">
-                            <option selected='selected' value="ur">Uniform Rates</option>
-                            <option value="gd">Gamma Distributed (G)</option>
-                            <option value="ir">Has Invariant Sites (I)</option>
-                            <option value="gir">Gamma Distributed With Invariant Sites (G+I)</option>
-                        </select>
-                        <div class="ml-options">
-                            <span>Initial tree for ML:</span>
-                            <select id="initial-tree-ml" class="form-control input-md">
-                                <option selected='selected' value="njBio">Make initial tree automatically (Default - NJ/BioNJ)</option>
-                                <option value="mp">Make initial tree automatically (Maximum parsimony)</option>
-                                <option value="nj">Make initial tree automatically (Neighbor joining)</option>
-                                <option value="bioNj">Make initial tree automatically (BioNJ)</option>
+                            <div class="ml-options">
+                                <span>A.A. Substitution Model:</span>
+                                <select id="ml-subst-model" class="form-control input-md">
+                                    <option selected='selected' value="jtt">Jones-Taylor-Thornton (JTT) model</option>
+                                    <option value="pm">Poisson model</option>
+                                    <option value="eim">Equal input model</option>
+                                    <option value="dm">Dayhoff model</option>
+                                    <option value="dmf">Dayhoff model with Freqs. (F+)</option>
+                                    <option value="jttf">JTT with Freqs. (F+) model</option>
+                                    <option value="wm">WAG model</option>
+                                    <option value="wmf">WAG with Freqs. (F+) model</option>
+                                    <option value="lg">LG model</option>
+                                    <option value="lgf">LG with Freqs. (F+) model</option>
+                                    <option value="grm">General Reversible Mitochondrial (mtREV)</option>
+                                    <option value="grmf">mtREV with Freqs. (F+) model</option>
+                                    <option value="grc">General Reversible Chloroplast (cpREV)</option>
+                                    <option value="grcf">cpREV with Freqs. (F+) model</option>
+                                    <option value="grt">General Reversible Transcriptase model (rtREV)</option>
+                                    <option value="grtf">rtREV with Freqs. (F+) model</option>
+                                </select>
+                            </div>
+                            <div class="nj-and-me-options">
+                                <span>A.A. Substitution Model:</span>
+                                <select id="nj_me-subst-model" class="form-control input-md">
+                                    <option selected='selected' value="jtt">Jones-Taylor-Thornton (JTT) model</option>
+                                    <option value="nd">No. of differences</option>
+                                    <option value="pd">p-distance</option>
+                                    <option value="pm">Poisson model</option>
+                                    <option value="eim">Equal input model</option>
+                                    <option value="dm">Dayhoff model</option>
+                                </select>
+                            </div>
+                            <span>A.A. Substitution Rate:</span>
+                            <select id="subst-rate" class="form-control input-md">
+                                <option selected='selected' value="ur">Uniform Rates</option>
+                                <option value="gd">Gamma Distributed (G)</option>
+                                <option value="ir">Has Invariant Sites (I)</option>
+                                <option value="gir">Gamma Distributed With Invariant Sites (G+I)</option>
                             </select>
-                        </div>
-                        <span>Gaps and Missing Data:</span>
-                        <select id="gaps-missing" class="form-control input-md">
-                            <option selected='selected' value="compDel">Complete deletion</option>
-                            <option value="partDel">Partial deletion</option>
-                            <option value="pairDel">Pairwise deletion</option>
-                        </select>
-                        <div class="cov-cutoff">
-                            <span>Site Coverage Cutoff:</span>
-                            <input value="95" id="site-cov-cutoff" name="site-cov-cutoff" type="text" class="form-control input-sm"/>
-                        </div>
-                        <div class="nj-and-me-options">
-                            <span>Phylogeny Test:</span>
-                            <select id="nj_me-phylo-test" class="form-control input-md">
-                                <option selected='selected' value="none">None</option>
-                                <option value="bm">Bootstrap method</option>
-                                <option value="ib">Interior-branch test</option>
+                            <div class="ml-options">
+                                <span>Initial tree for ML:</span>
+                                <select id="initial-tree-ml" class="form-control input-md">
+                                    <option selected='selected' value="njBio">Make initial tree automatically (Default - NJ/BioNJ)</option>
+                                    <option value="mp">Make initial tree automatically (Maximum parsimony)</option>
+                                    <option value="nj">Make initial tree automatically (Neighbor joining)</option>
+                                    <option value="bioNj">Make initial tree automatically (BioNJ)</option>
+                                </select>
+                            </div>
+                            <span>Gaps and Missing Data:</span>
+                            <select id="gaps-missing" class="form-control input-md">
+                                <option selected='selected' value="compDel">Complete deletion</option>
+                                <option value="partDel">Partial deletion</option>
+                                <option value="pairDel">Pairwise deletion</option>
                             </select>
-                        </div>
-                        <div class="ml-options">
-                            <span>Phylogeny Test:</span>
-                            <select id="ml-phylo-test" class="form-control input-md">
-                                <option selected='selected' value="none">None</option>
-                                <option value="bm">Bootstrap method</option>
-                            </select>
-                        </div>
-                        <div class="number-of-replicates">
-                            <span>Number of replicates:</span>
-                            <input value="100" id="number-of-replicates" name="number-of-replicates" type="text" class="form-control input-md"/>
+                            <div class="cov-cutoff">
+                                <span>Site Coverage Cutoff:</span>
+                                <input value="95" id="site-cov-cutoff" name="site-cov-cutoff" type="text" class="form-control input-sm"/>
+                            </div>
+                            <div class="nj-and-me-options">
+                                <span>Phylogeny Test:</span>
+                                <select id="nj_me-phylo-test" class="form-control input-md">
+                                    <option selected='selected' value="none">None</option>
+                                    <option value="bm">Bootstrap method</option>
+                                    <option value="ib">Interior-branch test</option>
+                                </select>
+                            </div>
+                            <div class="ml-options">
+                                <span>Phylogeny Test:</span>
+                                <select id="ml-phylo-test" class="form-control input-md">
+                                    <option selected='selected' value="none">None</option>
+                                    <option value="bm">Bootstrap method</option>
+                                </select>
+                            </div>
+                            <div class="number-of-replicates">
+                                <span>Number of replicates:</span>
+                                <input value="100" id="number-of-replicates" name="number-of-replicates" type="number" class="form-control input-md"/>
+                            </div>
                         </div>
                         <h3 class="text-info">Gene neighbors:</h3>
                         <div class="numberOf-neighbors">

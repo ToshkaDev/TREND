@@ -111,10 +111,10 @@ function takeCareOfFields() {
 
     $('input[name="tree-soft"]').change(function() {
         var checkedOption = $('input[name="tree-soft"]:checked').val();
-        if (checkedOption === "fast-tree") {
+        if (checkedOption === "FastTree") {
             $('.mega-tree').hide();
             $('.fast-tree').show();
-        } else if (checkedOption === "mega-tree") {
+        } else if (checkedOption === "Mega") {
             $('.fast-tree').hide();
             $('.mega-tree').show();
         }
@@ -151,7 +151,7 @@ function takeCareOfFields() {
     });
 
     $("#phylo-test-ft").change(function() {
-        $("#phylo-test-ft").val() != "-nosupport" ? $(".number-of-replicates-ft").show() : $(".number-of-replicates-ft").hide();
+        $("#phylo-test-ft").val() != "nosupport" ? $(".number-of-replicates-ft").show() : $(".number-of-replicates-ft").hide();
     });
 
     $("#reduce-redundancy").change(function() {
@@ -164,6 +164,7 @@ function takeCareOfFields() {
         $('#lc-value').removeAttr('checked');
         $('#enumerate-value').removeAttr('checked');
         $('#tree-method, #ml-phylo-test, #nj_me-phylo-test, #gaps-missing').trigger('change');
+        $("#phylo-test-ft").trigger('change');
         $('input[name="dom-prediction-program"]').trigger('change')
         $('input[name="tree-soft"]').trigger('change')
     });
