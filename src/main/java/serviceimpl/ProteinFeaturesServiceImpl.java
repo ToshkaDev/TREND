@@ -4,6 +4,7 @@ import java.util.*;
 
 import biojobs.BioJobDao;
 import biojobs.BioJobResultDao;
+import enums.MiscEnum;
 import enums.Status;
 import enums.ParamPrefixes;
 import model.internal.ProtoTreeInternal;
@@ -206,9 +207,12 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
         String outAlgnFile = super.getRandomFileName(".fa");
         String outNewickTree = super.getRandomFileName("noPostfix");
         argsForAlignmentAndTree.addAll(protoTreeInternal.getFieldsForAlignmentAndTreeBuild());
+        String programPath = ParamPrefixes.FAST_TREE_PATH.getPrefix() + super.getProperties().getFastTree();
+        if (protoTreeInternal.getTreeBuildingProgram().equals(ParamPrefixes.TREE_BUILDING_PROGRAM.getPrefix() + MiscEnum.MEGA.getProgram()))
+            programPath = ParamPrefixes.MEGACC_PATH.getPrefix() + super.getProperties().getMegacc();
         argsForAlignmentAndTree.addAll(Arrays.asList(
                 ParamPrefixes.MAFFT_PATH.getPrefix() + super.getProperties().getMafft(),
-                ParamPrefixes.MEGACC_PATH.getPrefix() + super.getProperties().getMegacc(),
+                programPath,
                 ParamPrefixes.OUTPUT_PARAMS.getPrefix() + super.getRandomFileName(null),
                 ParamPrefixes.OUTPUT_TREE.getPrefix() + outNewickTree,
                 ParamPrefixes.THREADS_MAFFT.getPrefix() + super.getProperties().getMafftThreadNum(),
@@ -222,10 +226,13 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
 
         String proteinFeaturesChangedOutFile = super.getRandomFileName(".json");
         argsForTreeWithDomains.addAll(protoTreeInternal.getFieldsForTreeAndDomains());
+        String inputNewickTree = ParamPrefixes.INPUT_THIRD.getPrefix() + outNewickTree;
+        if (protoTreeInternal.getTreeBuildingProgram().equals(ParamPrefixes.TREE_BUILDING_PROGRAM.getPrefix() + MiscEnum.MEGA.getProgram()))
+            inputNewickTree = ParamPrefixes.INPUT_THIRD.getPrefix() + outNewickTree + ".nwk";
         argsForTreeWithDomains.addAll(Arrays.asList(
                 protoTreeInternal.getDoPredictFeatures(),
                 ParamPrefixes.INPUT_SECOND.getPrefix() + outAlgnFile,
-                ParamPrefixes.INPUT_THIRD.getPrefix() + outNewickTree + ".nwk",
+                inputNewickTree,
                 ParamPrefixes.INPUT_FOURTH.getPrefix() + proteinFeaturesOutFile,
                 ParamPrefixes.OUTPUT.getPrefix() + outOrderedAlgnFile,
                 ParamPrefixes.OUTPUT_SECOND.getPrefix() + outSvgFile,
@@ -485,7 +492,7 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
             try {
                 super.launchProcess(commandArgument, protoTreeInternal);
             } catch (Exception exception) {
-                if (exception.getMessage().contains(Status.megaError.getStatusEnum()))
+                if (exception.getMessage() != null && exception.getMessage().contains(Status.megaError.getStatusEnum()))
                     super.saveError(protoTreeInternal, exception.getMessage());
                 else
                     super.saveError(protoTreeInternal, null);

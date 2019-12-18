@@ -53,6 +53,7 @@ public class AppProperties {
     private String segmaskerPath = "/home/vadim/Softs/ncbi-blast-2.6.0+/bin/segmasker";
     private String mafft = "/usr/bin/mafft";
     private String megacc = "/usr/bin/megacc";
+    private String fastTree = "/home/vadim/bin/FastTreeMP";
     private String cdhit = "/usr/local/bin/cd-hit";
     private String cdhitThreadNum = "4";
     // 2000 MB
@@ -335,6 +336,14 @@ public class AppProperties {
 
     public void setMegacc(String megacc) {
         this.megacc = megacc;
+    }
+
+    public String getFastTree() {
+        return fastTree;
+    }
+
+    public void setFastTree(String fastTree) {
+        this.fastTree = fastTree;
     }
 
     public String getRpsblastCddSuper() {

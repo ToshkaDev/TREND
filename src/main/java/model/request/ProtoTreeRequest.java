@@ -10,6 +10,7 @@ public class ProtoTreeRequest {
     private MultipartFile treeFile;
     private String treeFileArea;
 
+    private String treeBuildingProgram;
     private String doAlign;
     private String treeBuildMethod;
     private String aaSubstModel;
@@ -20,6 +21,11 @@ public class ProtoTreeRequest {
     private String phylogenyTest;
     private String numberOrReplicates;
     private String alignmentAlg;
+
+    private String aaSubstModelFt;
+    private String pseudoCountsFt;
+    private String phylogenyTestFt;
+    private String numberOrReplicatesFt;
 
     private String doPredictFeatures;
     private String domainPredictionProgram;
@@ -170,6 +176,46 @@ public class ProtoTreeRequest {
 
     public void setNumberOrReplicates(String numberOrReplicates) {
         this.numberOrReplicates = numberOrReplicates;
+    }
+
+    public String getTreeBuildingProgram() {
+        return treeBuildingProgram;
+    }
+
+    public void setTreeBuildingProgram(String treeBuildingProgram) {
+        this.treeBuildingProgram = treeBuildingProgram;
+    }
+
+    public String getAaSubstModelFt() {
+        return aaSubstModelFt;
+    }
+
+    public void setAaSubstModelFt(String aaSubstModelFt) {
+        this.aaSubstModelFt = aaSubstModelFt;
+    }
+
+    public String getPseudoCountsFt() {
+        return pseudoCountsFt;
+    }
+
+    public void setPseudoCountsFt(String pseudoCountsFt) {
+        this.pseudoCountsFt = pseudoCountsFt;
+    }
+
+    public String getPhylogenyTestFt() {
+        return phylogenyTestFt;
+    }
+
+    public void setPhylogenyTestFt(String phylogenyTestFt) {
+        this.phylogenyTestFt = phylogenyTestFt;
+    }
+
+    public String getNumberOrReplicatesFt() {
+        return numberOrReplicatesFt;
+    }
+
+    public void setNumberOrReplicatesFt(String numberOrReplicatesFt) {
+        this.numberOrReplicatesFt = numberOrReplicatesFt;
     }
 
     public String getDoPredictFeatures() {

@@ -2,6 +2,7 @@ package serviceimpl;
 
 import biojobs.BioJobDao;
 import biojobs.BioJobResultDao;
+import enums.MiscEnum;
 import enums.Status;
 import enums.ParamPrefixes;
 import exceptions.IncorrectRequestException;
@@ -108,10 +109,13 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
         String outAlgnFile = super.getRandomFileName(".fa");
         String outNewickTree = super.getRandomFileName("noPostfix");
         argsForAlignmentAndTree.addAll(protoTreeInternal.getFieldsForAlignmentAndTreeBuild());
+        String programPath = ParamPrefixes.FAST_TREE_PATH.getPrefix() + super.getProperties().getFastTree();
+        if (protoTreeInternal.getTreeBuildingProgram().equals(ParamPrefixes.TREE_BUILDING_PROGRAM.getPrefix() + MiscEnum.MEGA.getProgram()))
+            programPath = ParamPrefixes.MEGACC_PATH.getPrefix() + super.getProperties().getMegacc();
         argsForAlignmentAndTree.addAll(Arrays.asList(
                 ParamPrefixes.MAFFT_PATH.getPrefix() + super.getProperties().getMafft(),
-                ParamPrefixes.MEGACC_PATH.getPrefix() + super.getProperties().getMegacc(),
-                ParamPrefixes.OUTPUT_PARAMS.getPrefix() + super.getPrefix() + UUID.randomUUID().toString() + super.getPostfix(),
+                programPath,
+                ParamPrefixes.OUTPUT_PARAMS.getPrefix() + super.getRandomFileName(null),
                 ParamPrefixes.OUTPUT_TREE.getPrefix() + outNewickTree,
                 ParamPrefixes.THREADS_MAFFT.getPrefix() + super.getProperties().getMafftThreadNum(),
                 ParamPrefixes.THREADS_GENERAL.getPrefix() + super.getProperties().getMegaThreadNum(),
@@ -122,9 +126,12 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
         String outOrderedAlgnFile = super.getRandomFileName(".fa");
 
         argsForTreeEnumerate.addAll(protoTreeInternal.getFieldsForTreeAndDomains());
+        String inputNewickTree = ParamPrefixes.INPUT_THIRD.getPrefix() + outNewickTree;
+        if (protoTreeInternal.getTreeBuildingProgram().equals(ParamPrefixes.TREE_BUILDING_PROGRAM.getPrefix() + MiscEnum.MEGA.getProgram()))
+            inputNewickTree = ParamPrefixes.INPUT_THIRD.getPrefix() + outNewickTree + ".nwk";
         argsForTreeEnumerate.addAll(Arrays.asList(
                 ParamPrefixes.INPUT_SECOND.getPrefix() + outAlgnFile,
-                ParamPrefixes.INPUT_THIRD.getPrefix() + outNewickTree + ".nwk",
+                inputNewickTree,
                 ParamPrefixes.OUTPUT.getPrefix() + outOrderedAlgnFile,
                 ParamPrefixes.OUTPUT_THIRD.getPrefix() + outNewickFile
         ));
@@ -205,7 +212,7 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
             try {
                 super.launchProcess(commandArgument, protoTreeInternal);
             } catch (Exception exception) {
-                if (exception.getMessage().contains(Status.megaError.getStatusEnum()))
+                if (exception!= null && exception.getMessage().contains(Status.megaError.getStatusEnum()))
                     super.saveError(protoTreeInternal, exception.getMessage());
                 else
                     super.saveError(protoTreeInternal, null);

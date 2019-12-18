@@ -28,6 +28,8 @@ public enum  ParamPrefixes {
     MAFFT_PATH("-f "),
 
     //tree building specific parameters
+    //Mega params
+    TREE_BUILDING_PROGRAM("-B "),
     MEGACC_PATH("-k "),
     THREADS_GENERAL("-u "),
     TREE_BUILD_METHOD("-m "),
@@ -40,6 +42,13 @@ public enum  ParamPrefixes {
     NUMBER_OF_REPLICATES("-b "),
     OUTPUT_PARAMS("-x "),
     OUTPUT_TREE("-z "),
+
+    //FastTree params
+    PHYLOGENY_TEST_FT("-P "),
+    SUBST_MODEL_FT("-M "),
+    PSEUDOCOUNTS_FT("-S "),
+    NUMBER_OF_REPLICATES_FT("-R "),
+    FAST_TREE_PATH("-K "),
 
     //protein features prediction specific parameters
     DO_PREDICT_FETURES("-p "),

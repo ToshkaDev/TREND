@@ -16,6 +16,8 @@ function getOptions() {
     	var secondFileArea = $('#second-file-area').val() ? $('#second-file-area').val().trim() : '';
 	}
 
+    var treeBuildingProgram = $('input[name="tree-soft"]:checked').val();
+    // Mega
     var doAlign = $('#do-align').prop("checked") ? "yes" : "no";
     var doPredictFeatures = $('#do-predict-features').prop("checked") ? "yes" : "no";
     var alignmentAlg = $('#alignment-alg').val();
@@ -27,6 +29,14 @@ function getOptions() {
     var numberOrReplicates = $('#number-of-replicates').val();
     var phylogenyTest = getOption("phylo-test");
     var aaSubstModel = getOption("subst-model");
+
+
+    //FastTree
+    var aaSubstModelFt = $('#subst-model-ft').val();
+    var pseudoCountsFt = $('#pseudo-counts-ft').prop("checked") ? "yes" : "no";
+    var phylogenyTestFt = $('#phylo-test-ft').val();
+    var numberOrReplicatesFt = $('#number-of-replicates-ft').val();
+
 
     var domainPredictionProgram = $('input[name="dom-prediction-program"]:checked').val();
 
@@ -45,6 +55,7 @@ function getOptions() {
     var protoTreeCookies = setOrGetCookies();
 
     var optionToOptionName = {
+        "treeBuildingProgram": treeBuildingProgram,
         "redundancy": redundancy,
         "fetchFromIds": fetchFromIds,
         "fetchFromTree": fetchFromTree,
@@ -70,6 +81,10 @@ function getOptions() {
         "gapsAndMissingData": gapsAndMissingData,
         "siteCovCutOff": siteCovCutOff,
         "numberOrReplicates": numberOrReplicates,
+        "aaSubstModelFt": aaSubstModelFt,
+        "pseudoCountsFt": pseudoCountsFt,
+        "phylogenyTestFt": phylogenyTestFt,
+        "numberOrReplicatesFt": numberOrReplicatesFt,
         "doPredictFeatures": doPredictFeatures,
         "domainPredictionProgram": domainPredictionProgram,
         "lcrPrediction": lcrPrediction

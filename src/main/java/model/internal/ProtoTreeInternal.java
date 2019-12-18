@@ -1,6 +1,7 @@
 package model.internal;
 
-import org.springframework.web.multipart.MultipartFile;
+import enums.MiscEnum;
+import enums.ParamPrefixes;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +16,7 @@ public class ProtoTreeInternal {
     private String alignmentAlg;
     private String reorderOrNot;
 
+    private String treeBuildingProgram;
     private String doAlign;
     private String treeBuildMethod;
     private String aaSubstModel;
@@ -24,6 +26,11 @@ public class ProtoTreeInternal {
     private String siteCovCutOff;
     private String phylogenyTest;
     private String numberOrReplicates;
+
+    private String aaSubstModelFt;
+    private String pseudoCountsFt;
+    private String phylogenyTestFt;
+    private String numberOrReplicatesFt;
 
     private String doPredictFeatures;
     private String domainPredictionProgram;
@@ -199,6 +206,46 @@ public class ProtoTreeInternal {
         this.numberOrReplicates = numberOrReplicates;
     }
 
+    public String getTreeBuildingProgram() {
+        return treeBuildingProgram;
+    }
+
+    public void setTreeBuildingProgram(String treeBuildingProgram) {
+        this.treeBuildingProgram = treeBuildingProgram;
+    }
+
+    public String getAaSubstModelFt() {
+        return aaSubstModelFt;
+    }
+
+    public void setAaSubstModelFt(String aaSubstModelFt) {
+        this.aaSubstModelFt = aaSubstModelFt;
+    }
+
+    public String getPseudoCountsFt() {
+        return pseudoCountsFt;
+    }
+
+    public void setPseudoCountsFt(String pseudoCountsFt) {
+        this.pseudoCountsFt = pseudoCountsFt;
+    }
+
+    public String getPhylogenyTestFt() {
+        return phylogenyTestFt;
+    }
+
+    public void setPhylogenyTestFt(String phylogenyTestFt) {
+        this.phylogenyTestFt = phylogenyTestFt;
+    }
+
+    public String getNumberOrReplicatesFt() {
+        return numberOrReplicatesFt;
+    }
+
+    public void setNumberOrReplicatesFt(String numberOrReplicatesFt) {
+        this.numberOrReplicatesFt = numberOrReplicatesFt;
+    }
+
     public String getReorderOrNot() {
         return reorderOrNot;
     }
@@ -270,17 +317,25 @@ public class ProtoTreeInternal {
 
         if (getDoAlign() != null)
             fieldsForAlignmentAndTreeBuild.add(getDoAlign());
-
         fieldsForAlignmentAndTreeBuild.add(getAlignmentFile());
         fieldsForAlignmentAndTreeBuild.add(getAlignmentAlg());
-        fieldsForAlignmentAndTreeBuild.add(getTreeBuildMethod());
-        fieldsForAlignmentAndTreeBuild.add(getAaSubstModel());
-        fieldsForAlignmentAndTreeBuild.add(getAaSubstRate());
-        fieldsForAlignmentAndTreeBuild.add(getInitialTreeForMl());
-        fieldsForAlignmentAndTreeBuild.add(getGapsAndMissingData());
-        fieldsForAlignmentAndTreeBuild.add(getSiteCovCutOff());
-        fieldsForAlignmentAndTreeBuild.add(getPhylogenyTest());
-        fieldsForAlignmentAndTreeBuild.add(getNumberOrReplicates());
+        fieldsForAlignmentAndTreeBuild.add(getTreeBuildingProgram());
+        if (getTreeBuildingProgram().equals(ParamPrefixes.TREE_BUILDING_PROGRAM.getPrefix() + MiscEnum.MEGA.getProgram())) {
+            fieldsForAlignmentAndTreeBuild.add(getTreeBuildMethod());
+            fieldsForAlignmentAndTreeBuild.add(getAaSubstModel());
+            fieldsForAlignmentAndTreeBuild.add(getAaSubstRate());
+            fieldsForAlignmentAndTreeBuild.add(getInitialTreeForMl());
+            fieldsForAlignmentAndTreeBuild.add(getGapsAndMissingData());
+            fieldsForAlignmentAndTreeBuild.add(getSiteCovCutOff());
+            fieldsForAlignmentAndTreeBuild.add(getPhylogenyTest());
+            fieldsForAlignmentAndTreeBuild.add(getNumberOrReplicates());
+        } else if (getTreeBuildingProgram().equals(ParamPrefixes.TREE_BUILDING_PROGRAM.getPrefix() + MiscEnum.FAST_TREE.getProgram())) {
+            fieldsForAlignmentAndTreeBuild.add(getPhylogenyTestFt());
+            fieldsForAlignmentAndTreeBuild.add(getPseudoCountsFt());
+            fieldsForAlignmentAndTreeBuild.add(getAaSubstModelFt());
+            fieldsForAlignmentAndTreeBuild.add(getNumberOrReplicatesFt());
+        }
+
 
         fieldsForFeaturesPrediction.add(getFirstFileName());
         fieldsForFeaturesPrediction.add(geteValue());
