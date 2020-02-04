@@ -27,14 +27,14 @@ neighborGeneStroke = 1;
 //Gene info box
 //Need to make textPositionFactorDirect, textPositionFactorReverse,
 //subtractions from directGeneInfoBoxY and reverseGeneInfoBoxY calculable, not hard-coded
-infoBoxWidth = 300;
-infoBoxHeight = svgHeight*0.3;
+infoBoxWidth = 450;
+infoBoxHeight = svgHeight*0.56;
 infoBoxRectXRadius = 3;
 infoBoxRectYRadius = 3;
-directGeneInfoBoxY = directGeneFigureTopY-89;
-reverseGeneInfoBoxY = reverseGeneFigureTopY-89;
-textPositionFactorDirectY = 95;
-textPositionFactorReverseY = 68;
+directGeneInfoBoxY = directGeneFigureTopY-170;
+reverseGeneInfoBoxY = reverseGeneFigureTopY-170;
+textPositionFactorDirectY = 170;
+textPositionFactorReverseY = 145;
 textPositionZoomCorrection = 1;
 textPositionFactorX = 1;
 textPositionFactorXLast = 10;
@@ -88,12 +88,12 @@ function buildGeneTree(nwkObject, jsonDomainsAndGenesData) {
 function setSvgSizeAndBuildTree(textCounter, jsonDomainsAndGenesObj) {
     var fullSvgWidth = 2800, reductionFactor = 1;
     // factoring the tree vertical size depending on the number of leaves
-    if (textCounter <= 6) {
-        reductionFactor = 0.43;
+    if (textCounter <= 7) {
+        reductionFactor = 0.58;
     } else if (textCounter <= 100) {
-        reductionFactor = textCounter/16;
+        reductionFactor = textCounter/12;
     } else if (textCounter <= 1000) {
-        reductionFactor = textCounter/20;
+        reductionFactor = textCounter/19;
     } else {
         reductionFactor = textCounter/23;
     }
@@ -143,10 +143,14 @@ function createZoomableBox() {
         .call(d3.zoom().on("zoom", function() {
             tree.attr("transform", d3.event.transform);
             textPositionZoomCorrection = d3.event.transform.k;
+            tree.selectAll('.description-box')
+            .attr("width", infoBoxWidth/textPositionZoomCorrection)
+            .attr("height", infoBoxHeight/textPositionZoomCorrection);
         }))
         .append("g")
         .attr("id", "treeContainer");
 }
+
 
 
 function getGenesAndDraw(protIdsToYCoords, xCoordinate, xCoordinateText, jsonDomainsAndGenesObj) {
@@ -274,10 +278,17 @@ function addHtml(neighbourGenes, d3ParentElement) {
         .html(function(gene) {
             var format = gene.strand === "-" ? "complement(coords)" : "(coords)";
             var geneCoordinates = format.replace("coords", gene.start + ".." + gene.stop);
-            return `<div><a href="https://mistdb.com/genes/${gene.stable_id}" target="_blank">${gene.stable_id}</a></div>` +
-                `<div><a href="https://www.ncbi.nlm.nih.gov/protein/${gene.version}" target="_blank">${gene.version}</a></div>` +
-                `<div>${geneCoordinates}</div>` +
-                `<div>${gene.product}<div/>`;
+            var domainsList = "";
+            if (gene && gene.Aseq && gene.Aseq.pfam31NamesOnly) {
+                gene.Aseq.pfam31NamesOnly.forEach(domainName =>
+                    domainsList+=`<a href="https://pfam.xfam.org/search/keyword?query=${domainName}" target="_blank">${domainName}</a>, `);
+            }
+            domainsList = domainsList.slice(0, -2);
+            return `<div class="gene-info-style"><span style="font-weight: bold">Product: </span>${gene.product}</div>` +
+                `<div class="gene-info-style"><span style="font-weight: bold">MiST Id: </span><a href="https://mistdb.com/genes/${gene.stable_id}" target="_blank">${gene.stable_id}</a></div>` +
+                `<div class="gene-info-style"><span style="font-weight: bold">RefSeq Id: </span><a href="https://www.ncbi.nlm.nih.gov/protein/${gene.version}" target="_blank">${gene.version}</a></div>` +
+                `<div class="gene-info-style"><span style="font-weight: bold">Gene coordinates: </span>${geneCoordinates}</div>` +
+                `<div class="gene-info-style"><span style="font-weight: bold">Domains: </span>${domainsList}</div>`;
         });
 }
 
@@ -285,7 +296,7 @@ function createDescriptionBoxes(geneCluster, geneScale, span, mainGeneId) {
     geneCluster.append("rect")
         .style("display", "none")
         .attr("class", function(d) {
-            return "gene"+d.id+" gene-div "+"identifier-"+mainGeneId;
+            return "gene"+d.id+" gene-div "+"identifier-"+mainGeneId + " description-box";
         })
         .attr('width', infoBoxWidth)
         .attr('height', infoBoxHeight)
@@ -313,24 +324,43 @@ function addEventListeneres(geneCluster, geneScale) {
     geneCluster
     .on("mouseover", function (){
         //if the svg zoomed out proportion is less than 0.6 don't show anything
-        if (textPositionZoomCorrection < 0.6)
+        if (textPositionZoomCorrection < 0.4)
             return
         var element = d3.select(this);
         var mainGeneIdentifier = element.attr("class").split(" ")[2];
         var axisElem = document.getElementsByClassName('gene-axis-'+mainGeneIdentifier)[0].getBoundingClientRect();
         var textPositionFactorXMain;
         var top, left, xAbsolute = axisElem["x"] + window.scrollX, yAbsolute = axisElem["y"] + window.scrollY;
+        var geneId = null;
+        var isComplement = false;
+        var positionCorrection = 1;
+        //Adjusting position of the text
+        if (textPositionZoomCorrection > 1.4 && textPositionZoomCorrection < 2.2)
+            positionCorrection = 1.03;
+        else if (textPositionZoomCorrection > 2.2 && textPositionZoomCorrection < 2.8)
+            positionCorrection = 1.05;
+        else if (textPositionZoomCorrection > 2.8)
+            positionCorrection = 1.07;
+
         element.attr("dummy", function(gene) {
-            var isComplement = gene.strand === "-" ? true : false;
+            geneId = gene.id;
+            isComplement = gene.strand === "-" ? true : false;
             if (!isComplement)
-                top = yAbsolute - (textPositionFactorDirectY*textPositionZoomCorrection) + "px;";
-            else top = yAbsolute - (textPositionFactorReverseY*textPositionZoomCorrection) + "px;";
-            if (gene.stop === lastGeneStop) {
+                top = (yAbsolute - textPositionFactorDirectY)/positionCorrection  + "px;";
+            else
+                top = (yAbsolute - textPositionFactorReverseY)/positionCorrection + "px;";
+            if (gene.stop === lastGeneStop)
                 textPositionFactorXMain = textPositionFactorXLast;
-            }
             else
                 textPositionFactorXMain = textPositionFactorX;
-            left = geneScale(gene.start)*textPositionZoomCorrection + xAbsolute + textPositionFactorXMain + "px;";
+            var positionCorrectionLeft = positionCorrection > 1.03 ? positionCorrection - 0.02 : 1;
+            left = (geneScale(gene.start)*textPositionZoomCorrection + xAbsolute + textPositionFactorXMain)/positionCorrectionLeft + "px;";
+        });
+
+        d3.select('#svgContainer').select(".gene"+geneId+">.description-box").attr("y", function() {
+            if (!isComplement)
+                return directGeneInfoBoxY/textPositionZoomCorrection;
+            return reverseGeneInfoBoxY/textPositionZoomCorrection;
         });
 
         var elementsOfTheClass = document.getElementsByClassName(element.attr("class"));
@@ -371,19 +401,29 @@ function addHtmlEventListeneres(divs, geneScale) {
     divs
     .on("mouseover", function () {
         //if the svg zoomed out proportion is less than 0.6 don't show anything
-        if (textPositionZoomCorrection < 0.6)
+        if (textPositionZoomCorrection < 0.4)
             return
         var element = d3.select(this);
         var mainGeneIdentifier = element.attr("class").split(" ")[2];
         var axisElem = document.getElementsByClassName('gene-axis-'+mainGeneIdentifier)[0].getBoundingClientRect();
         var xAbsolute = axisElem["x"] + window.scrollX, yAbsolute = axisElem["y"] + window.scrollY;
         var textPositionFactorXMain;
+        var geneId = null;
+        var isComplement = false;
+        var positionCorrection = 1;
+        //Adjusting position of the text
+        if (textPositionZoomCorrection > 1.4 && textPositionZoomCorrection < 2.2)
+            positionCorrection = 1.03;
+        else if (textPositionZoomCorrection > 2.2 && textPositionZoomCorrection < 2.8)
+            positionCorrection = 1.05;
+        else if (textPositionZoomCorrection > 2.8)
+            positionCorrection = 1.07;
         element
             .style("top", function(gene) {
                 var isComplement = gene.strand === "-" ? true : false;
                 if (!isComplement)
-                    return yAbsolute - (textPositionFactorDirectY*textPositionZoomCorrection) + "px";
-                return yAbsolute - (textPositionFactorReverseY*textPositionZoomCorrection) + "px";
+                    return (yAbsolute - textPositionFactorDirectY)/positionCorrection + "px";
+                return (yAbsolute - textPositionFactorReverseY)/positionCorrection + "px";
 
             })
             .style("left", function(gene) {
@@ -391,7 +431,8 @@ function addHtmlEventListeneres(divs, geneScale) {
                     textPositionFactorXMain = textPositionFactorXLast;
                 else
                     textPositionFactorXMain = textPositionFactorX;
-                return geneScale(gene.start)*textPositionZoomCorrection + xAbsolute + textPositionFactorXMain + "px";
+                var positionCorrectionLeft = positionCorrection > 1.03 ? positionCorrection - 0.02 : 1;
+                return (geneScale(gene.start)*textPositionZoomCorrection + xAbsolute + textPositionFactorXMain)/positionCorrectionLeft + "px";
             })
             .style("display", "inline");
 

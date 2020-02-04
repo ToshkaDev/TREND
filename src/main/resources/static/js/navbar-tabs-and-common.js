@@ -9,7 +9,8 @@ $(document).ready( function() {
     attacheOnChevronClick('#neib-href');
     // attache the url of the page to show to a user that he can check the status of his job by this url.
     $("#check-by-url").attr("href", window.location.href);
-    $("#check-by-url").text(window.location.href)
+    $("#check-by-url").text(window.location.href);
+    setCopyrightDate();
 });
 
 function mainNavbar(tab) {
@@ -41,4 +42,9 @@ function adjustStickyNavbar() {
     } else {
         navbar.classList.remove("sticky");
     }
+}
+
+function setCopyrightDate() {
+    var today = new Date()
+    $("#current-year").text(today.getFullYear())
 }

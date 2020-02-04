@@ -59,21 +59,22 @@
         <div class="row">
             <div class="col-md-6 ">
                 <div class="row footer-info">
-                    <h2> <a th:href="@{http://u.osu.edu/zhulinlab/}" class="footer-text">ZHULIN LAB </a></h2>
+                    <h2> <a th:href="@{http://u.osu.edu/zhulinlab/}" class="footer-text" target="_blank">ZHULIN LAB </a></h2>
                 </div>
                 <div class="row footer-info">
-                    <a th:href="@{http://twitter.com/zhulinlab}" class="btn btn-default btn-sm social">
+                    <a th:href="@{http://twitter.com/zhulinlab}" class="btn btn-default btn-sm social" target="_blank">
                         <i class="fa fa-twitter"></i>
                     </a>
                 </div>
             </div>
             <div class="col-md-6 footer-info">
-                <a th:href="@{https://www.osu.edu}">
+                <a th:href="@{https://www.osu.edu}" target="_blank">
                     <img th:src="@{/images/OSU.png}" width="220" height="150">
                 </a>
             </div>
         </div>
-        <h4 id="copy-right" class="footer-text">&copy; 2019 Vadim Gumerov</h4>
+        <p class="footer-text footer-info">This website is free and open to all users and there is no login requirement</p>
+        <h4 id="copy-right" class="footer-text">&copy; 2019-<span id="current-year"></span>&nbsp; Vadim Gumerov</h4>
     </div>
 
 </body>

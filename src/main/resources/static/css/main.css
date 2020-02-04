@@ -204,6 +204,12 @@ div.result-area {
 	max-width: 50%;
 }
 
+.gene-info-style {
+    padding-bottom: 4px;
+    width: 400px;
+    font-size: 1.5em;
+}
+
 @media screen and (max-width: 991px) {
     .my-textarea {
         max-width: 95%;
@@ -463,13 +469,13 @@ div.protein-info-container {
 
 .footer-container {
     background-color: #acb4a5;
-    height: 210px;
+    height: 220px;
 }
 
 @media screen and (max-width: 995px) {
     .footer-container {
         background-color: #acb4a5;
-        height: 310px;
+        height: 340px;
         min-width: 231px;
     }
 }
