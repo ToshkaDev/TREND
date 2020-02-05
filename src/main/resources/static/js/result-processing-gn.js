@@ -62,6 +62,7 @@ function buildGeneTree(nwkObject, jsonDomainsAndGenesData) {
     var ptoteinNames = [];
     var longestXCoord = 0;
     var longestXCoordText;
+    var currentLongestLeaf = 0;
     d3.select('#treeContainer>svg').selectAll('*')
         .attr("dummy", function(){
             // a) we check 'processed' because text() gives text for actual 'text' and 'tspan' tag
@@ -73,9 +74,10 @@ function buildGeneTree(nwkObject, jsonDomainsAndGenesData) {
                 var xCoord = +d3.select(this).attr('x');
                 var text = d3.select(this).text();
                 protIdsToYCoords[text] = yCoord-yShiftOfClusterRegardingLeafeYCoord;
-                if (xCoord > longestXCoord) {
+                if ((xCoord + text.length) > currentLongestLeaf) {
                     longestXCoord = xCoord;
-                    longestXCoordText = d3.select(this).text();
+                    longestXCoordText = text;
+                    currentLongestLeaf = xCoord + text.length;
                 }
                 processed = true;
             } else
@@ -323,7 +325,7 @@ function createDescriptionBoxes(geneCluster, geneScale, span, mainGeneId) {
 function addEventListeneres(geneCluster, geneScale) {
     geneCluster
     .on("mouseover", function (){
-        //if the svg zoomed out proportion is less than 0.6 don't show anything
+        //if the svg zoomed out proportion is less than 0.4 don't show anything
         if (textPositionZoomCorrection < 0.4)
             return
         var element = d3.select(this);
@@ -357,7 +359,7 @@ function addEventListeneres(geneCluster, geneScale) {
             left = (geneScale(gene.start)*textPositionZoomCorrection + xAbsolute + textPositionFactorXMain)/positionCorrectionLeft + "px;";
         });
 
-        d3.select('#svgContainer').select(".gene"+geneId+">.description-box").attr("y", function() {
+        geneCluster.select(".gene"+geneId+">.description-box").attr("y", function() {
             if (!isComplement)
                 return directGeneInfoBoxY/textPositionZoomCorrection;
             return reverseGeneInfoBoxY/textPositionZoomCorrection;
