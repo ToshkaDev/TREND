@@ -6,7 +6,9 @@ public enum Status {
     stage("stage"),
     stageDetails("stageDetails"),
     error("Error"),
-    megaError("ERROR. MEGA");
+    ERROR("ERROR"),
+    megaError("ERROR. MEGA"),
+    fastTreeError("ERROR. FastTree");
 
     private String statusEnum;
 

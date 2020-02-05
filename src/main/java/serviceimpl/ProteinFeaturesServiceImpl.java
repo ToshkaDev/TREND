@@ -494,6 +494,8 @@ public class ProteinFeaturesServiceImpl extends BioUniverseServiceImpl implement
             } catch (Exception exception) {
                 if (exception.getMessage() != null && exception.getMessage().contains(Status.megaError.getStatusEnum()))
                     super.saveError(protoTreeInternal, exception.getMessage());
+                else if (exception.getMessage() != null && exception.getMessage().contains(Status.fastTreeError.getStatusEnum()))
+                    super.saveError(protoTreeInternal, exception.getMessage());
                 else
                     super.saveError(protoTreeInternal, null);
                 throw exception;

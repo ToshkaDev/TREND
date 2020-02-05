@@ -212,7 +212,9 @@ public class GeneNeighborhoodsServiceImpl extends BioUniverseServiceImpl impleme
             try {
                 super.launchProcess(commandArgument, protoTreeInternal);
             } catch (Exception exception) {
-                if (exception!= null && exception.getMessage().contains(Status.megaError.getStatusEnum()))
+                if (exception.getMessage() != null && exception.getMessage().contains(Status.megaError.getStatusEnum()))
+                    super.saveError(protoTreeInternal, exception.getMessage());
+                else if (exception.getMessage() != null && exception.getMessage().contains(Status.fastTreeError.getStatusEnum()))
                     super.saveError(protoTreeInternal, exception.getMessage());
                 else
                     super.saveError(protoTreeInternal, null);

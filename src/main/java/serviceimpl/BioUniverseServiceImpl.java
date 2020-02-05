@@ -260,10 +260,13 @@ public class BioUniverseServiceImpl implements BioUniverseService {
             BufferedReader iebr = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             String megaErrorMessage = null;
+            String fastTreeMessage = null;
             boolean errorHappened = false;
             while ((line = iebr.readLine()) != null) {
                 if (line.contains("Error") && line.contains("Message"))
                     megaErrorMessage = line;
+                if (line.contains("Non-unique name"))
+                    fastTreeMessage = line;
                 if (line.toLowerCase().contains("error") || line.contains("Traceback"))
                     errorHappened = true;
                 for (int i=0; i < stageArray.length; i++) {
@@ -275,9 +278,11 @@ public class BioUniverseServiceImpl implements BioUniverseService {
                 System.out.println("Input/Error stream: " + line);
                 System.out.println("\n");
             }
-            if (errorHappened || megaErrorMessage != null) {
+            if (errorHappened || megaErrorMessage != null || fastTreeMessage != null) {
                 if (megaErrorMessage != null)
                     throw new IncorrectRequestException(Status.megaError.getStatusEnum() + ": " + megaErrorMessage.split("=")[1]);
+                else if (fastTreeMessage != null)
+                    throw new IncorrectRequestException(Status.fastTreeError.getStatusEnum() + ": " + fastTreeMessage);
                 else
                     throw new IncorrectRequestException("Error happened in launchProcess(List<String> commandArguments).");
             }
