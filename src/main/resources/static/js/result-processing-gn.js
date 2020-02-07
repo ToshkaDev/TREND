@@ -28,13 +28,13 @@ neighborGeneStroke = 1;
 //Need to make textPositionFactorDirect, textPositionFactorReverse,
 //subtractions from directGeneInfoBoxY and reverseGeneInfoBoxY calculable, not hard-coded
 infoBoxWidth = 450;
-infoBoxHeight = svgHeight*0.56;
+infoBoxHeight = svgHeight*0.64;
 infoBoxRectXRadius = 3;
 infoBoxRectYRadius = 3;
-directGeneInfoBoxY = directGeneFigureTopY-170;
-reverseGeneInfoBoxY = reverseGeneFigureTopY-170;
-textPositionFactorDirectY = 170;
-textPositionFactorReverseY = 145;
+directGeneInfoBoxY = directGeneFigureTopY-186;
+reverseGeneInfoBoxY = reverseGeneFigureTopY-186;
+textPositionFactorDirectY = 185;
+textPositionFactorReverseY = 155;
 textPositionZoomCorrection = 1;
 textPositionFactorX = 1;
 textPositionFactorXLast = 10;
@@ -290,7 +290,8 @@ function addHtml(neighbourGenes, d3ParentElement) {
                 `<div class="gene-info-style"><span style="font-weight: bold">MiST Id: </span><a href="https://mistdb.com/genes/${gene.stable_id}" target="_blank">${gene.stable_id}</a></div>` +
                 `<div class="gene-info-style"><span style="font-weight: bold">RefSeq Id: </span><a href="https://www.ncbi.nlm.nih.gov/protein/${gene.version}" target="_blank">${gene.version}</a></div>` +
                 `<div class="gene-info-style"><span style="font-weight: bold">Gene coordinates: </span>${geneCoordinates}</div>` +
-                `<div class="gene-info-style"><span style="font-weight: bold">Domains: </span>${domainsList}</div>`;
+                `<div class="gene-info-style"><span style="font-weight: bold">Domains: </span>${domainsList}</div>` +
+                `<div class="gene-info-style"><span style="font-weight: bold">Cluster Id: </span>${gene.clusterId}</div>`;
         });
 }
 
@@ -335,14 +336,18 @@ function addEventListeneres(geneCluster, geneScale) {
         var top, left, xAbsolute = axisElem["x"] + window.scrollX, yAbsolute = axisElem["y"] + window.scrollY;
         var geneId = null;
         var isComplement = false;
-        var positionCorrection = 1;
+        var positionCorrection = 1, positionCorrectionReveres = 1;
         //Adjusting position of the text
-        if (textPositionZoomCorrection > 1.4 && textPositionZoomCorrection < 2.2)
+        if (textPositionZoomCorrection > 1.4 && textPositionZoomCorrection < 2.2) {
             positionCorrection = 1.03;
-        else if (textPositionZoomCorrection > 2.2 && textPositionZoomCorrection < 2.8)
+            positionCorrectionReveres = 1.01;
+        } else if (textPositionZoomCorrection >= 2.2 && textPositionZoomCorrection < 2.8) {
             positionCorrection = 1.05;
-        else if (textPositionZoomCorrection > 2.8)
+            positionCorrectionReveres = 1.02;
+        } else if (textPositionZoomCorrection >= 2.8) {
             positionCorrection = 1.07;
+            positionCorrectionReveres = 1.04;
+        }
 
         element.attr("dummy", function(gene) {
             geneId = gene.id;
@@ -350,7 +355,7 @@ function addEventListeneres(geneCluster, geneScale) {
             if (!isComplement)
                 top = (yAbsolute - textPositionFactorDirectY)/positionCorrection  + "px;";
             else
-                top = (yAbsolute - textPositionFactorReverseY)/positionCorrection + "px;";
+                top = (yAbsolute - textPositionFactorReverseY)/positionCorrectionReveres + "px;";
             if (gene.stop === lastGeneStop)
                 textPositionFactorXMain = textPositionFactorXLast;
             else
@@ -362,7 +367,18 @@ function addEventListeneres(geneCluster, geneScale) {
         geneCluster.select(".gene"+geneId+">.description-box").attr("y", function() {
             if (!isComplement)
                 return directGeneInfoBoxY/textPositionZoomCorrection;
-            return reverseGeneInfoBoxY/textPositionZoomCorrection;
+            // Corrections of vertical position of info boxes for reverse genes
+            else {
+                if (textPositionZoomCorrection < 1)
+                    return reverseGeneInfoBoxY/(textPositionZoomCorrection*0.93);
+                else if (textPositionZoomCorrection > 1.3 && textPositionZoomCorrection < 1.67)
+                    return reverseGeneInfoBoxY/(textPositionZoomCorrection*1.1);
+                else if (textPositionZoomCorrection >= 1.67 && textPositionZoomCorrection < 2)
+                    return reverseGeneInfoBoxY/(textPositionZoomCorrection*1.2);
+                else if (textPositionZoomCorrection >= 2)
+                    return reverseGeneInfoBoxY/(textPositionZoomCorrection*1.3);
+                return reverseGeneInfoBoxY/textPositionZoomCorrection;
+            }
         });
 
         var elementsOfTheClass = document.getElementsByClassName(element.attr("class"));
@@ -412,20 +428,24 @@ function addHtmlEventListeneres(divs, geneScale) {
         var textPositionFactorXMain;
         var geneId = null;
         var isComplement = false;
-        var positionCorrection = 1;
+        var positionCorrection = 1, positionCorrectionReveres = 1;
         //Adjusting position of the text
-        if (textPositionZoomCorrection > 1.4 && textPositionZoomCorrection < 2.2)
+        if (textPositionZoomCorrection > 1.4 && textPositionZoomCorrection < 2.2) {
             positionCorrection = 1.03;
-        else if (textPositionZoomCorrection > 2.2 && textPositionZoomCorrection < 2.8)
+            positionCorrectionReveres = 1.01;
+        } else if (textPositionZoomCorrection >= 2.2 && textPositionZoomCorrection < 2.8) {
             positionCorrection = 1.05;
-        else if (textPositionZoomCorrection > 2.8)
+            positionCorrectionReveres = 1.02;
+        } else if (textPositionZoomCorrection >= 2.8) {
             positionCorrection = 1.07;
+            positionCorrectionReveres = 1.04;
+        }
         element
             .style("top", function(gene) {
                 var isComplement = gene.strand === "-" ? true : false;
                 if (!isComplement)
                     return (yAbsolute - textPositionFactorDirectY)/positionCorrection + "px";
-                return (yAbsolute - textPositionFactorReverseY)/positionCorrection + "px";
+                return (yAbsolute - textPositionFactorReverseY)/positionCorrectionReveres + "px";
 
             })
             .style("left", function(gene) {
