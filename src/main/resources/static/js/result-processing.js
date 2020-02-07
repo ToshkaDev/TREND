@@ -161,6 +161,12 @@ function addEventListeners(data) {
                             var seq = getHighlightedSequence(proteinName, domainCount);
                             $("#Sequence").click();
                             $("." + "protein-sequence").html(seq);
+                        } else if (($("." + proteinName + infoPostfix).is(':visible') && !domainFlag)) {
+                            var seq = getNotHighlightedSequence(proteinName);
+                            //#8c8c8c is a color of TM regions
+                            if (d3.select(this.parentNode).attr("fill") == "#8c8c8c")
+                                $("#TMs").click();
+                            $("." + "protein-sequence").html(seq);
                         }
 					});
 				d3.select(this).selectAll('*').on("click", function(){
