@@ -238,8 +238,6 @@ def clusterGenesBasedOnSharedDomains(gene_to_neighbors):
 											gene2['clusterId'] = gene1ClusterId
 											gene1['clusterColor'] = gene1ClusterColor
 											gene2['clusterColor'] = gene1ClusterColor
-										PROCESSED_STABLE_IDS.add(gene2['stable_id'])
-
 
 					for mainGene2StableId, allNeighborGenes2 in gene_to_neighbors.items():
 						# first check that these are two different gene neigborhoods
@@ -264,7 +262,7 @@ def clusterGenesBasedOnSharedDomains(gene_to_neighbors):
 													gene3['clusterId'] = gene1ClusterId
 													gene1['clusterColor'] = gene1ClusterColor
 													gene3['clusterColor'] = gene1ClusterColor
-												PROCESSED_STABLE_IDS.add(gene3['stable_id'])
+
 			PROCESSED_STABLE_IDS.add(gene1['stable_id'])
 		PROCESSED_MAIN_GENE_STABLE_IDS.add(mainGene1StableId)
 

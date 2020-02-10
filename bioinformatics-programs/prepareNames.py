@@ -205,8 +205,9 @@ def fetchNamesAndSave():
 	proteinIdToTrueId = None
 	proteinIds, proteinIdsMultiProc = prepareIdListFromInput()
 	try:
-		proteinIdToSeq, proteinIdToTrueId = fetchFromMistByIds(proteinIdsMultiProc)
-		print("Fetching from MiST finished OK.")
+		if FETCH_FROM_MIST:
+			proteinIdToSeq, proteinIdToTrueId = fetchFromMistByIds(proteinIdsMultiProc)
+			print("Fetching from MiST finished OK.")
 	except Exception, e:
 		print("Error while fetching from MiST.")
 		print (e)
@@ -234,7 +235,7 @@ def fetchNamesAndSave():
 def fetchFromMistByIds(proteinIds, proteinIdsToOrigNames=None):
 	if not proteinIds:
 		return None
-	print("Fetching from MiST using ids from the tree leaves")
+	print("Fetching from MiST using ids")
 	proteinIdToSeq = manager.dict()
 	proteinIdToTrueId = manager.dict()
 	elementsForOneThread = int(math.ceil(len(proteinIds)/float(NUMBER_OF_PROCESSES)))
@@ -252,7 +253,7 @@ def fetchFromMistByIds(proteinIds, proteinIdsToOrigNames=None):
 		proc.start()
 	for proc in processes:
 		proc.join()
-	print("Fetched from MiST OK using ids from the tree leaves")
+	print("Fetched from MiST OK using ids")
 	return (proteinIdToSeq.copy(), proteinIdToTrueId.copy())
 
 
