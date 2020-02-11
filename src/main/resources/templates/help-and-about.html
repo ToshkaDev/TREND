@@ -9,7 +9,6 @@
             <div class="contact">
                 Send your comments or bug reports to: comp.bioverse@gmail.com
             </div>
-
         </div>
     </div>
 </div>
@@ -17,6 +16,7 @@
 <div th:fragment="credits">
     <div class="row">
         <div class="col-md-12 credits-list">
+            <span class="credits">Tools: </span>
             <div class="credits">
                 <a href="https://mafft.cbrc.jp/alignment/software/" target="_blank">MAFFT</a>
             </div>
@@ -39,22 +39,37 @@
                 <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi" target="_blank">BLAST</a>
             </div>
             <div class="credits">
+                <a href="http://etetoolkit.org/" target="_blank">ETE Toolkit</a>
+            </div>
+            <div class="credits">
+                <a href="https://github.com/guyleonard/jsPhyloSVG" target="_blank">jsPhyloSVG</a>
+            </div>
+            <br/>
+            <span class="credits">Databases: </span>
+            <div class="credits">
                 <a href="https://www.ncbi.nlm.nih.gov/Structure/cdd/cdd.shtml" target="_blank">CDD</a>
             </div>
             <div class="credits">
                 <a href="https://pfam.xfam.org/" target="_blank">Pfam</a>
             </div>
             <div class="credits">
+                <a href="https://www.ncbi.nlm.nih.gov/COG/" target="_blank">COG</a>
+            </div>
+            <div class="credits">
+                <a href="https://www.ncbi.nlm.nih.gov/COG/" target="_blank">KOG</a>
+            </div>
+            <div class="credits">
+                <a href="http://smart.embl-heidelberg.de/" target="_blank">SMART</a>
+            </div>
+            <div class="credits">
+                <a href="https://www.ncbi.nlm.nih.gov/proteinclusters" target="_blank">PRK</a>
+            </div>
+            <div class="credits">
+                <a href="http://tigrfams.jcvi.org/cgi-bin/index.cgi" target="_blank">TIGRFAMs</a>
+            </div>
+            <div class="credits">
                 <a href="https://mistdb.com/" target="_blank">MiST</a>
             </div>
-            <div class="credits">
-                <a href="http://etetoolkit.org/" target="_blank">ETE Toolkit</a>
-            </div>
-            <div class="credits">
-                 <a href="https://github.com/guyleonard/jsPhyloSVG" target="_blank">jsPhyloSVG</a>
-            </div>
-
-
         </div>
     </div>
 </div>
@@ -263,7 +278,7 @@
         <div id="neighborhoods-info" class="collapse">
             <div>
                 <p>
-                    You can cluster genes based on the shared domains of the encoded proteins and visualize the clusters and gene neighborhoods on phylogenetic tree running our neighborhoods analysis pipeline.
+                    You can cluster prokaryotic genes based on the shared domains of the encoded proteins and visualize the clusters and gene neighborhoods on phylogenetic tree running our neighborhoods analysis pipeline.
                 </p>
                 <p>
                     Protein names in the file with the sequences or the tree should start with protein identifiers
@@ -318,7 +333,7 @@
                     As a result of running <span class="proto-tree-text">Neighborhoods</span> pipeline a phylogenetic tree combined with interactive gene neighborhoods will be produced.
                 </p>
                 <p>
-                    Genes that belong to the same cluster will be colored in the same color. Genes that belong to the same operon will have the borders of the same color.
+                    Genes that belong to the same cluster will be colored in the same color. Genes that belong to the same operon will have borders of the same color.
                 </p>
                 <p>
                     Hovering the mouse on the picture shows the corresponding gene information including its product name, NCBI and MiST ids, links to the databases, encoded domains and cluster ids. To zoom in/zoom out use mouse wheel.

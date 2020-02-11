@@ -156,7 +156,7 @@ function createZoomableBox() {
 
 
 function getGenesAndDraw(protIdsToYCoords, xCoordinate, xCoordinateText, jsonDomainsAndGenesObj) {
-    xCoordinate = xCoordinate + xCoordinateText.length*6.5;
+    xCoordinate = xCoordinate + xCoordinateText.length*7.1;
     var refSeqCounter = 0;
     d3.select('#treeContainer>svg').attr("style", "");
     for (proteinName in protIdsToYCoords) {
