@@ -130,7 +130,7 @@ def prepareProteinToDomainsDict():
 			##### Prepare TM Regions ######
 			if "tmRegions" in proteinData["tmInfo"]:
 				for region in proteinData["tmInfo"]["tmRegions"]:
-					correctedCoords = addToCoordinateLists(aliStarts, aliEnds, int(region["tmSart"])-1, int(region["tmEnd"])-1)
+					correctedCoords = addToCoordinateLists(aliStarts, aliEnds, int(region["start"])-1, int(region["end"])-1)
 					tms.append([correctedCoords[0], correctedCoords[1], "[]", None, 35, TM_COLOR, TM_COLOR, ""])
 					startsToDomainList[correctedCoords[0]].append(correctedCoords[1])
 				domains.extend(tms)

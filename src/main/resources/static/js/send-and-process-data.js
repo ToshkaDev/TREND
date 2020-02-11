@@ -32,7 +32,7 @@ $(document).ready(function (){
         $("#first-area-message, #second-area-message, #both-areas-message, #one-area-message, #malformed-fasta, #malformed-fasta-second, #cannot-have-ids-and-seqs").hide();
         $('.second-area').toggle();
         if ($('.second-area').css("display") !== "none") {
-            $('#addSecondArea').html("Close Second Area");
+            $('#addSecondArea').html("Remove Second Area");
             $('.fetch-fromIds1').hide();
             $('.active-second-area').fadeIn();
         }

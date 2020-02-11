@@ -97,6 +97,7 @@ function processRetrievedDataAsync(data) {
             });
             $(window).resize(function() {
                 d3.select('#svgContainer>svg').remove();
+                $(".protein-info-container").remove();
                 prepareTreeContainer();
                 document.getElementById("treeContainer").appendChild(svgPicture);
                 if (paramsOfTrend["features"] === "true") {
@@ -137,6 +138,8 @@ function addEventListeners(data) {
 				d3.select(this).attr("class", currentClassName+"_text");
 				d3.select(this).selectAll('*').attr("class", currentClassName);
 				domainCount = 0;
+				tmCount = 0;
+				lcrCount = 0;
 
 			} else if (currentClassName) {
 			    if (!d3.select(this).select("path").empty()) {
@@ -147,26 +150,42 @@ function addEventListeners(data) {
                         d3.select(this).select("path").attr("domainFlag", classNameForJson + ":" + domainCount++)
 			       }
 			    }
+                // Selecting 'g'. #8c8c8c corresponds to TM color, #c71585 corresponds to lcr color
+                if (d3.select(this).attr("fill") == "#8c8c8c")
+                    d3.select(this).select("path").attr("tmFlag", classNameForJson + ":" + tmCount++)
+                else if (d3.select(this).attr("fill") == "#c71585")
+                    d3.select(this).select("path").attr("lcrFlag", classNameForJson + ":" + lcrCount++)
 
-				d3.select(this).attr("class", currentClassName);
-				d3.select(this).selectAll('*').attr("class", currentClassName);
+                d3.select(this).attr("class", currentClassName);
+                d3.select(this).selectAll('*').attr("class", currentClassName);
 
-				d3.select(this).on("click", function(){
-						checkTableAndDisplay(d3.event, d3.select(this).attr("class"), proteinIdToRendered);
+                d3.select(this).on("click", function() {
+                        checkTableAndDisplay(d3.event, d3.select(this).attr("class"), proteinIdToRendered);
                         var proteinName = d3.select(this).attr("class");
                         var domainFlag = d3.select(this).attr("domainFlag");
-                        var domainCount;
-                        if ($("." + proteinName + infoPostfix).is(':visible') && domainFlag) {
-                            domainCount = domainFlag.split(":")[1];
-                            var seq = getHighlightedSequence(proteinName, domainCount);
-                            $("#Sequence").click();
-                            $("." + "protein-sequence").html(seq);
-                        } else if (($("." + proteinName + infoPostfix).is(':visible') && !domainFlag)) {
-                            var seq = getNotHighlightedSequence(proteinName);
-                            //#8c8c8c is a color of TM regions
-                            if (d3.select(this.parentNode).attr("fill") == "#8c8c8c")
-                                $("#TMs").click();
-                            $("." + "protein-sequence").html(seq);
+                        var tmFlag = d3.select(this).attr("tmFlag");
+                        var lcrFlag = d3.select(this).attr("lcrFlag");
+                        var seq = "";
+                        if ($("." + proteinName + infoPostfix).is(':visible')) {
+                            if (domainFlag) {
+                                var domainCount = domainFlag.split(":")[1];
+                                seq = getHighlightedSequence(proteinName, domainCount, "domainFlag");
+                                $("#Sequence").click();
+                                $("." + "protein-sequence").html(seq);
+                            } else if (tmFlag) {
+                                var tmCount = tmFlag.split(":")[1];
+                                seq = getHighlightedSequence(proteinName, tmCount, "tmFlag");
+                                $("#Sequence").click();
+                                $("." + "protein-sequence").html(seq);
+                            } else if (lcrFlag) {
+                                  var lcrCount = lcrFlag.split(":")[1];
+                                  seq = getHighlightedSequence(proteinName, lcrCount, "lcrFlag");
+                                  $("#Sequence").click();
+                                  $("." + "protein-sequence").html(seq);
+                            } else {
+                                seq = getNotHighlightedSequence(proteinName);
+                                $("." + "protein-sequence").html(seq);
+                            }
                         }
 					});
 				d3.select(this).selectAll('*').on("click", function(){
@@ -258,8 +277,8 @@ function organizeData(currentClassName) {
             for (var tm of dataAsJson.tmInfo['tmRegions']) {
                 tmRaw = [];
                 tmRaw.push(tmCounter++ + ".");
-                tmRaw.push(tm.tmSart);
-                tmRaw.push(tm.tmEnd);
+                tmRaw.push(tm.start);
+                tmRaw.push(tm.end);
                 tmOrganizedData.push(tmRaw);
             }
             var additionalRaw = [dataAsJson.tmInfo.possibSigPep, dataAsJson.tmInfo.tmTopology];
@@ -402,14 +421,25 @@ function getTranslatedCoordinate(coordinate) {
     }
 }
 
-function getHighlightedSequence(proteinName, domainCount) {
-    var domainWithNoOverlaps = featureJSON[trueClassNameToChanged[proteinName]]["domainsWithNoOverlaps"][domainCount];
-    var proteinSequnce = featureJSON[trueClassNameToChanged[proteinName]].sequence
-    domStart = getTranslatedCoordinate(+domainWithNoOverlaps.start);
-    domEnd = getTranslatedCoordinate(+domainWithNoOverlaps.end);
-    sequenceFirstFragment = (''+proteinSequnce).substring(0, domStart);
-    sequenceMiddleFragment = "<span style='background-color: #d8f7dd'>" + proteinSequnce.substring(domStart, domEnd+1) + "</span>";
-    sequenceLastFragment = proteinSequnce.substring(domEnd+1, proteinSequnce.length);
+function getHighlightedSequence(proteinName, featureCount, featureFlag) {
+    var featureWithCoords = "";
+    var domainShift = 0;
+    if (featureFlag == "domainFlag") {
+        featureWithCoords = featureJSON[trueClassNameToChanged[proteinName]]["domainsWithNoOverlaps"][featureCount];
+        domainShift = 1;
+    }
+    if (featureFlag == "tmFlag")
+        featureWithCoords = featureJSON[trueClassNameToChanged[proteinName]]["tmInfo"]["tmRegions"][featureCount];
+    if (featureFlag == "lcrFlag")
+        featureWithCoords = featureJSON[trueClassNameToChanged[proteinName]]["lowComplexity"][featureCount];
+
+    var proteinSequnce = featureJSON[trueClassNameToChanged[proteinName]].sequence;
+    featureStart = getTranslatedCoordinate(+featureWithCoords.start + domainShift);
+    featureEnd = getTranslatedCoordinate(+featureWithCoords.end + domainShift);
+
+    sequenceFirstFragment = (''+proteinSequnce).substring(0, featureStart);
+    sequenceMiddleFragment = "<span style='background-color: #c7ebcd'>" + proteinSequnce.substring(featureStart, featureEnd+1) + "</span>";
+    sequenceLastFragment = proteinSequnce.substring(featureEnd+1, proteinSequnce.length);
     return sequenceFirstFragment+sequenceMiddleFragment+sequenceLastFragment;
 }
 

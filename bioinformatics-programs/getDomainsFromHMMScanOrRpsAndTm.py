@@ -249,8 +249,8 @@ class Protein(object):
 		self.tmInfo["tmTopology"] = tmTopology
 		self.tmInfo["tm"] = tm
 		self.tmInfo["tmRegions"] = []
-	def setTmRegions(self, tmSart, tmEnd):
-		self.tmInfo["tmRegions"].append(TmRegion(tmSart, tmEnd))
+	def setTmRegions(self, tmStart, tmEnd):
+		self.tmInfo["tmRegions"].append(TmRegion(tmStart, tmEnd))
 	def setLowComplexityRegions(self, lowCompStart, lowCompEnd):
 		self.lowComplexity.append(LowComplexityRegion(lowCompStart, lowCompEnd))
 	def setSequence(sequence):
@@ -301,9 +301,9 @@ class RpsDomainRegion(object):
 		self.superfamily_pssmId = None
 
 class TmRegion(object):
-	def __init__(self, tmSart, tmEnd):
-		self.tmSart = tmSart
-		self.tmEnd = tmEnd
+	def __init__(self, tmStart, tmEnd):
+		self.start = tmStart
+		self.end = tmEnd
 
 class LowComplexityRegion(object):
 	def __init__(self, lowCompSart, lowCompEnd):
