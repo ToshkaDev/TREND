@@ -32,7 +32,8 @@ FETCH_FROM_TREE = False
 REMOVE_DASHES = True
 
 REGEX_VOID = re.compile(r"(\(|\)|:|,|}|{|'|/|]|\[|\\)")
-REGEX_UNDERSCORE = re.compile(r"( |\|)")
+REGEX_VOID = re.compile(r"(\(|\)|:|,|}|{|'|]|\[|\\)")
+REGEX_UNDERSCORE = re.compile(r"( |/|\|)")
 REGEX_UNDERSCORE_MULTIPLE = re.compile(r"_{2,}")
 REGEX_VOID_SUBST = ""
 REGEX_UNDERSCORE_SUBST = "_"
