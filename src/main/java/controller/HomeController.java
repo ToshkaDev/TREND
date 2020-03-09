@@ -23,13 +23,6 @@ public class HomeController {
                 "fragmentsMain='help-and-about', help='help')";
     }
 
-    @GetMapping(value={"/credits"})
-    public String credit(Model model) {
-        model.addAttribute("mainTab", "credits");
-        return "main-view  :: addContent(" +
-                "fragmentsMain='help-and-about', help='credits')";
-    }
-
     @GetMapping(value={"/contact"})
     public String contact(Model model) {
         model.addAttribute("mainTab", "contact");

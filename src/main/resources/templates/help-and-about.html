@@ -13,66 +13,6 @@
     </div>
 </div>
 
-<div th:fragment="credits">
-    <div class="row">
-        <div class="col-md-12 credits-list">
-            <span class="credits">Tools: </span>
-            <div class="credits">
-                <a href="https://mafft.cbrc.jp/alignment/software/" target="_blank">MAFFT</a>
-            </div>
-            <div class="credits">
-                <a href="http://www.microbesonline.org/fasttree/" target="_blank">FastTree</a>
-            </div>
-            <div class="credits">
-                <a href="https://www.megasoftware.net/" target="_blank">MEGA</a>
-            </div>
-            <div class="credits">
-                <a href="http://hmmer.org/" target="_blank">HMMER</a>
-            </div>
-            <div class="credits">
-                <a href="http://www.cbs.dtu.dk/services/TMHMM/" target="_blank">TMHMM</a>
-            </div>
-            <div class="credits">
-                <a href="http://weizhongli-lab.org/cd-hit/" target="_blank">CD-HIT</a>
-            </div>
-            <div class="credits">
-                <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi" target="_blank">BLAST</a>
-            </div>
-            <div class="credits">
-                <a href="http://etetoolkit.org/" target="_blank">ETE Toolkit</a>
-            </div>
-            <div class="credits">
-                <a href="https://github.com/guyleonard/jsPhyloSVG" target="_blank">jsPhyloSVG</a>
-            </div>
-            <br/>
-            <span class="credits">Databases: </span>
-            <div class="credits">
-                <a href="https://www.ncbi.nlm.nih.gov/Structure/cdd/cdd.shtml" target="_blank">CDD</a>
-            </div>
-            <div class="credits">
-                <a href="https://pfam.xfam.org/" target="_blank">Pfam</a>
-            </div>
-            <div class="credits">
-                <a href="https://www.ncbi.nlm.nih.gov/COG/" target="_blank">COG</a>
-            </div>
-            <div class="credits">
-                <a href="https://www.ncbi.nlm.nih.gov/COG/" target="_blank">KOG</a>
-            </div>
-            <div class="credits">
-                <a href="http://smart.embl-heidelberg.de/" target="_blank">SMART</a>
-            </div>
-            <div class="credits">
-                <a href="https://www.ncbi.nlm.nih.gov/proteinclusters" target="_blank">PRK</a>
-            </div>
-            <div class="credits">
-                <a href="http://tigrfams.jcvi.org/cgi-bin/index.cgi" target="_blank">TIGRFAMs</a>
-            </div>
-            <div class="credits">
-                <a href="https://mistdb.com/" target="_blank">MiST</a>
-            </div>
-        </div>
-    </div>
-</div>
 <div th:fragment="about">
     <div class="row about-div">
         <div class="col-md-11 home-description">
@@ -88,8 +28,7 @@
         </div>
         <div class="col-md-4 home-description">
             <h3 class="h3-about">Identify protein domain architectures</h3>
-            Identify protein domains, transmembrane an
-            d low-complexity regions.
+            Identify protein domains, transmembrane and low-complexity regions.
             Make use of Pfam, COG, KOG, SMART, PRK, TIGR and MiST models.
         </div>
         <div class="col-md-4 home-description">
@@ -238,7 +177,7 @@
                     <div class="indented-text">
                         <p>
                             a) Put at the beginning of the tree leaves names NCBI/MiST protein ids/locus tags separated from the rest of the names by
-                            space, underscore ( _ ) or vertical bar (|).
+                            space, underscore ( _ ), vertical bar (|) or forward slash (/).
                         </p>
                         <p>
                             b) Tick <span class="proto-tree-text">Retrieve sequences (NCBI and MiST)</span>. Our id analyzer will extract the sequences from NCBI and MiST.
@@ -282,7 +221,7 @@
                 </p>
                 <p>
                     Protein names in the file with the sequences or the tree should start with protein identifiers
-                    separated from the rest of the name by space, underscore ( _ ) or vertical bar (|).
+                    separated from the rest of the name by space, underscore ( _ ), vertical bar (|) or forward slash (/).
                 </p>
                     <p>
                         Suitable identifiers:
@@ -345,6 +284,73 @@
         </div>
         <br/>
     </div>
+    <div class="col-md-12 help-div">
+        <hr/>
+        <div id="credits-href" class="info-header">
+            <h2 data-toggle="collapse" data-target="#credits-info">
+                Credits <i class="fa fa-chevron-down chevron-info"></i>
+            </h2>
+        </div>
+        <div id="credits-info" class="collapse">
+            <div class="row">
+                <div class="col-md-12 credits-list">
+                    <div class="credits">
+                        <a href="https://mafft.cbrc.jp/alignment/software/" target="_blank">MAFFT</a>
+                    </div>
+                    <div class="credits">
+                        <a href="http://www.microbesonline.org/fasttree/" target="_blank">FastTree</a>
+                    </div>
+                    <div class="credits">
+                        <a href="https://www.megasoftware.net/" target="_blank">MEGA</a>
+                    </div>
+                    <div class="credits">
+                        <a href="http://hmmer.org/" target="_blank">HMMER</a>
+                    </div>
+                    <div class="credits">
+                        <a href="http://www.cbs.dtu.dk/services/TMHMM/" target="_blank">TMHMM</a>
+                    </div>
+                    <div class="credits">
+                        <a href="http://weizhongli-lab.org/cd-hit/" target="_blank">CD-HIT</a>
+                    </div>
+                    <div class="credits">
+                        <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi" target="_blank">BLAST</a>
+                    </div>
+                    <div class="credits">
+                        <a href="http://etetoolkit.org/" target="_blank">ETE Toolkit</a>
+                    </div>
+                    <div class="credits">
+                        <a href="https://github.com/guyleonard/jsPhyloSVG" target="_blank">jsPhyloSVG</a>
+                    </div>
+                    <br/>
+                    <div class="credits">
+                        <a href="https://www.ncbi.nlm.nih.gov/Structure/cdd/cdd.shtml" target="_blank">CDD</a>
+                    </div>
+                    <div class="credits">
+                        <a href="https://pfam.xfam.org/" target="_blank">Pfam</a>
+                    </div>
+                    <div class="credits">
+                        <a href="https://www.ncbi.nlm.nih.gov/COG/" target="_blank">COG</a>
+                    </div>
+                    <div class="credits">
+                        <a href="https://www.ncbi.nlm.nih.gov/COG/" target="_blank">KOG</a>
+                    </div>
+                    <div class="credits">
+                        <a href="http://smart.embl-heidelberg.de/" target="_blank">SMART</a>
+                    </div>
+                    <div class="credits">
+                        <a href="https://www.ncbi.nlm.nih.gov/proteinclusters" target="_blank">PRK</a>
+                    </div>
+                    <div class="credits">
+                        <a href="http://tigrfams.jcvi.org/cgi-bin/index.cgi" target="_blank">TIGRFAMs</a>
+                    </div>
+                    <div class="credits">
+                        <a href="https://mistdb.com/" target="_blank">MiST</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="col-md-12 help-div">
         <br/>
         <div class="info-header">

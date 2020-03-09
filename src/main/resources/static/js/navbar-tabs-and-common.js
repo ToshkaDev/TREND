@@ -7,6 +7,7 @@ $(document).ready( function() {
     // on the help page
     attacheOnChevronClick('#domains-href');
     attacheOnChevronClick('#neib-href');
+    attacheOnChevronClick('#credits-href');
     // attache the url of the page to show to a user that he can check the status of his job by this url.
     $("#check-by-url").attr("href", window.location.href);
     $("#check-by-url").text(window.location.href);
