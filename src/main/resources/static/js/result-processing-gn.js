@@ -54,6 +54,8 @@ function buildGeneTree(nwkObject, jsonDomainsAndGenesData) {
 
     var jsonDomainsAndGenesObj = JSON.parse(jsonDomainsAndGenesData);
     setSvgSizeAndBuildTree(textCounter, jsonDomainsAndGenesObj)
+    if ($.isEmptyObject(jsonDomainsAndGenesObj))
+        $("#neighbors-not-retrieved-from-MiST").fadeIn();
 
     d3.select('#treeContainer>svg').select('desc').text("ProtoTree");
     var processed = false;
