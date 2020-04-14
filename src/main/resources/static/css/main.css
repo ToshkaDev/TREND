@@ -55,6 +55,19 @@ nav div.bottom-nav-bar {
    background-image: linear-gradient(-15deg, #214517, #acb4a5);
 }
 
+/* TREND citation */
+#trend-publication a, #trend-publication a:hover, #trend-publication a:focus, #trend-publication a:active {
+    font-size: 16px;
+    color: white;
+}
+
+#trend-publication a:hover, #trend-publication a:focus, #trend-publication a:active {
+    font-size: 16px;
+    text-decoration: underline;
+    color: #ffe5de;
+}
+/* End of TREND citation */
+
 /* The sticky class is added to the navbar with JS when it reaches its scroll position */
 .sticky {
   z-index: 1000;
