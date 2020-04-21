@@ -419,3 +419,18 @@
     </div>
 
 </div>
+
+<div th:fragment="protips">
+    <div class="col-md-12 help-div">
+        <h2 class="info-header">ProTips</h2>
+        <br/>
+        <div class="protips">
+            <p>
+                <span style="font-weight:bold">1)</span> In order to successfully draw gene neighborhoods please provide identifiers of proteins from the RefSeq database. This database is listed in 'Database' section of the BLASTP page as 'Reference proteins (refseq_protein)' option. Once you selected this option you can run BLASTP against this database using your protein of interest and collect homologous proteins and use this collected sequence set as input for TREND.
+            </p>
+            <p>
+                <span style="font-weight:bold">2)</span> If even using the RefSeq proteins you still couldn't retrieve the gene neighborhoods for some of your proteins this means that corresponding organisms are not in our database yet. Thousands of new genomes get deposited to NCBI every week. After quality assessment and ensuring that the genomes meet the depositions standards they slowly get migrated to the RefSeq database. Once the genomes are there the MiST database will collect and process them and finally TREND will be able to process and show the neighboring genes of corresponding genomes.
+            </p>
+        </div>
+    </div>
+</div>

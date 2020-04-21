@@ -24,7 +24,7 @@
 
     <div class="container-fluid main-container">
         <div class="form-group">
-            <div th:fragment="addContent(fragmentsMain, searchArea, filter, navigation, result, help)">
+            <div th:fragment="addContent(fragmentsMain, searchArea, filter, navigation, result, infoFragment)">
                 <div class="col-md-12 query-area">
                     <div th:replace="${filter} ? ~{${fragmentsMain} :: ${filter}} : ~{}"></div>
                     <div th:replace="${searchArea} ? ~{${fragmentsMain} :: ${searchArea}} : ~{}"></div>
@@ -34,7 +34,7 @@
                     <div th:replace="${result} ? ~{${fragmentsMain} :: ${result}} : ~{}"></div>
                 </div>
                 <div class="col-md-12 about">
-                    <div th:replace="${help} ? ~{${fragmentsMain} :: ${help}} : ~{}"></div>
+                    <div th:replace="${infoFragment} ? ~{${fragmentsMain} :: ${infoFragment}} : ~{}"></div>
                 </div>
            </div>
         </div>

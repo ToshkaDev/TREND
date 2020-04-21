@@ -601,6 +601,8 @@ input:checked + .slider:before {
     font-size: 0.7em;
 }
 
+/******* Help, ProTips, Credits, Contact sections *******/
+
 /*Help section*/
 .info-header {
     text-decoration: none;
@@ -643,6 +645,15 @@ input:checked + .slider:before {
 }
 
 /*Contacts end*/
+
+
+.protips {
+    /*font-size: 1.1em;*/
+    line-height: 1.5em;
+}
+
+/******* End of Help, ProTips, Credits, Contact sections *******/
+
 
 /*Examples*/
 
