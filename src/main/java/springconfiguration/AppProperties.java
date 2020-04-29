@@ -2,12 +2,13 @@ package springconfiguration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 
-import java.security.SecureRandom;
 import java.util.UUID;
 
 @ConfigurationProperties("program")
 @PropertySource("classpath:application.properties")
+@RefreshScope
 public class AppProperties {
 
     private String workingDirLocation = "bioinformatics-programs-workingDir";
@@ -68,6 +69,10 @@ public class AppProperties {
     private String hmmscanThreadNum = "10";
     private String fetchFromMist = "true";
     private String fetchFromNCBI = "false";
+
+    private Boolean maintenanceAnnounce = false;
+    private String maintenanceDate = "June-10-202*.";
+    private String startDate = "in two hours.";
 
 
     public String getWorkingDirLocation() {
@@ -456,5 +461,29 @@ public class AppProperties {
 
     public void setXvfbrunSafe(String xvfbrunSafe) {
         this.xvfbrunSafe = xvfbrunSafe;
+    }
+
+    public Boolean getMaintenanceAnnounce() {
+        return maintenanceAnnounce;
+    }
+
+    public void setMaintenanceAnnounce(Boolean maintenanceAnnounce) {
+        this.maintenanceAnnounce = maintenanceAnnounce;
+    }
+
+    public String getMaintenanceDate() {
+        return maintenanceDate;
+    }
+
+    public void setMaintenanceDate(String maintenanceDate) {
+        this.maintenanceDate = maintenanceDate;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
     }
 }

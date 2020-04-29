@@ -78,6 +78,12 @@ public class ProteinFeaturesController extends BioUniverseController {
 
     @Override
     void addToModelCommon(Model model) {
+        Boolean maintenanceAnnounce = ((BioUniverseService) proteinFeaturesService).getProperties().getMaintenanceAnnounce();
+        String maintenanceDate = ((BioUniverseService) proteinFeaturesService).getProperties().getMaintenanceDate();
+        String startDate = ((BioUniverseService) proteinFeaturesService).getProperties().getStartDate();
+        model.addAttribute("maintenanceAnnounce", maintenanceAnnounce);
+        model.addAttribute("maintenanceDate", maintenanceDate);
+        model.addAttribute("startDate", startDate);
         model.addAttribute("mainTab", "domains");
         model.addAttribute("getFieldsValues", "/js/get-fields-values.js");
     }

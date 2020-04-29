@@ -108,3 +108,19 @@ program.hmmscanThreadNum=10
 program.fetchFromMist=true
 program.fetchFromNCBI=true
 program.cdhitThreadNum=4
+
+#*************************#
+# Server management is done via port 80
+# I use it mainly for changing and refreshing application.properties
+#*************************#
+management.security.enabled=false
+management.port=80
+endpoints.enabled=false
+endpoints.refresh.enabled=true
+endpoints.health.enabled=true
+
+#*************************#
+# Management of announcement
+program.maintenanceAnnounce=false
+program.maintenanceDate=June-10-2020.
+program.startDate=in two hours.

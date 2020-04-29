@@ -601,7 +601,7 @@ input:checked + .slider:before {
     font-size: 0.7em;
 }
 
-/******* Help, ProTips, Credits, Contact sections *******/
+/******* Help, ProTips, Credits, Contact sections, Announcement *******/
 
 /*Help section*/
 .info-header {
@@ -652,7 +652,15 @@ input:checked + .slider:before {
     line-height: 1.5em;
 }
 
-/******* End of Help, ProTips, Credits, Contact sections *******/
+/* Announcement */
+.announcement {
+    display: flex;
+    justify-content: center;
+    color: #fa484c;
+    font-size: 1.1em;
+    margin: 0 10px;
+}
+/******* End of Help, ProTips, Credits, Contact sections, Announcement *******/
 
 
 /*Examples*/
@@ -668,3 +676,10 @@ input:checked + .slider:before {
 }
 
 /*Examples end*/
+
+/******* Auxiliary *******/
+.boldFont {
+    font-weight: bold;
+}
+
+/******* End of Auxiliary *******/

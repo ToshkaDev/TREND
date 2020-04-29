@@ -1,17 +1,27 @@
 package controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import service.BioUniverseService;
 
 @Controller
 @RequestMapping("/")
 public class HomeController {
 
+    @Autowired
+    public final BioUniverseService bioUniverseService;
+
+    public HomeController(BioUniverseService bioUniverseService) {
+        this.bioUniverseService = bioUniverseService;
+    }
+
     @GetMapping(value={"", "/home"})
     public String home(Model model) {
         model.addAttribute("mainTab", "home");
+        addToModelCommon(model);
         return "main-view  :: addContent(" +
                 "fragmentsMain='help-and-about', infoFragment='about')";
     }
@@ -19,6 +29,7 @@ public class HomeController {
     @GetMapping(value={"/help"})
     public String help(Model model) {
         model.addAttribute("mainTab", "help");
+        addToModelCommon(model);
         return "main-view  :: addContent(" +
                 "fragmentsMain='help-and-about', infoFragment='help')";
     }
@@ -26,6 +37,7 @@ public class HomeController {
     @GetMapping(value={"/protips"})
     public String proTips(Model model) {
         model.addAttribute("mainTab", "protips");
+        addToModelCommon(model);
         return "main-view  :: addContent(" +
                 "fragmentsMain='help-and-about', infoFragment='protips')";
     }
@@ -33,7 +45,17 @@ public class HomeController {
     @GetMapping(value={"/contact"})
     public String contact(Model model) {
         model.addAttribute("mainTab", "contact");
+        addToModelCommon(model);
         return "main-view  :: addContent(" +
                 "fragmentsMain='help-and-about', infoFragment='contact')";
+    }
+
+    void addToModelCommon(Model model) {
+        Boolean maintenanceAnnounce = bioUniverseService.getProperties().getMaintenanceAnnounce();
+        String maintenanceDate = bioUniverseService.getProperties().getMaintenanceDate();
+        String startDate = bioUniverseService.getProperties().getStartDate();
+        model.addAttribute("maintenanceAnnounce", maintenanceAnnounce);
+        model.addAttribute("maintenanceDate", maintenanceDate);
+        model.addAttribute("startDate", startDate);
     }
 }

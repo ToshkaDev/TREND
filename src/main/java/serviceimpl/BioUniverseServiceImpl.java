@@ -9,6 +9,7 @@ import exceptions.IncorrectRequestException;
 import model.internal.ProtoTreeInternal;
 import model.request.ProtoTreeRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ import static converters.ConverterMain.fromProtoTreeRequestToProtoTreeInternal;
  * Created by vadim on 8/14/17.
  */
 @Service
+@Primary
 public class BioUniverseServiceImpl implements BioUniverseService {
     private final int defaultLastJobId = 1;
     private final AppProperties properties;

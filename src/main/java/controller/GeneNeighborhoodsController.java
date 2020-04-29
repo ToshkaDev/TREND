@@ -71,6 +71,12 @@ public class GeneNeighborhoodsController extends BioUniverseController {
 
     @Override
     void addToModelCommon(Model model) {
+        Boolean maintenanceAnnounce = ((BioUniverseService) geneNeighborhoodsService).getProperties().getMaintenanceAnnounce();
+        String maintenanceDate = ((BioUniverseService) geneNeighborhoodsService).getProperties().getMaintenanceDate();
+        String startDate = ((BioUniverseService) geneNeighborhoodsService).getProperties().getStartDate();
+        model.addAttribute("maintenanceAnnounce", maintenanceAnnounce);
+        model.addAttribute("maintenanceDate", maintenanceDate);
+        model.addAttribute("startDate", startDate);
         model.addAttribute("mainTab", "gene-neighborhoods");
     }
 }
