@@ -87,11 +87,15 @@ nav div.bottom-nav-bar {
     color: #c62f2d;
 }
 
-/* Add some top padding to the page content to prevent sudden quick movement (as the navigation bar gets a new position at the top of the page (position:fixed and top:0) */
+/* Add some top padding to the page content and, importantly, 'wrapper' class to prevent sudden quick movement (as the navigation bar gets a new position at the top of the page (position:fixed and top:0) */
 .sticky + .main-container {
   padding-top: 60px;
 }
 
+.wrapper {
+    height: 290px;
+}
+/* End of Adding to prevent sudden quick movement */
 
  /*End of navigation bar styles */
 
@@ -152,7 +156,6 @@ div.panel-default {
         width: 95%;
     }
 }
-
 
 label.error {
     font-size:small;
@@ -236,7 +239,7 @@ div.result-area {
 
 .main-container {
     min-height: calc(100vh - 330px);
-    margin-top: 120px;
+    margin-top: 80px;
 }
 
 .switcher {

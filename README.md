@@ -7,4 +7,4 @@ TREND has an extensible modular architecture, new functionality can be added wit
 
 TREND stands for **TR**ee-based **E**xploration of **N**eighborhoods and **D**omains.
 
-Vadim M. Gumerov, Igor B. Zhulin (2020). TREND: a platform for exploring protein function in prokaryotes based on phylogenetic, domain architecture and gene neighborhood analyses. Nucleic Acids Research, gkaa243, https://doi.org/10.1093/nar/gkaa243
+_Vadim M. Gumerov, Igor B. Zhulin (2020). TREND: a platform for exploring protein function in prokaryotes based on phylogenetic, domain architecture and gene neighborhood analyses. Nucleic Acids Research, gkaa243, https://doi.org/10.1093/nar/gkaa243_

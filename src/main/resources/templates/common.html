@@ -3,53 +3,55 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
     <div th:fragment="main-navbar">
-        <div class="container-fluid logo-area">
-            <div class="row">
-                <div class="col-md-6">
-                    <br/>
-                    <br/>
-                    <br/>
-                    <br/>
-                    <a class="logo-text red-letters" th:href="@{/}" style="color: #c62f2d; font-size:350%; font-weight: bold">TREND</a>
-                    <div class="logo-text"><span class="red-letters">TR</span>ee-based <span class="red-letters">E</span>xploration of <span class="red-letters">N</span>eighborhoods and <span class="red-letters">D</span>omains</div>
-                </div>
-                <div class="col-md-6">
-                    <div class="protoTree-figure">
-                        <a th:href="@{/}">
-                            <img th:src="@{/images/ProtoTree.png}" width="500" height="200">
-                        </a>
+        <div class="wrapper">
+            <div class="container-fluid logo-area">
+                <div class="row">
+                    <div class="col-md-6">
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <a class="logo-text red-letters" th:href="@{/}" style="color: #c62f2d; font-size:350%; font-weight: bold">TREND</a>
+                        <div class="logo-text"><span class="red-letters">TR</span>ee-based <span class="red-letters">E</span>xploration of <span class="red-letters">N</span>eighborhoods and <span class="red-letters">D</span>omains</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="protoTree-figure">
+                            <a th:href="@{/}">
+                                <img th:src="@{/images/ProtoTree.png}" width="500" height="200">
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
+            <nav id="navbar" class="navbar navbar-inverse">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bu-navbar">
+                            <span class="sr-only">Toggle Dropdown</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                    </div>
+                    <div class="collapse navbar-collapse" id="bu-navbar">
+                        <ul class="nav navbar-nav">
+                            <li id="home"><a th:href="@{/}">Home</a></li>
+                            <li id="domains"><a th:href="@{/domains}">Domains</a></li>
+                            <li id="gene-neighborhoods"><a th:href="@{/gene-neighborhoods}">Neighborhoods</a></li>
+                            <li id="help"><a th:href="@{/help}">Help</a></li>
+                            <li id="protips"><a th:href="@{/protips}">ProTips</a></li>
+                            <li id="contact"><a th:href="@{/contact}">Contact</a></li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li id="trend-publication">
+                                <a th:href="@{https://doi.org/10.1093/nar/gkaa243}" target="_blank">Gumerov VM, Zhulin IB (2020) Nucleic Acids Research, gkaa243</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="bottom-nav-bar"></div>
+            </nav>
         </div>
-        <nav id="navbar" class="navbar navbar-inverse">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bu-navbar">
-                        <span class="sr-only">Toggle Dropdown</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                </div>
-                <div class="navbar-collapse" id="bu-navbar">
-                    <ul class="nav navbar-nav">
-                        <li id="home"><a th:href="@{/}">Home</a></li>
-                        <li id="domains"><a th:href="@{/domains}">Domains</a></li>
-                        <li id="gene-neighborhoods"><a th:href="@{/gene-neighborhoods}">Neighborhoods</a></li>
-                        <li id="help"><a th:href="@{/help}">Help</a></li>
-                        <li id="protips"><a th:href="@{/protips}">ProTips</a></li>
-                        <li id="contact"><a th:href="@{/contact}">Contact</a></li>
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        <li id="trend-publication">
-                            <a th:href="@{https://doi.org/10.1093/nar/gkaa243}" target="_blank">Gumerov VM, Zhulin IB (2020) Nucleic Acids Research, gkaa243</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="bottom-nav-bar"></div>
-        </nav>
 
         <div style="display: none">
             <span id="mainTab" th:text="${mainTab}"></span>

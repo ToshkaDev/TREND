@@ -12,6 +12,13 @@ $(document).ready( function() {
     $("#check-by-url").attr("href", window.location.href);
     $("#check-by-url").text(window.location.href);
     setCopyrightDate();
+
+    // control navbar toggling on load
+    controlNavBarToggle();
+    // control navbar toggling on 'show'/'hide' events
+    $('.navbar-collapse').on('shown.bs.collapse hidden.bs.collapse', function () {
+        controlNavBarToggle();
+    });
 });
 
 function mainNavbar(tab) {
@@ -48,4 +55,38 @@ function adjustStickyNavbar() {
 function setCopyrightDate() {
     var today = new Date()
     $("#current-year").text(today.getFullYear())
+}
+
+// control navbar toggling on 'window resize' event
+$(window).resize(function(){
+    controlNavBarToggle();
+});
+
+// navbar control function
+function controlNavBarToggle() {
+    var navbarVisible = $(".navbar-collapse").is(":visible");
+        if (window.innerWidth <= 317) {
+        setWrapperClassHeight(navbarVisible, "870px", "540px");
+    } else  if (window.innerWidth <= 372) {
+        setWrapperClassHeight(navbarVisible, "830px", "510px");
+    } else if (window.innerWidth <= 506) {
+        setWrapperClassHeight(navbarVisible, "805px", "490px");
+    } else if (window.innerWidth <= 679) {
+        setWrapperClassHeight(navbarVisible, "785px", "490px");
+    } else if (window.innerWidth <= 768) {
+        setWrapperClassHeight(navbarVisible, "760px", "460px");
+    } else if (window.innerWidth <= 991) {
+        $('.wrapper').css("height", "510px");
+    } else if (window.innerWidth <= 1159) {
+        $('.wrapper').css("height", "340px");
+    } else {
+        $('.wrapper').css("height", "290px");
+    }
+}
+
+function setWrapperClassHeight(navbarVisible, heightL, heightS) {
+    if (navbarVisible)
+      $('.wrapper').css("height", heightL);
+    else
+      $('.wrapper').css("height", heightS);
 }
