@@ -110,11 +110,11 @@ program.fetchFromNCBI=true
 program.cdhitThreadNum=4
 
 #*************************#
-# Server management is done via port 80
+# Server management is done via port 81
 # I use it mainly for changing and refreshing application.properties
 #*************************#
 management.security.enabled=false
-management.port=80
+management.port=81
 endpoints.enabled=false
 endpoints.refresh.enabled=true
 endpoints.health.enabled=true
