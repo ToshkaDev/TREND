@@ -31,9 +31,8 @@ FETCH_FROM_IDS = False
 FETCH_FROM_TREE = False
 REMOVE_DASHES = True
 
-REGEX_VOID = re.compile(r"(\(|\)|:|,|}|{|'|/|]|\[|\\)")
 REGEX_VOID = re.compile(r"(\(|\)|:|,|}|{|'|]|\[|\\)")
-REGEX_UNDERSCORE = re.compile(r"( |/|\|)")
+REGEX_UNDERSCORE = re.compile(r"( |/|\||;|=)")
 REGEX_UNDERSCORE_MULTIPLE = re.compile(r"_{2,}")
 REGEX_VOID_SUBST = ""
 REGEX_UNDERSCORE_SUBST = "_"
@@ -195,7 +194,9 @@ def prepareIdListFromInput():
 	proteinIds = set()
 	with open(INPUT_FILE, "r") as inputFile:
 		for line in inputFile:
-			proteinIds.add(line.strip())
+			record = line.strip()
+			if len(record):
+				proteinIds.add(record)
 	proteinIdsMultiProc = manager.list(proteinIds.copy())
 	return (proteinIds, proteinIdsMultiProc)
 

@@ -463,6 +463,8 @@ def processSegmasker():
 def formatSequence(sequence):
 	stringWithSpaceChars = ""
 	piece = int(math.floor(len(sequence)/SEQUENCE_LINE_LEN))
+	# If the for loop will not be iterated
+	ind = 0
 	for ind in xrange(piece):
 		stringWithSpaceChars = stringWithSpaceChars + " " + sequence[ind*SEQUENCE_LINE_LEN:(ind+1)*SEQUENCE_LINE_LEN]
 	return (stringWithSpaceChars + " " + sequence[(ind+1)*SEQUENCE_LINE_LEN:]).strip()
