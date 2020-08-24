@@ -117,7 +117,7 @@ def initialize(argv):
 def getChangedName(line):
 	line = REGEX_VOID.sub(REGEX_VOID_SUBST, line)
 	line = REGEX_UNDERSCORE.sub(REGEX_UNDERSCORE_SUBST, line)
-	return REGEX_UNDERSCORE_MULTIPLE.sub(REGEX_UNDERSCORE_SUBST, line)
+	return REGEX_UNDERSCORE_MULTIPLE.sub(REGEX_UNDERSCORE_SUBST, line.rstrip("."))
 
 # Default case for Tree
 def getChangedNamesForTree():
