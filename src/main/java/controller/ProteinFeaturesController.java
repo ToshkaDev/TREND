@@ -81,9 +81,13 @@ public class ProteinFeaturesController extends BioUniverseController {
         Boolean maintenanceAnnounce = ((BioUniverseService) proteinFeaturesService).getProperties().getMaintenanceAnnounce();
         String maintenanceDate = ((BioUniverseService) proteinFeaturesService).getProperties().getMaintenanceDate();
         String startDate = ((BioUniverseService) proteinFeaturesService).getProperties().getStartDate();
+        String systemMessage = ((BioUniverseService) proteinFeaturesService).getProperties().getSystemMessage();
+        String systemMessageEnabled = ((BioUniverseService) proteinFeaturesService).getProperties().getSystemMessageEnabled();
         model.addAttribute("maintenanceAnnounce", maintenanceAnnounce);
         model.addAttribute("maintenanceDate", maintenanceDate);
         model.addAttribute("startDate", startDate);
+        model.addAttribute("systemMessage", systemMessage);
+        model.addAttribute("systemMessageEnabled", systemMessageEnabled);
         model.addAttribute("mainTab", "domains");
         model.addAttribute("getFieldsValues", "/js/get-fields-values.js");
     }

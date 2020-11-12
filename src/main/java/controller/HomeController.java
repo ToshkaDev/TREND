@@ -54,8 +54,12 @@ public class HomeController {
         Boolean maintenanceAnnounce = bioUniverseService.getProperties().getMaintenanceAnnounce();
         String maintenanceDate = bioUniverseService.getProperties().getMaintenanceDate();
         String startDate = bioUniverseService.getProperties().getStartDate();
+        String systemMessage = bioUniverseService.getProperties().getSystemMessage();
+        String systemMessageEnabled = bioUniverseService.getProperties().getSystemMessageEnabled();
         model.addAttribute("maintenanceAnnounce", maintenanceAnnounce);
         model.addAttribute("maintenanceDate", maintenanceDate);
         model.addAttribute("startDate", startDate);
+        model.addAttribute("systemMessage", systemMessage);
+        model.addAttribute("systemMessageEnabled", systemMessageEnabled);
     }
 }

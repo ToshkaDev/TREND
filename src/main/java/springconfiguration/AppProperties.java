@@ -73,6 +73,8 @@ public class AppProperties {
     private Boolean maintenanceAnnounce = false;
     private String maintenanceDate = "June-10-202*.";
     private String startDate = "in two hours.";
+    private String systemMessage = "One of the underlying databases is down. Please be patient.";
+    private String systemMessageEnabled = "false";
 
 
     public String getWorkingDirLocation() {
@@ -485,5 +487,21 @@ public class AppProperties {
 
     public void setStartDate(String startDate) {
         this.startDate = startDate;
+    }
+
+    public String getSystemMessage() {
+        return systemMessage;
+    }
+
+    public void setSystemMessage(String systemMessage) {
+        this.systemMessage = systemMessage;
+    }
+
+    public String getSystemMessageEnabled() {
+        return systemMessageEnabled;
+    }
+
+    public void setSystemMessageEnabled(String systemMessageEnabled) {
+        this.systemMessageEnabled = systemMessageEnabled;
     }
 }

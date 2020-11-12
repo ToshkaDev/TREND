@@ -124,3 +124,5 @@ endpoints.health.enabled=true
 program.maintenanceAnnounce=false
 program.maintenanceDate=June-10-2020.
 program.startDate=in two hours.
+program.systemMessageEnabled=false
+pogram.systemMessage=One of the underlying databases is down. Please be patient.

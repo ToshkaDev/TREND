@@ -57,6 +57,10 @@
             <span id="mainTab" th:text="${mainTab}"></span>
         </div>
 
+        <div class="col-md-12 announcement" th:if="${systemMessageEnabled}">
+            <p th:text="${systemMessage}"></p>
+        </div>
+
         <div class="col-md-12 announcement" th:if="${maintenanceAnnounce}">
             <p>Maintenance works will be carried out <span class="boldFont" id="maintenanceDate" th:text="${maintenanceDate}"></span>
                 We ask you to finish your jobs prior to this date. The server will be stopped and the running jobs will be lost.

@@ -74,9 +74,13 @@ public class GeneNeighborhoodsController extends BioUniverseController {
         Boolean maintenanceAnnounce = ((BioUniverseService) geneNeighborhoodsService).getProperties().getMaintenanceAnnounce();
         String maintenanceDate = ((BioUniverseService) geneNeighborhoodsService).getProperties().getMaintenanceDate();
         String startDate = ((BioUniverseService) geneNeighborhoodsService).getProperties().getStartDate();
+        String systemMessage = ((BioUniverseService) geneNeighborhoodsService).getProperties().getSystemMessage();
+        String systemMessageEnabled = ((BioUniverseService) geneNeighborhoodsService).getProperties().getSystemMessageEnabled();
         model.addAttribute("maintenanceAnnounce", maintenanceAnnounce);
         model.addAttribute("maintenanceDate", maintenanceDate);
         model.addAttribute("startDate", startDate);
+        model.addAttribute("systemMessage", systemMessage);
+        model.addAttribute("systemMessageEnabled", systemMessageEnabled);
         model.addAttribute("mainTab", "gene-neighborhoods");
     }
 }
