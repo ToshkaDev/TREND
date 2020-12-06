@@ -459,32 +459,6 @@ div.protein-info-container h4 {
 
 /*Footer*/
 
-.social {
-    background-color: #acb4a5;
-    font-size: 170%;
-    border-radius: 50%;
-    border-width: 2px;
-    border-color: white;
-    color: white;
-    display: flex;
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    align-items: center;
-    justify-content: center;
-    height: 50px;
-    width: 50px;
-    margin-bottom: 5px;
-}
-
-.social:hover, .social:active, .social:visited {
-    background-color: white;
-    color: #1DA1F2;
-    border-color: white;
-}
-
-
 .footer-info, #copy-right {
     display: flex;
     justify-content: center;

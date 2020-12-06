@@ -73,15 +73,10 @@
 
     <div th:fragment="copy" class="footer-container">
         <div class="row">
-            <div class="col-md-6 ">
-                <div class="row footer-info">
-                    <h2> <a th:href="@{http://u.osu.edu/zhulinlab/}" class="footer-text" target="_blank">ZHULIN LAB </a></h2>
-                </div>
-                <div class="row footer-info">
-                    <a th:href="@{http://twitter.com/zhulinlab}" class="btn btn-default btn-sm social" target="_blank">
-                        <i class="fa fa-twitter"></i>
-                    </a>
-                </div>
+            <div class="col-md-6 footer-info">
+                <a th:href="@{https://www.nih.gov/}" target="_blank">
+                    <img th:src="@{/images/NIH-min.png}" width="220" height="150">
+                </a>
             </div>
             <div class="col-md-6 footer-info">
                 <a th:href="@{https://www.osu.edu}" target="_blank">
