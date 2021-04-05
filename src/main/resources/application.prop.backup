@@ -71,11 +71,11 @@ program.enumerate=../bioinformatics-programs/orderSequencesBasedOnTree.py
 program.geneNeighbors=../bioinformatics-programs/gene_neighbors.py
 program.reduceWithCdHit=../bioinformatics-programs/runCdHit.py
 
-program.hmmscanDbPath=/data/HMM_models/
+program.hmmscanDbPath=/data/HMM_models/Pfam34/
 program.rpsblastDbPath=/data/Ncbi/CDD_PSSMs/
 program.rpsprocDbPath=/home/bioverse/trend/Soft/rpcbproc/rpsbproc_dir/rpsbproc_data
-program.pfam=Pfam-A32.hmm
-program.pfamAndMist=Pfam-A32_and_Mist-specific.hmm
+program.pfam=Pfam-A.hmm
+program.pfamAndMist=Pfam-A_and_Mist_Trend.hmm
 program.rpsblastCddSuper=Cdd
 program.rpsblastCddNcbi=Cdd_NCBI
 program.rpsblastCog=Cog
