@@ -46,11 +46,12 @@ clusterOffsetRight = 0.044;
 PROCESSED_STABLE_IDS = [];
 GENE_NEIB_COUNTER = 0;
 
-function buildGeneTree(nwkObject, jsonDomainsAndGenesData) {
+function buildGeneTree(nwkObject, jsonDomainsAndGenesData, firstBuild=true) {
     var textCounter = Newick.parse(nwkObject.newick)[1]
     if (textCounter < 3)
         return false;
-    createZoomableBox();
+    if (firstBuild)
+        createZoomableBox();
 
     var jsonDomainsAndGenesObj = JSON.parse(jsonDomainsAndGenesData);
     setSvgSizeAndBuildTree(textCounter, jsonDomainsAndGenesObj)
@@ -147,12 +148,16 @@ function createZoomableBox() {
         .call(d3.zoom().on("zoom", function() {
             tree.attr("transform", d3.event.transform);
             textPositionZoomCorrection = d3.event.transform.k;
-            tree.selectAll('.description-box')
-            .attr("width", infoBoxWidth/textPositionZoomCorrection)
-            .attr("height", infoBoxHeight/textPositionZoomCorrection);
+            setWidthHeightOfDescriptionBoxes();
         }))
         .append("g")
         .attr("id", "treeContainer");
+}
+
+function setWidthHeightOfDescriptionBoxes() {
+    d3.select('#svgContainer').selectAll('.description-box')
+    .attr("width", infoBoxWidth/textPositionZoomCorrection)
+    .attr("height", infoBoxHeight/textPositionZoomCorrection);
 }
 
 function getGenesAndDraw(protIdsToYCoords, xCoordinate, xCoordinateText, jsonDomainsAndGenesObj) {
@@ -203,7 +208,7 @@ function drawNeighborGenes(domElement, gene, neighbGenes, yCoordinate, xCoordina
     createDescriptionBoxes(geneCluster, geneScale, span, gene);
     var divs = addHtml([...neighbGenes, gene], d3.select('#svgContainer'));
     addEventListeneres(geneCluster, geneScale, gene);
-    addHtmlEventListeneres(divs, geneScale);
+    addHtmlEventListeneres(divs, geneScale, gene);
 }
 
 function getCondition(gene, thisgene){
@@ -426,7 +431,7 @@ function addEventListeneres(geneCluster, geneScale, thisgene) {
     });
 }
 
-function addHtmlEventListeneres(divs, geneScale) {
+function addHtmlEventListeneres(divs, geneScale, thisgene) {
     divs
     .on("mouseover", function () {
         //if the svg zoomed out proportion is less than 0.6 don't show anything
