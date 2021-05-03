@@ -261,6 +261,14 @@
         </div>
         <div class="col-md-12 text-center result-container">
             <div class="result-download-buttons">
+                <div class="switcher-genes">
+                    <span class="switch-text">Сodirect:</span>
+                    <span class="glyphicon glyphicon-info-sign codirect-glyphicon" data-toggle="tooltip" data-placement="top" title="If this option is active, genes encoded in the genome in the same direction as query genes are displayed in forward direction (left to right) regardless of their actual orientation (see Help for more info)."> </span>
+                    <label class="switch">
+                        <input id="codirect-value" type="checkbox"/>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
                 <a id="results-load" class="btn btn-info btn-md proto-tree-button" href="#">
                     Tree (SVG) <span class="glyphicon glyphicon-download-alt "> </span>
                 </a>
@@ -277,7 +285,9 @@
                     CD-HIT clusters (TXT) <span class="glyphicon glyphicon-download-alt"> </span>
                 </a>
             </div>
+
         </div>
+
         <div class="col-md-12 my-result">
             <div style="display: none">
                 <span id="jobId" th:text="${jobId}"></span>

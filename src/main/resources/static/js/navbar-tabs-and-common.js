@@ -19,6 +19,11 @@ $(document).ready( function() {
     $('.navbar-collapse').on('shown.bs.collapse hidden.bs.collapse', function () {
         controlNavBarToggle();
     });
+    // initialize tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
+    //set codirect check input to "on"
+    $('#codirect-value').attr('checked', true);
 });
 
 function mainNavbar(tab) {

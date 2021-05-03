@@ -47,6 +47,20 @@ function processRetrievedDataAsync(data) {
                     } else {
                         $('.result-container').show();
                         onDownload();
+                        /*  The following code reacts at #codirect-value check input changes.
+                            By default this check input is and all genes that have the same strand (regardless "+" or "-")
+                            are oriented as forward genes ("+" strand), and genes that have the have a different strand
+                            are rendered as reverse genes ("-" strand).
+                            If the checker is set to off, the tree will be redrawn orienting genes according
+                            to their true genomic orientation ("+" strand or "-" strand).
+                        */
+                        checkInputStates = {"checked": true, "undefined": false};
+                        $('#codirect-value').click(function() {
+                            var codirectValue = $('#codirect-value').attr("checked");
+                            $('#codirect-value').attr('checked', !checkInputStates[codirectValue]);
+                            d3.select('#treeContainer>svg').remove();
+                            buildGeneTree(nwkObject, jsonDomainsAndGenesData);
+                        })
                     }
                 });
             });

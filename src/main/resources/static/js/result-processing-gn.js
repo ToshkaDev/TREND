@@ -155,8 +155,6 @@ function createZoomableBox() {
         .attr("id", "treeContainer");
 }
 
-
-
 function getGenesAndDraw(protIdsToYCoords, xCoordinate, xCoordinateText, jsonDomainsAndGenesObj) {
     xCoordinate = xCoordinate + xCoordinateText.length*7.1;
     var refSeqCounter = 0;
@@ -202,10 +200,21 @@ function drawNeighborGenes(domElement, gene, neighbGenes, yCoordinate, xCoordina
         .attr("transform", `translate(0, ${axisYTranslation})`)
         .attr("color", "#e6e6e6")
         .call(d3.axisBottom(geneScale).tickValues([]));
-    createDescriptionBoxes(geneCluster, geneScale, span, gene.id);
+    createDescriptionBoxes(geneCluster, geneScale, span, gene);
     var divs = addHtml([...neighbGenes, gene], d3.select('#svgContainer'));
-    addEventListeneres(geneCluster, geneScale);
+    addEventListeneres(geneCluster, geneScale, gene);
     addHtmlEventListeneres(divs, geneScale);
+}
+
+function getCondition(gene, thisgene){
+    var forcelyCodirect = $("#codirect-value").attr("checked");
+    var condition;
+    //gene.strand === thisgene.strand => render the gene as direct (left to write direction) regardless of an actual strand ("-" or "+")
+    if (forcelyCodirect)
+        condition = gene.strand === thisgene.strand ? true : false;
+    else
+        condition = gene.strand === "+" ? true : false;
+    return condition;
 }
 
 function createFrameAndAppendGroupTags(containerGroup, neighbourGenes, clusterPictureWidth) {
@@ -236,8 +245,8 @@ function createGenePaths(geneCluster, thisgene, geneScale) {
     var genePath;
     geneCluster.append("path")
         .attr("d", function(gene, i) {
-            var isComplement = gene.strand === "-" ? true : false;
-            if (!isComplement) {
+            var condition = getCondition(gene, thisgene);
+            if (condition) {
                 genePath = [
                     `M${geneScale(gene.start)}`, directGeneFigureTopY,
                     `L${geneScale(gene.stop)-geneFigureArrowLen}`, directGeneFigureTopY,
@@ -297,11 +306,11 @@ function addHtml(neighbourGenes, d3ParentElement) {
         });
 }
 
-function createDescriptionBoxes(geneCluster, geneScale, span, mainGeneId) {
+function createDescriptionBoxes(geneCluster, geneScale, span, thisgene) {
     geneCluster.append("rect")
         .style("display", "none")
         .attr("class", function(d) {
-            return "gene"+d.id+" gene-div "+"identifier-"+mainGeneId + " description-box";
+            return "gene"+d.id+" gene-div "+"identifier-"+thisgene.id + " description-box";
         })
         .attr('width', infoBoxWidth)
         .attr('height', infoBoxHeight)
@@ -318,14 +327,14 @@ function createDescriptionBoxes(geneCluster, geneScale, span, mainGeneId) {
             return geneScale(boxXCoord);
         })
         .attr("y", function(gene) {
-            var isComplement = gene.strand === "-" ? true : false;
-            if (!isComplement)
+            var condition = getCondition(gene, thisgene);
+            if (condition)
                 return directGeneInfoBoxY;
             return reverseGeneInfoBoxY;
         });
 }
 
-function addEventListeneres(geneCluster, geneScale) {
+function addEventListeneres(geneCluster, geneScale, thisgene) {
     geneCluster
     .on("mouseover", function (){
         //if the svg zoomed out proportion is less than 0.4 don't show anything
@@ -353,8 +362,8 @@ function addEventListeneres(geneCluster, geneScale) {
 
         element.attr("dummy", function(gene) {
             geneId = gene.id;
-            isComplement = gene.strand === "-" ? true : false;
-            if (!isComplement)
+            condition = getCondition(gene, thisgene);
+            if (condition)
                 top = (yAbsolute - textPositionFactorDirectY)/positionCorrection  + "px;";
             else
                 top = (yAbsolute - textPositionFactorReverseY)/positionCorrectionReveres + "px;";
@@ -367,7 +376,7 @@ function addEventListeneres(geneCluster, geneScale) {
         });
 
         geneCluster.select(".gene"+geneId+">.description-box").attr("y", function() {
-            if (!isComplement)
+            if (condition)
                 return directGeneInfoBoxY/textPositionZoomCorrection;
             // Corrections of vertical position of info boxes for reverse genes
             else {
@@ -444,8 +453,8 @@ function addHtmlEventListeneres(divs, geneScale) {
         }
         element
             .style("top", function(gene) {
-                var isComplement = gene.strand === "-" ? true : false;
-                if (!isComplement)
+                condition = getCondition(gene, thisgene);
+                if (condition)
                     return (yAbsolute - textPositionFactorDirectY)/positionCorrection + "px";
                 return (yAbsolute - textPositionFactorReverseY)/positionCorrectionReveres + "px";
 

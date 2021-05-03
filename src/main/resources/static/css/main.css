@@ -251,8 +251,22 @@ div.result-area {
     justify-content: space-between;
 }
 
+.switcher-genes {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 20px;
+}
+
 .switch-text {
     padding-top: 7px;
+}
+.unidirect-glyphicon {
+    padding-right: 5px;
+    color: #214517;
 }
 
 .stage-element, #neighbors-not-retrieved-from-MiST {

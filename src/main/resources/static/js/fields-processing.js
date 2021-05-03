@@ -179,16 +179,15 @@ function takeCareOfFields() {
             $('.predict-features').hide();
     });
 
-    lcrStates = {"checked": true, "undefined": false};
+    checkInputStates = {"checked": true, "undefined": false};
     $('#lc-value').click(function() {
         var lcValue = $('#lc-value').attr("checked");
-        $('#lc-value').attr('checked', !lcrStates[lcValue]);
+        $('#lc-value').attr('checked', !checkInputStates[lcValue]);
     })
 
-    enumerateStates = {"checked": true, "undefined": false};
     $('#enumerate-value').click(function() {
         var enumerateValue = $('#enumerate-value').attr("checked");
-        $('#enumerate-value').attr('checked', !enumerateStates[enumerateValue]);
+        $('#enumerate-value').attr('checked', !checkInputStates[enumerateValue]);
     })
 
     $("#fetch-fromTree-value").change(function() {
