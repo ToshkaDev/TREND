@@ -88,7 +88,7 @@ nav div.bottom-nav-bar {
     color: #c62f2d;
 }
 
-.social {
+.trend-social {
     background-color: #4d6a45;
     font-size: 120%;
     border-radius: 50%;
@@ -106,7 +106,7 @@ nav div.bottom-nav-bar {
     width: 40px;
 }
 
-.social:hover, .social:active, .social:visited {
+.trend-social:hover, .trend-social:active, .trend-social:visited {
     background-color: white;
     color: #1DA1F2;
     border-color: white;
