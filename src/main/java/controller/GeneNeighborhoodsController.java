@@ -42,7 +42,7 @@ public class GeneNeighborhoodsController extends BioUniverseController {
     @GetMapping(value={"tree/{jobId:.+}"})
     public String geneNeighborhoodsResult(@PathVariable String jobId, Model model) {
         model.addAttribute("sendOrGiveResult","/js/result-processing-gn.js");
-        model.addAttribute("specificJs", "/js/result-processing-gn-server.js");
+        model.addAttribute("specificJs", "/js/result-processing-gn-server.js?version=1");
         model.addAttribute("resultProcessingCommon", "/js/result-processing-common.js");
         model.addAttribute("jobId", jobId);
         addToModelCommon(model);

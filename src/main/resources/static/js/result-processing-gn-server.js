@@ -89,6 +89,9 @@ function rebuildTreeOnClick() {
         PROCESSED_STABLE_IDS = [];
         buildGeneTree(nwkObject, jsonDomainsAndGenesData, firstBuild=false);
         setWidthHeightOfDescriptionBoxes();
+        //reinitialize onDownload() function, so that svgData variable in that function would point to a new svg object,
+        //since the original svg object was cached.
+        onDownload();
     })
 }
 
