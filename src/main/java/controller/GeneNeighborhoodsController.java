@@ -31,9 +31,9 @@ public class GeneNeighborhoodsController extends BioUniverseController {
 
     @GetMapping(value="")
     public String geneNeighborhoods(Model model) {
-        model.addAttribute("sendOrGiveResult", "/js/send-and-process-data.js");
+        model.addAttribute("sendOrGiveResult", "/js/send-and-process-data.js?version=1");
         model.addAttribute("getFieldsValues", "/js/get-fields-values.js");
-        model.addAttribute("fieldsProcessing", "/js/fields-processing.js");
+        model.addAttribute("fieldsProcessing", "/js/fields-processing.js?version=1");
         addToModelCommon(model);
         return "main-view  :: addContent(" +
                 "fragmentsMain='neighborhoods-fragments', searchArea='gene-neighborhoods', filter='proto-tree-filter')";

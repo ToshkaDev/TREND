@@ -165,8 +165,11 @@ function takeCareOfFields() {
         $('#enumerate-value').removeAttr('checked');
         $('#tree-method, #ml-phylo-test, #nj_me-phylo-test, #gaps-missing').trigger('change');
         $("#phylo-test-ft").trigger('change');
-        $('input[name="dom-prediction-program"]').trigger('change')
-        $('input[name="tree-soft"]').trigger('change')
+        
+        $('input[name="dom-prediction-program"]').trigger('change');
+        $("#do-predict-features").prop("disabled") ? $(".predict-features").hide() : $(".predict-features").show();
+
+        $('input[name="tree-soft"]').trigger('change');
     });
 
     $('#do-predict-features').prop("checked", true);

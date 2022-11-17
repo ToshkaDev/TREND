@@ -56,6 +56,9 @@ $(document).ready(function (){
         $('#rpsblast-db').hide();
         $("#do-predict-features").prop("checked", true);
         $("#do-predict-features").prop("disabled", false);
+
+        clearFieldsOnPipelineSelect();
+        $('#filter-clear').trigger("click");
     });
     $('#partial-pipeline').click(function() {
         $('.full-pipe').hide();
@@ -70,8 +73,27 @@ $(document).ready(function (){
         $(".predict-features").hide();
         $("#do-predict-features").prop("checked", false);
         $("#do-predict-features").prop("disabled", true);
+
+        clearFieldsOnPipelineSelect();
+        $('#filter-clear').trigger("click");
     });
 });
+
+function clearFieldsOnPipelineSelect() {
+    //Clear retrieval by id values
+    $("#fetch-fromIds-value1").prop("checked", false);
+    $("#fetch-fromTree-value").prop("checked", false);
+    //Clear text input areas
+    $('#first-file-area').val('');
+    $('#second-file-area').val('');
+    //Clear file input areas
+    $('#sequence-file').val('');
+    $('#alignment-file').val('');
+    $('#tree-file').val('');
+    $("#alignment-file-info").html('');
+    $("#sequence-file-info").html('');
+    $('#sequence-file-info').html('');
+}
 
 function fastaIsCorrect(fasta, malformedMessageId,  notFastaMessageId, cannotHaveIdsAndSeqsMessage) {
     var fetchFromIds = $("#fetch-fromIds-value1").prop("checked");

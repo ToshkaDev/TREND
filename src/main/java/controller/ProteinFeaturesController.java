@@ -39,8 +39,8 @@ public class ProteinFeaturesController extends BioUniverseController {
 
     @GetMapping(value={""})
     public String protoTree(Model model) {
-        model.addAttribute("sendOrGiveResult", "/js/send-and-process-data.js");
-        model.addAttribute("fieldsProcessing", "/js/fields-processing.js");
+        model.addAttribute("sendOrGiveResult", "/js/send-and-process-data.js?version=1");
+        model.addAttribute("fieldsProcessing", "/js/fields-processing.js?version=1");
         addToModelCommon(model);
         return "main-view  :: addContent(" +
                 "fragmentsMain='features-fragments', searchArea='proto-tree', filter='proto-tree-filter'" +
