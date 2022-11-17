@@ -166,13 +166,15 @@ function takeCareOfFields() {
         $('#tree-method, #ml-phylo-test, #nj_me-phylo-test, #gaps-missing').trigger('change');
         $("#phylo-test-ft").trigger('change');
 
-        if ($("#do-predict-features").prop("disabled") && !$("#fetch-fromTree-value").prop("checked"))
+        if ($("#do-predict-features").prop("disabled") && !$("#fetch-fromTree-value").prop("checked")) {
             $(".predict-features").hide()
-        else
+        } else {
             $(".predict-features").show();
+            $('input[name="dom-prediction-program"]').trigger('change');
+        }
         
-        $('input[name="dom-prediction-program"]').trigger('change');
         $('input[name="tree-soft"]').trigger('change');
+        $('#do-predict-features').prop("checked", true);
     });
 
     $('#do-predict-features').prop("checked", true);
