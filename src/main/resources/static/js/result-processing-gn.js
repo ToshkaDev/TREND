@@ -299,7 +299,7 @@ function addHtml(neighbourGenes, d3ParentElement) {
             var domainsList = "";
             if (gene && gene.Aseq && gene.Aseq.pfam31NamesOnly) {
                 gene.Aseq.pfam31NamesOnly.forEach(domainName =>
-                    domainsList+=`<a href="https://pfam.xfam.org/search/keyword?query=${domainName}" target="_blank">${domainName}</a>, `);
+                    domainsList+=`<a href="https://www.ebi.ac.uk/interpro/search/text/${domainName}" target="_blank">${domainName}</a>, `);
             }
             domainsList = domainsList.slice(0, -2);
             return `<div class="gene-info-style"><span style="font-weight: bold">Product: </span>${gene.product}</div>` +

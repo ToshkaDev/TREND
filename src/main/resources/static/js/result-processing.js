@@ -246,7 +246,7 @@ function organizeData(currentClassName) {
             } else if (dataAsJson.domains[0].predictor == "Hmmer"){
                 score = "Probability";
                 domainHeaders = ["No.", "Domain", "Start", "End", "Probability", "C-Evalue", "I-Evalue", "Alignment"];
-                hrefRootPath = "https://pfam.xfam.org/search/keyword?query=";
+                hrefRootPath = "https://www.ebi.ac.uk/interpro/search/text/";
             }
 
             domainOrganizedData.push(domainHeaders);
