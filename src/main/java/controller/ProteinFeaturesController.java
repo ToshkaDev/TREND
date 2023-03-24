@@ -50,7 +50,7 @@ public class ProteinFeaturesController extends BioUniverseController {
     @GetMapping(value={"tree/{jobId:.+}"})
     public String result(@PathVariable String jobId, @RequestParam("pipeline") String pipeline, @RequestParam("reduce") String reduce,
                          @RequestParam("features") String features, @RequestParam("eon") String eon, Model model) {
-        model.addAttribute("sendOrGiveResult", "/js/result-processing.js");
+        model.addAttribute("sendOrGiveResult", "/js/result-processing.js?version=1");
         model.addAttribute("resultProcessingCommon", "/js/result-processing-common.js");
         model.addAttribute("jobId", jobId);
         addToModelCommon(model);
