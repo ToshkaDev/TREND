@@ -40,9 +40,7 @@ REGEX_LEAF_NAME_1 = re.compile(r"(\('[^\(].+?':|,'[^\(].+?':)")
 REGEX_LEAF_NAME_2 = re.compile(r"(\([^\(].+?:|,[^\(].+?:)")
 REGEX_NUMBER_UNDERSCORE = re.compile(r"^\d+_")
 
-#~ MIST_BASE_URL = "https://api.mistdb.caltech.edu/v1/genes/"
-#~ ASEQ_SEQUENCE_FIELD = "?fields=id,stable_id&fields.Aseq=sequence&fields.Component=definition"
-MIST_BASE_URL = "https://api.mistdb.caltech.edu/v1/genes?search="
+MIST_BASE_URL = "https://mib-jouline-db.asc.ohio-state.edu/v1/genes?search="
 ASEQ_SEQUENCE_FIELD = "&fields=id,stable_id&fields.Aseq=sequence&fields.Component=definition"
 NUMBER_OF_PROCESSES = 30
 FETCH_FROM_NCBI = True

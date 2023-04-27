@@ -46,7 +46,7 @@ OPERON_TOLERANCE = 200
 NUM_OF_NEIGHBORS = 5
 OUTPUT_FILE = None
 
-BASE_URL = "https://api.mistdb.caltech.edu/v1/genes"
+BASE_URL = "https://mib-jouline-db.asc.ohio-state.edu/v1/genes"
 GENE_FIELDS = "id,stable_id,version,locus,strand,start,stop,length,pseudo,product"
 PFAM = "pfam31"
 

@@ -36,6 +36,14 @@ function takeCareOfValidators() {
     $("#number-of-replicates").focusout(function() {
        typeof protValidator != 'undefined' ? protValidator.resetForm() : protValidator;
     });
+
+    $("#evalue-threshold-hmmer").keyup(function() {
+        $("#evalue-threshold-hmmer").valid();
+    });
+
+    $("#probability").keyup(function() {
+        $("#probability").valid();
+    });
 }
 
 function takeCareOfFields() {
