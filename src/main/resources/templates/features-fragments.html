@@ -363,15 +363,21 @@
                             </label>
                         </div>
                         <div id="hmmer-db" class="predict-features">
-                            <span>HMMER Databse:</span>
-                            <select class="form-control input-md hmmer-db">
-                                <option id="pfam-only" selected='selected' value="pfam-only">Pfam 35</option>
-                                <option id="pfam_and_mist"  value="pfam_and_mist">Pfam 35 + MiST + TREND</option>
-                            </select>
-                            <span>E-value threshold:</span>
-                            <input id="evalue-threshold-hmmer" type="number" min="0" max="5" step="0.01" value="0.1" name="evalue-threshold" class="form-control input-md"/>
-                            <span>Domain Score:</span>
-                            <input id="probability" type="number" min="0" value="20" class="form-control input-md"  >
+                            <div>
+                                <span>HMMER Databse:</span>
+                                <select class="form-control input-md hmmer-db">
+                                    <option id="pfam-only" selected='selected' value="pfam-only">Pfam 35</option>
+                                    <option id="pfam_and_mist"  value="pfam_and_mist">Pfam 35 + MiST + TREND</option>
+                                </select>
+                            </div>
+                            <div>
+                                <span>E-value threshold:</span>
+                                <input id="evalue-threshold-hmmer" type="number" min="0" max="5" step="0.01" value="0.1" name="evalue-threshold" class="form-control input-md"/>
+                            </div>
+                            <div>
+                                <span>Domain Score:</span>
+                                <input id="probability" type="number" min="0" value="20" class="form-control input-md"  >
+                            </div>
                         </div>
                         <div id="rpsblast-db" class="predict-features">
                             <span>RPSBLAST Database:</span>
