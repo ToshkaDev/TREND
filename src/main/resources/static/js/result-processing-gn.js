@@ -303,7 +303,7 @@ function addHtml(neighbourGenes, d3ParentElement) {
             }
             domainsList = domainsList.slice(0, -2);
             return `<div class="gene-info-style"><span style="font-weight: bold">Product: </span>${gene.product}</div>` +
-                `<div class="gene-info-style"><span style="font-weight: bold">MiST Id: </span><a href="https://mistdb.com/genes/${gene.stable_id}" target="_blank">${gene.stable_id}</a></div>` +
+                `<div class="gene-info-style"><span style="font-weight: bold">MiST Id: </span><a href="https://mistdb.com/mist/genes/${gene.stable_id}" target="_blank">${gene.stable_id}</a></div>` +
                 `<div class="gene-info-style"><span style="font-weight: bold">RefSeq Id: </span><a href="https://www.ncbi.nlm.nih.gov/protein/${gene.version}" target="_blank">${gene.version}</a></div>` +
                 `<div class="gene-info-style"><span style="font-weight: bold">Gene coordinates: </span>${geneCoordinates}</div>` +
                 `<div class="gene-info-style"><span style="font-weight: bold">Domains: </span>${domainsList}</div>` +
