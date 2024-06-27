@@ -46,7 +46,9 @@ OPERON_TOLERANCE = 200
 NUM_OF_NEIGHBORS = 5
 OUTPUT_FILE = None
 
-BASE_URL = "https://mib-jouline-db.asc.ohio-state.edu/v1/genes"
+BASE_URL_GENOMES = "https://mib-jouline-db.asc.ohio-state.edu/v1/genes"
+BASE_URL_MAGS = "https://metagenomes.asc.ohio-state.edu/v1/genes"
+URLS = [BASE_URL_GENOMES, BASE_URL_MAGS]
 GENE_FIELDS = "id,stable_id,version,locus,strand,start,stop,length,pseudo,product"
 PFAM = "pfam31"
 
@@ -102,14 +104,14 @@ def initialize(argv):
 	random.seed(RANDOM_SEED)
 	RANDOM_STATE = random.getstate()
 
-def findGene(geneNameOrId):
+def findGene(geneNameOrId, url):
 	params = urllib.urlencode({'search': geneNameOrId, 'fields': GENE_FIELDS, 'fields.Aseq': PFAM})
-	result = urllib.urlopen(BASE_URL + "?%s" % params)
+	result = urllib.urlopen(url + "?%s" % params)
 	try:
 		result = json.loads(result.read())
 	except Exception as e:
 		result = None
-		print("Exception happened whyle trying to decode json: " + str(e))
+		print("Exception happened while trying to decode json: " + str(e))
 		print("So returning None")
 	finally:
 		return result
@@ -117,30 +119,34 @@ def findGene(geneNameOrId):
 def getGeneAndProcessGeneNeighbors(geneStableIdList):
 	duplicateCounter = 1
 	for geneIndex in xrange(len(geneStableIdList[0])):
-		gene = geneStableIdList[0][geneIndex]
-		mainGeneDict = findGene(gene)
-		fullProteinName = geneStableIdList[3][geneIndex]
-		if mainGeneDict and len(mainGeneDict):
-			duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter, fullProteinName)
-		else:
-			gene = geneStableIdList[1][geneIndex]
-			mainGeneDict = findGene(gene)
+		for url in URLS:
+			gene = geneStableIdList[0][geneIndex]
+			mainGeneDict = findGene(gene, url)
+			fullProteinName = geneStableIdList[3][geneIndex]
 			if mainGeneDict and len(mainGeneDict):
-				duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter, fullProteinName)
+				duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter, fullProteinName, url)
+				break
 			else:
-				gene = geneStableIdList[2][geneIndex]
-				mainGeneDict = findGene(gene)
+				gene = geneStableIdList[1][geneIndex]
+				mainGeneDict = findGene(gene, url)
 				if mainGeneDict and len(mainGeneDict):
-					duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter, fullProteinName)
+					duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter, fullProteinName, url)
+					break
+				else:
+					gene = geneStableIdList[2][geneIndex]
+					mainGeneDict = findGene(gene, url)
+					if mainGeneDict and len(mainGeneDict):
+						duplicateCounter = getGeneNeighborsAndPrepareDomains(mainGeneDict[0], duplicateCounter, fullProteinName, url)
+						break
 
-def getGeneNeighborsAndPrepareDomains(mainGeneDict, duplicateCounter, fullProteinName):
+def getGeneNeighborsAndPrepareDomains(mainGeneDict, duplicateCounter, fullProteinName, url):
 	if mainGeneDict['Aseq'] and mainGeneDict['Aseq']['pfam31'] and len(mainGeneDict['Aseq']['pfam31']):
 		mainGeneSortedDomains = sorted(mainGeneDict['Aseq']['pfam31'], key=lambda x: x['ali_from'], reverse=False)
 		mainGeneDomainsWithNoOverlaps, mainGeneDomainWithNoOverlapsNamesOnly = removeOverlapps(mainGeneSortedDomains)
 		mainGeneDict['Aseq']['pfam31'] = mainGeneDomainsWithNoOverlaps
 		mainGeneDict['Aseq']['pfam31NamesOnly'] = mainGeneDomainWithNoOverlapsNamesOnly
 	params = urllib.urlencode({'fields': GENE_FIELDS, 'fields.Aseq': PFAM, 'amount': NUM_OF_NEIGHBORS})
-	result = urllib.urlopen(BASE_URL + "/" + mainGeneDict["stable_id"] + "/neighbors?%s" % params)
+	result = urllib.urlopen(url + "/" + mainGeneDict["stable_id"] + "/neighbors?%s" % params)
 	genesList = json.loads(result.read())
 
 	previousGene = None

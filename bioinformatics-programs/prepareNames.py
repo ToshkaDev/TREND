@@ -40,7 +40,9 @@ REGEX_LEAF_NAME_1 = re.compile(r"(\('[^\(].+?':|,'[^\(].+?':)")
 REGEX_LEAF_NAME_2 = re.compile(r"(\([^\(].+?:|,[^\(].+?:)")
 REGEX_NUMBER_UNDERSCORE = re.compile(r"^\d+_")
 
-MIST_BASE_URL = "https://mib-jouline-db.asc.ohio-state.edu/v1/genes?search="
+MIST_BASE_URL_GENOMES = "https://mib-jouline-db.asc.ohio-state.edu/v1/genes?search="
+MIST_BASE_URL_MAGS = "https://metagenomes.asc.ohio-state.edu/v1/genes?search="
+URLS = [MIST_BASE_URL_GENOMES, MIST_BASE_URL_MAGS]
 ASEQ_SEQUENCE_FIELD = "&fields=id,stable_id&fields.Aseq=sequence&fields.Component=definition"
 NUMBER_OF_PROCESSES = 30
 FETCH_FROM_NCBI = True
@@ -260,21 +262,23 @@ def fetchFromMistByIds(proteinIds, proteinIdsToOrigNames=None):
 def fetchFromMist(proteinIdToSeq, proteinIdToTrueId, multiProcList, proteinIdsToOrigNames=None):
 	for proteinId in multiProcList:
 		proteinId = proteinId.strip()
-		preparedUrl = MIST_BASE_URL + proteinId + ASEQ_SEQUENCE_FIELD
-		result = urllib.urlopen(preparedUrl).read()
-		proteinDict = json.loads(result)
-		if len(proteinDict):
-			proteinDict = proteinDict[0]
-			if "Aseq" in proteinDict and "sequence" in proteinDict["Aseq"]:
-				proteinSeq = proteinDict["Aseq"]["sequence"]
-				if not proteinIdsToOrigNames:
-					if "Component" in proteinDict and "definition" in proteinDict["Component"]:
-						proteinName = proteinId + "_" + proteinDict["Component"]["definition"].split(",")[0]
-						proteinIdToSeq[proteinName] = proteinSeq
-						proteinIdToTrueId[proteinName]  = proteinId
-				else:
-					for proteinName in proteinIdsToOrigNames[proteinId]:
-						proteinIdToSeq[proteinName] = proteinSeq
+		for url in URLS:
+		    preparedUrl = url + proteinId + ASEQ_SEQUENCE_FIELD
+		    result = urllib.urlopen(preparedUrl).read()
+		    proteinDict = json.loads(result)
+		    if len(proteinDict):
+		        proteinDict = proteinDict[0]
+		        if "Aseq" in proteinDict and "sequence" in proteinDict["Aseq"]:
+		            proteinSeq = proteinDict["Aseq"]["sequence"]
+		            if not proteinIdsToOrigNames:
+		                if "Component" in proteinDict and "definition" in proteinDict["Component"]:
+		                    proteinName = proteinId + "_" + proteinDict["Component"]["definition"].split(",")[0]
+		                    proteinIdToSeq[proteinName] = proteinSeq
+		                    proteinIdToTrueId[proteinName]  = proteinId
+		            else:
+		                for proteinName in proteinIdsToOrigNames[proteinId]:
+		                    proteinIdToSeq[proteinName] = proteinSeq
+		        break
 # ============== Fetch from MiST# ============== #
 
 ####===================================================#####
