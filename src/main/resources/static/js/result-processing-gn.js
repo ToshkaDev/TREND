@@ -302,9 +302,15 @@ function addHtml(neighbourGenes, d3ParentElement) {
                     domainsList+=`<a href="https://www.ebi.ac.uk/interpro/search/text/${domainName}" target="_blank">${domainName}</a>, `);
             }
             domainsList = domainsList.slice(0, -2);
+
+            const refSeqPrefixes = new Set(['NP', 'AP', 'XP', 'YP', 'WP']);
+            var mistDatabase = "https://mistdb.com/mist/genes/${gene.stable_id}";
+            if (!refSeqPrefixes.has(gene.version.split("_")[0]))
+                mistDatabase = "https://mistdb.com/mist-metagenomes/genes/${gene.stable_id}";
+
             return `<div class="gene-info-style"><span style="font-weight: bold">Product: </span>${gene.product}</div>` +
-                `<div class="gene-info-style"><span style="font-weight: bold">MiST Id: </span><a href="https://mistdb.com/mist/genes/${gene.stable_id}" target="_blank">${gene.stable_id}</a></div>` +
-                `<div class="gene-info-style"><span style="font-weight: bold">RefSeq Id: </span><a href="https://www.ncbi.nlm.nih.gov/protein/${gene.version}" target="_blank">${gene.version}</a></div>` +
+                `<div class="gene-info-style"><span style="font-weight: bold">MiST Id: </span><a href="${mistDatabase}" target="_blank">${gene.stable_id}</a></div>` +
+                `<div class="gene-info-style"><span style="font-weight: bold">NCBI Id: </span><a href="https://www.ncbi.nlm.nih.gov/protein/${gene.version}" target="_blank">${gene.version}</a></div>` +
                 `<div class="gene-info-style"><span style="font-weight: bold">Gene coordinates: </span>${geneCoordinates}</div>` +
                 `<div class="gene-info-style"><span style="font-weight: bold">Domains: </span>${domainsList}</div>` +
                 `<div class="gene-info-style"><span style="font-weight: bold">Cluster Id: </span>${gene.clusterId}</div>`;
