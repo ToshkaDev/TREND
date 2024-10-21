@@ -304,9 +304,9 @@ function addHtml(neighbourGenes, d3ParentElement) {
             domainsList = domainsList.slice(0, -2);
 
             const refSeqPrefixes = new Set(['NP', 'AP', 'XP', 'YP', 'WP']);
-            var mistDatabase = "https://mistdb.com/mist/genes/${gene.stable_id}";
-            if (!refSeqPrefixes.has(gene.version.split("_")[0]))
-                mistDatabase = "https://mistdb.com/mist-metagenomes/genes/${gene.stable_id}";
+            var mistDatabase = "https://mistdb.com/mist/genes/" + gene.stable_id;
+            if (gene.version && !refSeqPrefixes.has(gene.version.split("_")[0]))
+                mistDatabase = "https://mistdb.com/mist-metagenomes/genes/" + gene.stable_id;
 
             return `<div class="gene-info-style"><span style="font-weight: bold">Product: </span>${gene.product}</div>` +
                 `<div class="gene-info-style"><span style="font-weight: bold">MiST Id: </span><a href="${mistDatabase}" target="_blank">${gene.stable_id}</a></div>` +

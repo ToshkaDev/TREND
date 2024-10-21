@@ -42,6 +42,14 @@ public class HomeController {
                 "fragmentsMain='help-and-about', infoFragment='protips')";
     }
 
+    @GetMapping(value={"/news"})
+    public String news (Model model) {
+        model.addAttribute("mainTab", "news");
+        addToModelCommon(model);
+        return "main-view  :: addContent(" +
+                "fragmentsMain='help-and-about', infoFragment='news')";
+    }
+
     @GetMapping(value={"/contact"})
     public String contact(Model model) {
         model.addAttribute("mainTab", "contact");

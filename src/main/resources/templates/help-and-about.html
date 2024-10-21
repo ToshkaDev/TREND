@@ -60,47 +60,9 @@
 </div>
 
 <div th:fragment="help">
-    <div class="col-md-12 help-div">
-    <h2 class="info-header">News</h2>
-    <div>
-        <h4 style="font-weight: bold"> October 2024 </h4>
-        <p> TREND databases have been updated to the latest versions: </p>
-            <ul>
-                <li class="info">
-                    Pfam models v37.1
-                </li>
-                <li class="info">
-                    CDD models v3.21:
-                    <ul>
-                        <li class="info"> 62456 models in the default search set and indexed in Entrez </li>
-                        <li class="info"> 19638 models from Pfam v35 </li>
-                        <li class="info"> 5137 models from COG v2 </li>
-                        <li class="info"> 1009 models from SMART v6.0 </li>
-                        <li class="info"> 12282 models from the Protein Clusters/NCBIFAM database </li>
-                        <li class="info"> 4488 models from the TIGRFAM v14.0 database </li>
-                        <li class="info"> 2142 models from the NCBIFAM database </li>
-                        <li class="info"> 19902 models curated by NCBI/CDD </li>
-                        <li class="info"> 4705 multi-model superfamilies indexed in Entrez </li>
-                    </ul>
-                </li>
-                <li class="info">
-                    MiST v4.0:
-                    <ul>
-                        <li class="info"> Gene neighborhoods for 202,000+ genomes and 10,000+ MAGs are available </li>
-                    </ul>
-                </li>
-            </ul>
-        <p> TREND can now display gene neighborhoods of both genomes and metagenome-assembled genomes (MAGs) present in the MiST database. </p>
-    </div>
-    </div>
-
-    <div class="col-md-12 help-div">
-        <div id="analysis-href" class="info-header">
-            <h2 data-toggle="collapse" data-target="#analysis-info">
-                Analysis <i class="fa fa-chevron-down chevron-info"></i>
-            </h2>
-        </div>
-        <div id="analysis-info" class="collapse">
+     <div class="col-md-12 help-div">
+        <h2 class="info-header"> Analysis </h2>
+        <div id="analysis-info">
             <p>Studying the evolutionary history and function of a protein is an intriguing but not a trivial task.</p>
             <p>Computational analysis usually starts with collecting homologous proteins.</p>
             <p>Consequent steps include: </p>
@@ -135,7 +97,6 @@
     </div>
 
     <div class="col-md-12 help-div">
-        <hr/>
         <div id="domains-href" class="info-header">
             <h2 data-toggle="collapse" data-target="#domains-info">
                 Domains <i class="fa fa-chevron-down chevron-info"></i>
@@ -506,6 +467,42 @@
             </p>
             <br/>
             <br/>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="news">
+    <div class="col-md-12 help-div">
+        <h2 class="info-header">News</h2>
+        <div>
+            <h4 style="font-weight: bold"> 2024, October </h4>
+            <p> TREND databases have been updated to the latest versions: </p>
+            <ul>
+                <li class="info">
+                    Pfam models v37.1
+                </li>
+                <li class="info">
+                    CDD models v3.21:
+                    <ul>
+                        <li class="info"> 62456 models in the default search set and indexed in Entrez </li>
+                        <li class="info"> 19638 models from Pfam v35 </li>
+                        <li class="info"> 5137 models from COG v2 </li>
+                        <li class="info"> 1009 models from SMART v6.0 </li>
+                        <li class="info"> 12282 models from the Protein Clusters/NCBIFAM database </li>
+                        <li class="info"> 4488 models from the TIGRFAM v14.0 database </li>
+                        <li class="info"> 2142 models from the NCBIFAM database </li>
+                        <li class="info"> 19902 models curated by NCBI/CDD </li>
+                        <li class="info"> 4705 multi-model superfamilies indexed in Entrez </li>
+                    </ul>
+                </li>
+                <li class="info">
+                    MiST v4.0:
+                    <ul>
+                        <li class="info"> Gene neighborhoods for 202,000+ genomes and 10,000+ MAGs are available </li>
+                    </ul>
+                </li>
+            </ul>
+            <p> TREND can now display gene neighborhoods of both genomes and metagenome-assembled genomes (MAGs) available in the MiST database. </p>
         </div>
     </div>
 </div>
