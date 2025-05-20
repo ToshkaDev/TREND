@@ -2,6 +2,8 @@
 
 TREND (**TR**ee-based **E**xploration of **N**eighborhoods and **D**omains) is a modular, web-based platform for automated analysis of protein function in prokaryotes, integrating phylogenetic relationships, domain architectures, and gene neighborhood context. The platform provides ample opportunities for adjusting each step of the analysis.
 
+The live web server is freely available at: https://trend.evobionet.com
+
 TREND streamlines the complex workflows typically required for:
 - Multiple sequence alignment and phylogenetic tree construction
 - Identification of protein features (e.g., Pfam/CDD domains, TM regions, low-complexity regions)
@@ -15,9 +17,9 @@ TREND streamlines the complex workflows typically required for:
 - Input via protein sequences, identifiers (NCBI, RefSeq, MiST), multiple sequence alignments, phylogenetic trees
 - Integration with Pfam, CDD, and MiST databases
 - Protein feature identification using Profile Hidden Markov models from multiple databses: CDD, Pfam (InterPro), COG, KOG, SMART, PRK, TIGRFAMs, MiST
-- Multiple sequence alignment using MAFFT algorithms 
+- Sequence edundancy reduction with CD-HIT and multiple sequence alignment using MAFFT algorithms 
 - Phylogenetic tree building using FastTree and MEGA
-- Redundancy reduction with CD-HIT
+- Gene neighborhoods and opreron identification are avilable for over 200,000 genomes
 - Interactive visual outputs linking evolutionary and functional contexts
 - Web interface and downloadable results
 
