@@ -1,3 +1,13 @@
+![License](https://img.shields.io/github/license/ToshkaDev/TREND)
+![Maven](https://img.shields.io/badge/build-maven-blue.svg)
+![Requirements](https://img.shields.io/badge/requirements-python%202.7%2B-blue)
+![Top Language](https://img.shields.io/github/languages/top/ToshkaDev/TREND)
+![Code size](https://img.shields.io/github/languages/code-size/ToshkaDev/TREND)
+[![Web Server](https://img.shields.io/badge/Live%20Server-trend.evobionet.com-brightgreen)](https://trend.evobionet.com/)
+[![Published Article DOI](https://zenodo.org/badge/DOI/10.1093/nar/gkaa243.svg)](https://doi.org/10.1093/nar/gkaa243)
+[![Correction Article DOI](https://zenodo.org/badge/DOI/10.1093/nar/gkac034.svg)](https://doi.org/10.1093/nar/gkac034)
+![Maintenance](https://img.shields.io/badge/maintenance-active-brightgreen.svg)
+
 ## 📊 TREND - a highly customizable computational platform for protein analysis
 
 TREND (**TR**ee-based **E**xploration of **N**eighborhoods and **D**omains) is a modular, web-based platform for automated analysis of protein function in prokaryotes, integrating phylogenetic relationships, domain architectures, and gene neighborhood context. The platform provides ample opportunities for adjusting each step of the analysis.
