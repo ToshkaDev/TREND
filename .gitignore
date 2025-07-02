@@ -1,39 +1,69 @@
-# Compiled class file
+# === Java / Maven ===
+target/
 *.class
-
-# Log file
-*.log
-
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
 *.jar
 *.war
 *.ear
-*.zip
-*.tar.gz
-*.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# ignore all bin directories
-# matches "bin" in any subfolder
-bin/
+# Maven Wrapper cache
+.mvn/
+!/.mvn/wrapper/maven-wrapper.jar
 
-# ignore all target directories
-target/
-
-# ignore all files ending with ~
-*~
-
-#Additionally
-*.settings
+# Eclipse / IntelliJ / NetBeans
+.idea/
+*.iml
+*.ipr
+*.iws
+*.bak
+*.tmp
+*.log
+*.swp
+*.swo
+*.~*
 *.project
 *.classpath
-*.jsdtscope
-*.iml
-*.idea
+*.settings/
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+build/
+dist/
+venv/
+.venv/
+env/
+.env/
+
+# === Docker ===
+*.log
+docker-compose.override.yml
+docker-compose*.log
+
+# === OS / Misc ===
+.DS_Store
+Thumbs.db
+*.orig
+*.rej
+*.tmp
+*.out
+
+# === Git ===
+*.patch
+*.diff
+
+# === Logs ===
+logs/
+*.log
+
+# === Test Reports ===
+test-output/
+coverage/
+htmlcov/
+.jacoco/
+coverage.xml
+*.lcov
 

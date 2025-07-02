@@ -23,7 +23,7 @@ public class BioJobResult {
     private String resultFileName;
 
     @NotNull
-    @Column(name="RESULT_FILE")
+    @Column(name="RESULT_FILE", columnDefinition = "text")
     private String resultFile;
 
     public BioJob getBiojob() {

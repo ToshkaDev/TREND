@@ -1,0 +1,24 @@
+version: '3.3'
+
+services:
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    ports: []             # Remove port mapping (served via nginx)
+    volumes: []           # Remove dev mounts
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      #- /etc/letsencrypt/live/trend.evobionet.com/fullchain.pem:/etc/letsencrypt/live/trend.evobionet.com/fullchain.pem
+      #- /etc/letsencrypt/live/trend.evobionet.com/privkey.pem:/etc/letsencrypt/live/trend.evobionet.com/privkey.pem
+    depends_on:
+      - backend

@@ -1,0 +1,48 @@
+# Maven build output
+.mvn/
+!.mvn/wrapper/
+
+# IDE / editor junk
+*.iml
+*.log
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# OS / filesystem noise
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker artifacts
+docker-compose.override.yml
+docker-compose.dev.yml
+docker-compose.prod.yml
+docker-compose*.log
+
+# Python build artifacts
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Temporary files
+.env
+.env.*
+*.bak
+*.tmp
+*.~*
+
+# Avoid excluding critical files!
+# Keep these in if used:
+!pom.xml
+!mvnw
+!mvnw.cmd
+!requirements.txt

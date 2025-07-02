@@ -29,10 +29,10 @@ public class BioJob {
     @Column(name="FINISHED")
     private boolean finished;
 
-    @Column(name="STAGE")
+    @Column(name="STAGE", columnDefinition = "text")
     private String stage;
 
-    @Column(name="STAGE_DETAILS")
+    @Column(name="STAGE_DETAILS", columnDefinition = "text")
     private String stageDetails;
 
     @NotNull

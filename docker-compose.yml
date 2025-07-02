@@ -1,0 +1,32 @@
+version: '3.3'
+
+services:
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.dev.Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src:/app/src
+      - ./pom.xml:/app/pom.xml
+      - ./mvnw:/app/mvnw
+      - ./.mvn:/app/.mvn
+      - ./bioinformatics-programs:/app/bioinformatics-programs
+    environment:
+      - SPRING_DATASOURCE_URL
+      - SPRING_DATASOURCE_USERNAME
+      - SPRING_DATASOURCE_PASSWORD
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    restart: always
+    env_file: .env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
