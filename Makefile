@@ -27,6 +27,6 @@ down-dev:
 
 # Danger zone: delete volumes
 # reset-db:
-# 	@echo "⚠️ WARNING: This will delete Postgres volume. Continue in 5s..."
+# 	@echo "WARNING: This will delete Postgres volume. Continue in 5s..."
 # 	@sleep 10
 # 	docker volume rm -f $$(docker volume ls -q --filter name=*_db_data || true)

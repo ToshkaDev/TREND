@@ -13,13 +13,15 @@ services:
       - ./pom.xml:/app/pom.xml
       - ./mvnw:/app/mvnw
       - ./.mvn:/app/.mvn
-      - ./bioinformatics-programs:/app/bioinformatics-programs
+      - ./bioinformatics-programs:/app/bioinformatics-programs:ro
     environment:
       - SPRING_DATASOURCE_URL
       - SPRING_DATASOURCE_USERNAME
       - SPRING_DATASOURCE_PASSWORD
     depends_on:
       - db
+    networks:
+      - trend-net           # Explicit shared network
 
   db:
     image: postgres:15
@@ -27,6 +29,12 @@ services:
     env_file: .env
     volumes:
       - db_data:/var/lib/postgresql/data
+    networks:
+      - trend-net
 
 volumes:
   db_data:
+
+networks:
+  trend-net:
+    driver: bridge
