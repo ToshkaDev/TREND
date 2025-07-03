@@ -2,6 +2,7 @@
 
 APP_DIR=/app
 TARGET_DIR=${APP_DIR}/Soft
+TARGET_DIR=/home/vadim/Documents/Applications/TREND/util
 
 HMMER_VERSION=3.4
 HMMER_DIR=${TARGET_DIR}/hmmer-${HMMER_VERSION}
@@ -22,4 +23,10 @@ MAFFT_DIR=${TARGET_DIR}/mafft-${MAFFT_VERSION}
 
 MEGA_VERSION=11.0.13-1
 MEGA_DIR=${TARGET_DIR}/mega-${MEGA_VERSION}
-install-mega.sh ${MEGA_VERSION} ${MEGA_DIR}
+./install-mega.sh ${MEGA_VERSION} ${MEGA_DIR}
+
+# Install databases
+
+PFAM_VERSION=37.4
+PFAM_DIR=${TARGET_DIR}/pfam-${PFAM_VERSION}
+./install-pfam.sh ${PFAM_VERSION} ${PFAM_DIR} ${HMMER_DIR}/bin
