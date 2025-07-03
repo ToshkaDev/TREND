@@ -9,6 +9,7 @@ services:
     ports: []             # Remove port mapping (served via nginx)
     volumes:
       - ./bioinformatics-programs:/app/bioinformatics-programs:ro
+      - ./util:/app/util:ro
     depends_on:
       - db
     networks:

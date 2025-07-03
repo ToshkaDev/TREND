@@ -14,6 +14,7 @@ services:
       - ./mvnw:/app/mvnw
       - ./.mvn:/app/.mvn
       - ./bioinformatics-programs:/app/bioinformatics-programs:ro
+      - ./util:/app/util:ro
     environment:
       - SPRING_DATASOURCE_URL
       - SPRING_DATASOURCE_USERNAME
