@@ -44,8 +44,6 @@ make
 make install
 
 echo "Cleaning up"
-#rm -rf $TARBALL_BASENAME
-#rm $TARBALL_FILENAME
-#export PATH
+rm -r $TEMP_DIR
 
 echo "Successfully installed Mafft version $VERSION"

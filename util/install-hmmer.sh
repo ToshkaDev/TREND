@@ -39,7 +39,5 @@ make
 make install
 echo "Cleaning up"
 rm -r $TEMP_DIR
-PATH=$BIN_PATH:$PATH
-export PATH
 
 echo "Successfully installed HMMER3 version $VERSION"

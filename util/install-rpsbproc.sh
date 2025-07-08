@@ -44,13 +44,12 @@ echo "Downloading rpsbproc ..."
 echo "This will take ~3 min ..."
 cd $TEMP_DIR
 echo "Download destination path: $(pwd)"
-wget $RPSBPROC_URL
+curl -L -o "$RPSBPROC_TAR" "$RPSBPROC_URL"
 tar xzvf $RPSBPROC_TAR
 cp "$TEMP_DIR/RpsbProc-x64-linux/rpsbproc" ${BIN_PATH}
 
 echo "Clening up ..."
-rm -rf $RPSBPROC_TAR
-rm -rf $UNTARED_DIR
+rm -r $TEMP_DIR
 
 cat  <<- __EOF__ > $BIN_PATH/rpsbproc.ini
 [datafiles]
