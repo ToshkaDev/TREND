@@ -30,7 +30,8 @@ MAFFT_URL="https://mafft.cbrc.jp/alignment/software/$TARBALL_FILENAME"
 
 echo "Downloading Mafft ..."
 cd $TEMP_DIR
-wget -q $MAFFT_URL
+#wget -q $MAFFT_URL
+curl -sS "$MAFFT_URL"
 
 echo "Decompressing tarball"
 tar zxvf $TARBALL_FILENAME

@@ -13,7 +13,17 @@ RUN apt-get update && \
     curl -sS https://bootstrap.pypa.io/pip/2.7/get-pip.py | python && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# RUN apt-get install -y --no-install-recommends \
+#         python-qt4 \
+#         xvfb \
+#         elfutils
+
 WORKDIR /app
+
+# Install all the necessary programs
+COPY util/ /app/util/
+RUN chmod +x /app/util/*
+RUN bash /app/util/install-software.sh
 
 # Copy Java project files
 COPY pom.xml mvnw ./

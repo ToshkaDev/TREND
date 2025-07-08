@@ -25,7 +25,7 @@ TARBALL_FILENAME="${TARBALL_BASENAME}-x64-linux.tar.gz"
 BLAST_URL="https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/$VERSION/$TARBALL_FILENAME"
 echo $BLAST_URLecho "Downloading Blast tarball"
 cd $TEMP_DIR
-wget -q $BLAST_URL
+curl -s "$BLAST_URL"
 
 echo "Decompressing tarball"
 tar zxvf $TARBALL_FILENAME

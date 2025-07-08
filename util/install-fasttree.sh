@@ -17,6 +17,7 @@ FASTTREE_URL="http://www.microbesonline.org/fasttree/FastTreeMP"
 
 echo "Downloading FASTTREE ..."
 
-wget -O $BIN_PATH/FastTreeMP $FASTTREE_URL
+#wget -O $BIN_PATH/FastTreeMP $FASTTREE_URL
+curl -L -o "$BIN_PATH/FastTreeMP" "$FASTTREE_URL"
 
 echo "Successfully installed FASTTREE version $VERSION"
