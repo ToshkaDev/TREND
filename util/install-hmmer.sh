@@ -30,8 +30,7 @@ echo "Downloading HMMER3 tarball ..."
 
 cd $TEMP_DIR
 
-#wget -q $HMMER3_URL
-curl -sS "$HMMER3_URL"
+curl -L -o $TARBALL_FILENAME "$HMMER3_URL"
 echo "Decompressing tarball ..."
 tar zxvf $TARBALL_FILENAME
 cd $TARBALL_BASENAME

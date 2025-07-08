@@ -11,8 +11,8 @@ if [ -z "$VERSION" ] || [ -z "$CDD_PSSMS_DIR" ]; then
 	exit 1
 fi
 
-PSSM_TARS=("Cdd_LE.tar.gz" "Cdd_NCBI_LE.tar.gz" "Cog_LE.tar.gz" "Kog_LE.tar.gz" "Prk_LE.tar.gz" "Smart_LE.tar.gz" "Tigr_LE.tar.gz")
-#PSSM_TARS=("Smart_LE.tar.gz" "Prk_LE.tar.gz")
+#PSSM_TARS=("Cdd_LE.tar.gz" "Cdd_NCBI_LE.tar.gz" "Cog_LE.tar.gz" "Kog_LE.tar.gz" "Prk_LE.tar.gz" "Smart_LE.tar.gz" "Tigr_LE.tar.gz")
+PSSM_TARS=("Smart_LE.tar.gz" "Prk_LE.tar.gz")
 
 
 CDD_PSSM_URL=https://ftp.ncbi.nih.gov/pub/mmdb/cdd/little_endian/
@@ -24,7 +24,7 @@ else
 	echo "Downloading CDD $VERSION PSSMs database ..."
 	for f in ${PSSM_TARS[@]}; do
 		echo $f
-		curl ${CDD_PSSM_URL}/$f -o $CDD_PSSMS_DIR/$f > /dev/null 2>&1
+		curl -L -o $CDD_PSSMS_DIR/$f ${CDD_PSSM_URL}/$f
 		tar xvf $CDD_PSSMS_DIR/$f -C $CDD_PSSMS_DIR
 		echo "Delete the tar compressed file $f ..."
 		rm $CDD_PSSMS_DIR/$f

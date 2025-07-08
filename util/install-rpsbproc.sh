@@ -32,8 +32,7 @@ DATA_FILES=("cddid.tbl.gz" "cdtrack.txt" "family_superfamily_links" "cddannot.da
 echo "Downloading rpsbproc data files: "
 for f in ${DATA_FILES[@]}; do
 	echo $f
-	#curl ${FTPSITE}/$f -o $RPSBPROC_DATA_PATH/$f > /dev/null 2>&1
-	curl -s -L -o "$RPSBPROC_DATA_PATH/$f" "${FTPSITE}/$f"
+	curl -L -o "$RPSBPROC_DATA_PATH/$f" "${FTPSITE}/$f"
 	if [[ ${f##*\.} == "gz" ]]; then
 		gzip -d $RPSBPROC_DATA_PATH/$f
 	fi

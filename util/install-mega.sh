@@ -32,8 +32,7 @@ MEGA_URL="https://www.megasoftware.net/releases/${DEB_FILENAME}"
 
 echo "Downloading Mega deb file"
 cd $TEMP_DIR
-#wget -q $MEGA_URL
-curl -sS "$MEGA_URL"
+curl -L -o "$DEB_FILENAME" "$MEGA_URL"
 
 echo "Installing Mega ..."
 dpkg-deb -x "${DEB_FILENAME}" $MEGA_DIR/

@@ -35,8 +35,7 @@ fi
 
 if [[ ! -s "$PFAM_DIR/$PFAM_HMM_NAME" ]]; then
 	echo "Downloading Pfam $VERSION HMM database ..."
-	#wget -q -O "$TEMP_DIR/$GZ_PFAM_HMM_NAME" $PFAM_HMM_URL
-	curl -s -L -o "$TEMP_DIR/$GZ_PFAM_HMM_NAME" "$PFAM_HMM_URL"
+	curl -L -o "$TEMP_DIR/$GZ_PFAM_HMM_NAME" "$PFAM_HMM_URL"
 	echo "Decompressing ..."
 	gunzip "$TEMP_DIR/$GZ_PFAM_HMM_NAME"
 	echo "Copying to $PFAM_DIR"

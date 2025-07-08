@@ -18,7 +18,6 @@ TARBALL=${BASE_NAME}.tar.gz
 CDHIT_URL="https://github.com/weizhongli/cdhit/releases/download/V${VERSION}/${TARBALL}"
 
 echo "Downloading CD_HIT ..."
-#wget -O $TARGET_DIR/$TARBALL $CDHIT_URL
 curl -L -o "$TARGET_DIR/$TARBALL" "$CDHIT_URL"
 
 echo "Decompressing tarball ..."

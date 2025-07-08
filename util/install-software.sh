@@ -37,6 +37,6 @@ CDHIT_DIR=${TARGET_DIR}/cdhit-${CDHIT_VERSION}
 # PFAM_DIR=${TARGET_DIR}/pfam-${PFAM_VERSION}
 # ./util/install-pfam.sh ${PFAM_VERSION} ${PFAM_DIR} ${HMMER_DIR}/bin
 
-# CDD_VERSION=3.21
-# CDD_DIR=${TARGET_DIR}/cdd-${CDD_VERSION}
-# ./util/install-cdd.sh ${CDD_VERSION} ${CDD_DIR}
+CDD_VERSION=3.21
+CDD_DIR=${TARGET_DIR}/cdd-${CDD_VERSION}
+./util/install-cdd.sh ${CDD_VERSION} ${CDD_DIR}
