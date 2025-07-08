@@ -13,8 +13,10 @@ BLAST_VERSION=2.16.0
 BLAST_DIR=${TARGET_DIR}/blast-${BLAST_VERSION}
 ./install-blast.sh ${BLAST_VERSION} ${BLAST_DIR}
 
-#0.4.0
-RPSBPROC_VERSION=$4
+#0.5.0 rpsbproc
+RPSBPROC_DIR=${TARGET_DIR}/rpsbproc-0.5.0
+# we provide BLAST_VERSION as rpsbproc processes the blast package results
+/install-rpsbproc.sh ${BLAST_VERSION} ${RPSBPROC_DIR}
 
 
 MAFFT_VERSION=7.487
@@ -30,3 +32,7 @@ MEGA_DIR=${TARGET_DIR}/mega-${MEGA_VERSION}
 PFAM_VERSION=37.4
 PFAM_DIR=${TARGET_DIR}/pfam-${PFAM_VERSION}
 ./install-pfam.sh ${PFAM_VERSION} ${PFAM_DIR} ${HMMER_DIR}/bin
+
+CDD_VERSION=3.21
+CDD_DIR=${TARGET_DIR}/cdd-${CDD_VERSION}
+./install-cdd.sh ${CDD_VERSION} ${CDD_DIR}
