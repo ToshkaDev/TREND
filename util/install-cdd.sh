@@ -31,4 +31,4 @@ else
 	done
 fi
 
-echo "Succefully installed CDD PSSMs database."
+echo "Succesfully installed CDD PSSMs database."
