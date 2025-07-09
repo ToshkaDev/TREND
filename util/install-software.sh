@@ -1,4 +1,4 @@
-#!/bin bash
+#!/bin/bash
 
 APP_DIR=/app
 TARGET_DIR=${APP_DIR}/Soft
@@ -32,7 +32,7 @@ CDHIT_VERSION=4.8.1
 CDHIT_DIR=${TARGET_DIR}/cdhit-${CDHIT_VERSION}
 ./util/install-cdhit.sh ${CDHIT_VERSION} ${CDHIT_DIR}
 
-# # Install databases
+# Install databases
 # PFAM_VERSION=37.4
 # PFAM_DIR=${TARGET_DIR}/pfam-${PFAM_VERSION}
 # ./util/install-pfam.sh ${PFAM_VERSION} ${PFAM_DIR} ${HMMER_DIR}/bin

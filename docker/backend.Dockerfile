@@ -7,6 +7,8 @@ RUN apt-get update && \
         python2.7-dev \
         libblas-dev liblapack-dev libatlas-base-dev gfortran \
         python2.7 \
+        python-cairo \
+        fonts-dejavu \
         curl \
         bash && \
     ln -s /usr/bin/python2.7 /usr/bin/python && \
