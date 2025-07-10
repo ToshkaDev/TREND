@@ -19,4 +19,6 @@ echo "Downloading FASTTREE ..."
 
 curl -L -o "$BIN_PATH/FastTreeMP" "$FASTTREE_URL"
 
+export PATH=$BIN_PATH:$PATH
+
 echo "Successfully installed FASTTREE version $VERSION"

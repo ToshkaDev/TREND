@@ -27,7 +27,7 @@ RPSBPROC_TAR="$RPSBPROC.tar.gz"
 RPSBPROC_URL="$FTPSITE/rpsbproc/$RPSBPROC_TAR"
 UNTARED_DIR=export
 
-DATA_FILES=("cddid.tbl.gz" "cdtrack.txt" "family_superfamily_links" "cddannot.dat.gz" "cddannot_generic.dat.gz" "bitscore_specific.txt")
+DATA_FILES=("cddid.tbl.gz" "cdtrack.txt" "family_superfamily_links.txt" "cddannot.dat.gz" "cddannot_generic.dat.gz" "bitscore_specific.txt")
 
 echo "Downloading rpsbproc data files: "
 for f in ${DATA_FILES[@]}; do
@@ -50,18 +50,6 @@ cp "$TEMP_DIR/RpsbProc-x64-linux/rpsbproc" ${BIN_PATH}
 
 echo "Clening up ..."
 rm -r $TEMP_DIR
-
-cat  <<- __EOF__ > $BIN_PATH/rpsbproc.ini
-[datafiles]
-cdd = $RPSBPROC_DATA_PATH/cddid.tbl
-cdt = $RPSBPROC_DATA_PATH/cdtrack.txt
-clst = $RPSBPROC_DATA_PATH/family_superfamily_links
-feats = $RPSBPROC_DATA_PATH/cddannot.dat
-genfeats = $RPSBPROC_DATA_PATH/cddannot_generic.dat
-spthr = $RPSBPROC_DATA_PATH/bitscore_specific.txt
-__EOF__
-
-
 
 
 
