@@ -11,8 +11,8 @@ TEMP_DIR=$TARGET_DIR/tmp
 mkdir -p $TEMP_DIR
 
 
-if [[ -z "$BLAST_VERSION" || -z "$TARGET_DIR" || -z "$TEMP_DIR" ]]; then
-	echo "Usage: $0 <blast version> <target directory> <tem directory>"
+if [[ -z "$BLAST_VERSION" || -z "$TARGET_DIR" ]]; then
+	echo "Usage: $0 <blast version> <target directory>"
 	exit 1
 fi
 
@@ -27,7 +27,7 @@ RPSBPROC_TAR="$RPSBPROC.tar.gz"
 RPSBPROC_URL="$FTPSITE/rpsbproc/$RPSBPROC_TAR"
 UNTARED_DIR=export
 
-DATA_FILES=("cddid.tbl.gz" "cdtrack.txt" "family_superfamily_links.txt" "cddannot.dat.gz" "cddannot_generic.dat.gz" "bitscore_specific.txt")
+DATA_FILES=("cddid.tbl.gz" "cdtrack.txt" "family_superfamily_links" "cddannot.dat.gz" "cddannot_generic.dat.gz" "bitscore_specific.txt")
 
 echo "Downloading rpsbproc data files: "
 for f in ${DATA_FILES[@]}; do

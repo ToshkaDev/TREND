@@ -7,16 +7,17 @@ RUN apt-get update && \
         python2.7-dev \
         libblas-dev liblapack-dev libatlas-base-dev gfortran libdw1 \
         python2.7 \
-        python-cairo \
-        fonts-dejavu \
+        python-qt4 xvfb xauth \
+        perl \
         curl \
         bash && \
     ln -s /usr/bin/python2.7 /usr/bin/python && \
     curl -sS https://bootstrap.pypa.io/pip/2.7/get-pip.py | python && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# python-cairo and fonts-dejavu are needed to render images using ete2
+# python-qt4 xvfb are needed to render images using ete2
 # libdw1 is needed for rpsbproc
+# python2.7-dev is needed to install biopython==1.76 as it contains C extensions
 WORKDIR /app
 
 # Copy built Spring Boot JAR

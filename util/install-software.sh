@@ -32,6 +32,10 @@ CDHIT_VERSION=4.8.1
 CDHIT_DIR=${TARGET_DIR}/cdhit-${CDHIT_VERSION}
 ./util/install-cdhit.sh ${CDHIT_VERSION} ${CDHIT_DIR}
 
+TMHMM_VERSION=2.0c
+TMHMM_DIR=${TARGET_DIR}/tmhmm-${TMHMM_VERSION}
+./util/install-tmhmm.sh ${TMHMM_VERSION} ${TMHMM_DIR}
+
 # Install databases
 # PFAM_VERSION=37.4
 # PFAM_DIR=${TARGET_DIR}/pfam-${PFAM_VERSION}
