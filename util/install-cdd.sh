@@ -11,10 +11,7 @@ if [ -z "$VERSION" ] || [ -z "$CDD_PSSMS_DIR" ]; then
 	exit 1
 fi
 
-#PSSM_TARS=("Cdd_LE.tar.gz" "Cdd_NCBI_LE.tar.gz" "Cog_LE.tar.gz" "Kog_LE.tar.gz" "Prk_LE.tar.gz" "Smart_LE.tar.gz" "Tigr_LE.tar.gz")
-PSSM_TARS=("Smart_LE.tar.gz" "Prk_LE.tar.gz")
-
-
+PSSM_TARS=("Cdd_LE.tar.gz" "Cdd_NCBI_LE.tar.gz" "Cog_LE.tar.gz" "Kog_LE.tar.gz" "Prk_LE.tar.gz" "Smart_LE.tar.gz" "Tigr_LE.tar.gz")
 CDD_PSSM_URL=https://ftp.ncbi.nih.gov/pub/mmdb/cdd/little_endian/
 
 if [ -n "$(ls -A $CDD_PSSMS_DIR)" ]; then

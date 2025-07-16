@@ -5,7 +5,7 @@ build-prod:
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
 
 up-prod:
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
 
 down-prod:
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml down
@@ -20,7 +20,7 @@ build-dev:
 	docker-compose -f docker-compose.yml build
 
 up-dev:
-	docker-compose -f docker-compose.yml up -d
+	docker-compose -f docker-compose.yml up
 
 down-dev:
 	docker-compose -f docker-compose.yml down
