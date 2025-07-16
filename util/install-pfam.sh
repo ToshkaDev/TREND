@@ -14,6 +14,7 @@ TEMP_DIR=$TARGET_DIR/tmp
 mkdir -p $TEMP_DIR
 
 PFAM_DIR="$TARGET_DIR/PfamA"
+mkdir -p $PFAM_DIR
 
 if [[ -z "$VERSION" || -z "$TARGET_DIR" ]]; then
 	echo "Usage: $0 <pfam version> <target directory>"
@@ -39,12 +40,28 @@ if [[ ! -s "$PFAM_DIR/$PFAM_HMM_NAME" ]]; then
 	echo "Decompressing ..."
 	gunzip "$TEMP_DIR/$GZ_PFAM_HMM_NAME"
 	echo "Copying to $PFAM_DIR"
-	mkdir -p $PFAM_DIR
 	mv "$TEMP_DIR/$PFAM_HMM_NAME" $PFAM_DIR
 fi
 
 cd $PFAM_DIR
+
+# Download MiST and TREND models
+FILEID=1EHDOluhCcDy-pgbOKRVz_PbxXtKGQ7tk
+MIST_TREND_NAME=Mist_Trend.hmm
+TARBALL=${MIST_TREND_NAME}.tar.gz
+curl -L -o "$TARBALL" "https://docs.google.com/uc?export=download&id=${FILEID}"
+
+echo "Decompressing tarball ..."
+tar xvf $TARBALL
+rm $TARBALL
+
+#Preparing models
 echo "Preparing Pfam HMM database ..."
 $HMMER3_BINDIR/hmmpress -f ./$PFAM_HMM_NAME
 
-echo "Successfully installed Pfam $VERSION database"
+echo "Preparing Pfam + MiST_TREND HMM database ..."
+PFAM_MIST_TREND_HMM_NAME=Pfam-A_and_Mist-specific.hmm
+cat $PFAM_HMM_NAME $MIST_TREND_NAME > $PFAM_MIST_TREND_HMM_NAME
+$HMMER3_BINDIR/hmmpress -f ./$PFAM_MIST_TREND_HMM_NAME
+
+echo "Successfully installed Pfam $VERSION database and MiST_TREND database"

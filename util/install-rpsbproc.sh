@@ -4,15 +4,14 @@ set -e
 
 #0.5.0
 #RPSBPROC_VERSION=$1  [No version anymore]
-BLAST_VERSION=$1
-TARGET_DIR=$2
+TARGET_DIR=$1
 
 TEMP_DIR=$TARGET_DIR/tmp
 mkdir -p $TEMP_DIR
 
 
-if [[ -z "$BLAST_VERSION" || -z "$TARGET_DIR" ]]; then
-	echo "Usage: $0 <blast version> <target directory>"
+if [[ -z "$TARGET_DIR" ]]; then
+	echo "Usage: $0 <target directory>"
 	exit 1
 fi
 
