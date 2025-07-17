@@ -25,8 +25,9 @@ mkdir -p $TEMP_DIR
 mkdir -p $MEGA_DIR
 mkdir -p $BIN_PATH
 
-# https://www.megasoftware.net/releases/mega-cc_11.0.13-1_amd64.deb
-DEB_FILENAME="mega-cc_${VERSION}_amd64.deb"
+# https://www.megasoftware.net/releases/megax-cc_10.2.6-1_amd64.deb
+
+DEB_FILENAME="megax-cc_${VERSION}_amd64.deb"
 
 MEGA_URL="https://www.megasoftware.net/releases/${DEB_FILENAME}"
 
