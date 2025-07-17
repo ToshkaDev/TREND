@@ -5,7 +5,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         build-essential \
         python2.7-dev \
-        libblas-dev liblapack-dev libatlas-base-dev gfortran libdw1 \
+        libblas-dev liblapack-dev libatlas-base-dev gfortran libdw1 zlib1g-dev \
         python2.7 \
         python-qt4 xvfb xauth \
         perl \
@@ -17,6 +17,7 @@ RUN apt-get update && \
 
 # python-qt4 xvfb are needed to render images using ete2
 # libdw1 is needed for rpsbproc
+# zlib1g-dev is needed to compile cd-hit
 # python2.7-dev is needed to install biopython==1.76 as it contains C extensions
 WORKDIR /app
 

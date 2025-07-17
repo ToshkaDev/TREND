@@ -27,6 +27,10 @@ tar xvf $TARBALL
 echo "Move executables to bin directory ..."
 mv $BASE_NAME/* $BIN_PATH
 
+# Compile
+cd $BIN_PATH
+make
+
 echo "Clean up ..."
 rm -r $BASE_NAME
 rm $TARGET_DIR/$TARBALL
