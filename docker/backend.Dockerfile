@@ -1,4 +1,17 @@
+# Stage 1: Build JAR
+FROM maven:3.6.3-openjdk-8-slim AS builder
+WORKDIR /build
+COPY . .
+RUN mvn clean package -DskipTests
+
+
+# Stage 2: Final production image with Python and the JAR
 FROM openjdk:8-jdk-slim-buster
+
+# Fix old Debian Buster repo URLs
+RUN sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list && \
+    sed -i 's|http://security.debian.org/|http://archive.debian.org/|g' /etc/apt/sources.list && \
+    echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
 
 # Install dependencies and Python 2
 RUN apt-get update && \
@@ -11,7 +24,7 @@ RUN apt-get update && \
         perl \
         curl \
         bash && \
-    ln -s /usr/bin/python2.7 /usr/bin/python && \
+    ln -sf /usr/bin/python2.7 /usr/bin/python && \
     curl -sS https://bootstrap.pypa.io/pip/2.7/get-pip.py | python && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -22,7 +35,12 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Copy built Spring Boot JAR
-COPY target/*.jar app.jar
+COPY --from=builder /build/target/*.jar app.jar
+
+# Install all the necessary programs
+COPY util/ /app/util/
+RUN chmod +x /app/util/*
+RUN bash /app/util/install-software.sh
 
 # Copy Python scripts and install dependencies
 COPY bioinformatics-programs/ /app/bioinformatics-programs/
