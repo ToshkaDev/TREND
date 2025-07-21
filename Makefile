@@ -25,6 +25,9 @@ up-dev:
 down-dev:
 	docker-compose -f docker-compose.yml down
 
+clean-dev:
+	docker-compose -f docker-compose.yml down -v
+
 # Danger zone: delete volumes
 # reset-db:
 # 	@echo "WARNING: This will delete Postgres volume. Continue in 5s..."
