@@ -29,7 +29,7 @@ TREND streamlines the complex workflows typically required for:
 - Input via protein sequences, identifiers (NCBI, RefSeq, MiST), multiple sequence alignments, phylogenetic trees
 - Integration with Pfam, CDD, and MiST databases
 - Protein feature identification using Profile Hidden Markov models from multiple databses: CDD, Pfam (InterPro), COG, KOG, SMART, PRK, TIGRFAMs, MiST
-- Sequence edundancy reduction with CD-HIT and multiple sequence alignment using MAFFT algorithms 
+- Sequence redundancy reduction with CD-HIT and multiple sequence alignment using MAFFT algorithms 
 - Phylogenetic tree building using FastTree and MEGA
 - Gene neighborhoods and opreron identification are avilable for over 200,000 genomes
 - Interactive visual outputs linking evolutionary and functional contexts
@@ -42,6 +42,17 @@ TREND streamlines the complex workflows typically required for:
 - Web Server: Tomcat with NGINX reverse proxy
 - Integrations: Python scripts for bioinformatics tasks
 
+### General Requirements
+- [git](https://git-scm.com/)
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+
+### Setup
+```bash
+$ git clone https://github.com/ToshkaDev/TREND.git
+$ cd TREND
+```
+
 ### Getting Started
 - **Build the development Docker image**: `make build-dev`
 
@@ -49,7 +60,13 @@ This Makefile target builds the development image, which includes application de
 
 - **Start the application in development mode**: `make up-dev`
 
-This command spins up the full development stack via Docker Compose using `docker-compose.yml`. It launches the backend and frontend services along with a database container. Once running, the main application will be available at: http://localhost:8080. Make sure you have a `.env` file in the root directory before starting the services. A fully prepared file is already available in this repository.
+This command spins up the full development stack via Docker Compose using `docker-compose.yml`. It launches the backend and frontend services along with a database container. Once running, the main application will be available at: http://localhost:8080. Make sure you have an `.env` file in the root directory before starting the services. A fully prepared `.env` file is already available in this repository.
+
+Use dbshell.sh script to connect to the running database: 
+```bash
+$ chmod 755 dbshell.sh
+$ ./dbshell.sh
+```
 
 - **To stop the development server, run**: `make down-dev`
 
