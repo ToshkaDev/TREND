@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
+import springconfiguration.AppProperties;
+
 /**
  * Created by vadim on 03/30/18.
  */
@@ -32,8 +34,8 @@ public class ProteinFeaturesController extends BioUniverseController {
     public final ProteinFeaturesService proteinFeaturesService;
     private static final Log logger = LogFactory.getLog(ProteinFeaturesController.class);
 
-	public ProteinFeaturesController(StorageService storageService, ProteinFeaturesService proteinFeaturesService) {
-    	super(storageService);
+	public ProteinFeaturesController(StorageService storageService, ProteinFeaturesService proteinFeaturesService, AppProperties appProperties) {
+    	super(storageService, appProperties);
     	this.proteinFeaturesService = proteinFeaturesService;
     }
 

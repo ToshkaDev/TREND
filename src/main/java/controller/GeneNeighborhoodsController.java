@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
+import springconfiguration.AppProperties;
+
 @Controller
 @RequestMapping("/gene-neighborhoods")
 public class GeneNeighborhoodsController extends BioUniverseController {
@@ -24,8 +26,8 @@ public class GeneNeighborhoodsController extends BioUniverseController {
     public final GeneNeighborhoodsService geneNeighborhoodsService;
     private static final Log logger = LogFactory.getLog(GeneNeighborhoodsController.class);
 
-    public GeneNeighborhoodsController(StorageService storageService, GeneNeighborhoodsService geneNeighborhoodsService) {
-        super(storageService);
+    public GeneNeighborhoodsController(StorageService storageService, GeneNeighborhoodsService geneNeighborhoodsService, AppProperties appProperties) {
+        super(storageService, appProperties);
         this.geneNeighborhoodsService = geneNeighborhoodsService;
     }
 

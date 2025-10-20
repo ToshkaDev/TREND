@@ -30,7 +30,7 @@ import java.io.OutputStreamWriter;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-
+import springconfiguration.AppProperties;
 
 /**
  * Created by vadim on 8/13/17.
@@ -38,15 +38,15 @@ import java.util.stream.Collectors;
 public abstract class BioUniverseController {
 
     private final StorageService storageService;
+    private final AppProperties appProperties;
     protected final List<String> statusReady = Arrays.asList("ready");
     protected final List<String> statusNotReady = Arrays.asList("notReady");
     protected final List<String> statusNoSuchBioJob = Arrays.asList("noSuchBioJob");
-    private final String baseUrl = "http://localhost:8080";
-    // private final String baseUrl = "http://trend.zhulinlab.org";
 
     @Autowired
-    public BioUniverseController(StorageService storageService) {
+    public BioUniverseController(StorageService storageService, AppProperties appProperties) {
         this.storageService = storageService;
+        this.appProperties = appProperties;
     }
 
     @GetMapping("/files/{filename:.+}")
@@ -81,7 +81,7 @@ public abstract class BioUniverseController {
     public Map<String, List<String>> getFileNameIfReadyCommon(String jobId, String cookies, BioUniverseService bioUniverseService, String specificPath) {
         BioJob bioJob;
         // String urlPath = ServletUriComponentsBuilder.fromCurrentContextPath().path(specificPath + "/univ_files/").build().toString();
-        String urlPath = ServletUriComponentsBuilder.fromHttpUrl(baseUrl).path(specificPath + "/univ_files/").build().toString();
+        String urlPath = ServletUriComponentsBuilder.fromHttpUrl(appProperties.getBaseUrl()).path(specificPath + "/univ_files/").build().toString();
         Map<String, List<String>> result = new HashMap<>();
         result.put(Status.status.getStatusEnum(), statusNoSuchBioJob);
         List<String> listOfResultFileNames;

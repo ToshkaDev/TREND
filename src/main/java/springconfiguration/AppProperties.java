@@ -76,6 +76,8 @@ public class AppProperties {
     private String systemMessage = "One of the underlying databases is down. Please be patient.";
     private String systemMessageEnabled = "false";
 
+    private String baseUrl = "http://localhost:8080";
+
 
     public String getWorkingDirLocation() {
         return workingDirLocation;
@@ -503,5 +505,13 @@ public class AppProperties {
 
     public void setSystemMessageEnabled(String systemMessageEnabled) {
         this.systemMessageEnabled = systemMessageEnabled;
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 }

@@ -20,13 +20,13 @@ services:
     image: nginx:stable-alpine
     ports:
       - "80:80"
-    #  - "443:443"
+      - "443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       #- /etc/letsencrypt/live/trend.evobionet.com/fullchain.pem:/etc/letsencrypt/live/trend.evobionet.com/fullchain.pem
       #- /etc/letsencrypt/live/trend.evobionet.com/privkey.pem:/etc/letsencrypt/live/trend.evobionet.com/privkey.pem
     depends_on:
-     - backend
+      - backend
     networks:
       - trend-net
 
