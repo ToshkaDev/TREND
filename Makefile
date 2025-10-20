@@ -2,16 +2,16 @@
 
 # Production commands
 build-prod:
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
+	docker-compose -f docker-compose.prod.yml build
 
 up-prod:
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+	docker-compose -f docker-compose.prod.yml up
 
 down-prod:
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml down
+	docker-compose -f docker-compose.prod.yml down
 
 logs:
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml logs -f
+	docker-compose -f docker-compose.prod.yml logs -f
 
 restart-prod: down-prod build-prod up-prod
 

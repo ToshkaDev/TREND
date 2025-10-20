@@ -3,18 +3,33 @@ version: '3.3'
 services:
 
   backend:
-    build:
-      context: .
-      dockerfile: docker/backend.Dockerfile
-    ports: []             # Remove port mapping (served via nginx)
+    # Uncomment to build an image
+    # build:
+    #   context: .
+    #   dockerfile: docker/backend.Dockerfile
     volumes:
       - ./bioinformatics-programs:/app/bioinformatics-programs:ro
       - ./util:/app/util
+      - ./src/main/resources/application.properties:/app/application.properties:ro
+    environment:
+      - SPRING_DATASOURCE_URL
+      - SPRING_DATASOURCE_USERNAME
+      - SPRING_DATASOURCE_PASSWORD
+      - SPRING_CONFIG_LOCATION=/app/application.properties
     depends_on:
       - db
     networks:
       - trend-net
     image: bioliners/trend:v1.5.0
+
+  db:
+    image: postgres:15
+    restart: always
+    env_file: .env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - trend-net
 
   nginx:
     image: nginx:stable-alpine
@@ -23,13 +38,16 @@ services:
       - "443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      #- /etc/letsencrypt/live/trend.evobionet.com/fullchain.pem:/etc/letsencrypt/live/trend.evobionet.com/fullchain.pem
-      #- /etc/letsencrypt/live/trend.evobionet.com/privkey.pem:/etc/letsencrypt/live/trend.evobionet.com/privkey.pem
+      - /etc/letsencrypt/live/trend.evobionet.com/fullchain.pem:/etc/letsencrypt/live/trend.evobionet.com/fullchain.pem
+      - /etc/letsencrypt/live/trend.evobionet.com/privkey.pem:/etc/letsencrypt/live/trend.evobionet.com/privkey.pem
     depends_on:
       - backend
     networks:
       - trend-net
 
+volumes:
+  db_data:
+  
 networks:
   trend-net:
     driver: bridge
