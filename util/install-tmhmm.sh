@@ -37,7 +37,7 @@ sed -i '1 s|/usr/local/bin/perl|/usr/bin/perl|' $BIN_PATH/tmhmmformat.pl
 chmod +x $BIN_PATH/decodeanhmm.Linux_x86_64
 
 echo "Cleaning up ..."
-rm -r $BASE_NAME $TARBALL
+rm -r "$TARGET_DIR/$BASE_NAME" $TARBALL
 
 echo "Successfully installed tmhmm version $VERSION"
 
