@@ -1,16 +1,14 @@
-version: '3.3'
+version: "3.3"
 
 services:
-
   backend:
     # Uncomment to build an image
     # build:
     #   context: .
     #   dockerfile: docker/backend.Dockerfile
     volumes:
-      - ./bioinformatics-programs:/app/bioinformatics-programs:ro
-      - ./util:/app/util
       - ./src/main/resources/application.properties:/app/application.properties:ro
+    env_file: .env
     environment:
       - SPRING_DATASOURCE_URL
       - SPRING_DATASOURCE_USERNAME
@@ -47,7 +45,7 @@ services:
 
 volumes:
   db_data:
-  
+
 networks:
   trend-net:
     driver: bridge
