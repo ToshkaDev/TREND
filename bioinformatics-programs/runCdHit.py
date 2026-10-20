@@ -66,14 +66,16 @@ def initialyze(argv):
 
 		
 def cdHit(): 
-	cd_hit_commandline = '{0} -i {1} -d 0 -o {2} -c {3} -n {4} -G 1 -g 1 -b 20 -s 0.0 -aL 0.0 -aS 0.0 -T {5} -M {6}'.format(CD_HIT, INPUT_FILE, \
-	OUTPUT_FILE, CD_HIT_CLUSTER_IDENTITY, WORD_LENGTH, NUMBER_OF_THREADS, CD_HIT_MEMORY)
-	print(cd_hit_commandline)
+	cd_hit_commandline = [CD_HIT, "-i", INPUT_FILE, "-d", "0", "-o", OUTPUT_FILE, "-c", str(CD_HIT_CLUSTER_IDENTITY),
+		"-n", str(WORD_LENGTH), "-G", "1", "-g", "1", "-b", "20", "-s", "0.0", "-aL", "0.0", "-aS", "0.0",
+		"-T", str(NUMBER_OF_THREADS), "-M", str(CD_HIT_MEMORY)]
+	print(" ".join(cd_hit_commandline))
 	runSubProcess(cd_hit_commandline)
 	
 def runSubProcess(command):
 	try:
-		call(command, shell=True)
+		# 'command' is a list of arguments and is run without a shell
+		call(command)
 	except OSError, osError:
 		print "osError " + osError
 		print traceback.print_exc()
