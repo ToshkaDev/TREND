@@ -30,7 +30,11 @@ services:
       - trend-net
 
   nginx:
-    image: nginx:stable-alpine
+    # Pinned (was the floating `stable-alpine` tag) so security updates are explicit
+    # and `docker-compose up` pulls the new image instead of reusing a stale cached one.
+    # 1.30.7 fixes the Nov 18 2026 advisories (CVE-2026-123007, -123633, -121810,
+    # -123634, -113425, -118899, -125283, -120967, -123640).
+    image: nginx:1.30.7-alpine
     ports:
       - "80:80"
       - "443:443"
