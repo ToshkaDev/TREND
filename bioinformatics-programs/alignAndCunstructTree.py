@@ -167,7 +167,7 @@ def initialyze(argv):
 			if param in GAPS_AND_MISSING_DATA_BEHAVIOUR:
 				GAPS_MISSING = GAPS_AND_MISSING_DATA_BEHAVIOUR[param]
 		elif opt in ("-c", "--coverage_cutoff"):
-			COVERAGE_CUTOFF = str(arg).strip()
+			COVERAGE_CUTOFF = str(int(arg))
 		elif opt in ("-u", "--cpu"):
 			TREE_THREADS = str(arg).strip()
 		elif opt in ("-p", "--phylo"):
@@ -179,7 +179,7 @@ def initialyze(argv):
 		elif opt in ("-b", "--bootstrap"):
 			param = str(arg).strip()
 			if len(param) > 0:
-				BOOTSTRAPS = param
+				BOOTSTRAPS = str(int(param))
 		elif opt in ("-e", "--initial_tree"):
 			param = str(arg).strip()
 			if param in ML_INITIAL_TREE_OPTIONS:
@@ -194,6 +194,9 @@ def initialyze(argv):
 			OUTPUT_FILE_THIRD = str(arg).strip()
 		elif opt in ("-P", "--phylotest_ft"):
 			param = str(arg).strip()
+			if param not in ["nosupport", "nome", "sh"]:
+				print "===========ERROR==========\n Invalid value for -P/--phylotest_ft" + USAGE
+				sys.exit(2)
 			if param != "sh":
 				PHYLOGENY_TEST_FT = "-"+param
 			else:
@@ -201,13 +204,16 @@ def initialyze(argv):
 				PHYLOGENY_TEST_FT = ""
 		elif opt in ("-M", "--subst_model_ft"):
 			param = str(arg).strip()
+			if param not in ["jtt", "wag", "lg"]:
+				print "===========ERROR==========\n Invalid value for -M/--subst_model_ft" + USAGE
+				sys.exit(2)
 			if param != "jtt":
 				SUBST_MODEL_FT = "-"+param
 		elif opt in ("-S", "--pseudocounts_ft"):
 			if str(arg).strip() == "yes":
 				PSEUDOCOUNTS_FT = "-pseudo"
 		elif opt in ("-R", "--bootstrap_ft"):
-			NUMBER_OF_REPLICATES_FT = "-boot " + str(arg).strip()
+			NUMBER_OF_REPLICATES_FT = "-boot " + str(int(arg))
 		elif opt in ("-B", "--tree_program"):
 			TREE_BUILDING_PROGRAM = str(arg).strip()
 			if TREE_BUILDING_PROGRAM != "FastTree" and TREE_BUILDING_PROGRAM != "Mega":
@@ -349,7 +355,7 @@ def align_sequences():
 	if DO_ALIGN:
 		if MAFFT_PROGRAM != None:
 			mafft = MAFFT_PROGRAM
-		runSubProcess(" ".join([mafft, ALGORITHM, REORDER_OR_NOT, "--thread", ALIGN_THREADS, INPUT_FILE, ">", OUTPUT_FILE_FIRST]), "align_sequences()")
+		runSubProcess([mafft] + ALGORITHM.split() + REORDER_OR_NOT.split() + ["--thread", ALIGN_THREADS, INPUT_FILE], "align_sequences()", OUTPUT_FILE_FIRST)
 	else:
 		with open(INPUT_FILE, "r") as inputFile, open(OUTPUT_FILE_FIRST, "w") as outputFile:
 			outputFile.write(inputFile.read())
@@ -366,23 +372,30 @@ def buildMegaTree():
 			paramOutputFile.write(element + "\n")
 			for param, val in subelement.items():
 				paramOutputFile.write(" = ".join([param, val]) + "\n")
-	runSubProcess(" ".join([megacc, "-a", OUTPUT_FILE_SECOND, "-d", OUTPUT_FILE_FIRST, "-n", "-o", OUTPUT_FILE_THIRD]), "buildTree()")
+	runSubProcess([megacc, "-a", OUTPUT_FILE_SECOND, "-d", OUTPUT_FILE_FIRST, "-n", "-o", OUTPUT_FILE_THIRD], "buildTree()")
 
 def buildFastTree():
 	fastTree = "FastTreeMP"
 	if FAST_TREE_PROGRAM != None:
 		fastTree = FAST_TREE_PROGRAM
-	runSubProcess(" ".join([fastTree, PHYLOGENY_TEST_FT, SUBST_MODEL_FT, NUMBER_OF_REPLICATES_FT, OUTPUT_FILE_FIRST, ">", OUTPUT_FILE_THIRD]), "buildTree()")
+	runSubProcess([fastTree] + PHYLOGENY_TEST_FT.split() + SUBST_MODEL_FT.split() + NUMBER_OF_REPLICATES_FT.split() + [OUTPUT_FILE_FIRST], "buildTree()", OUTPUT_FILE_THIRD)
 
-def runSubProcess(command, processName):
+# 'command' is a list of arguments. It is run without a shell, so no argument is ever interpreted
+# by the shell. If 'outputFile' is given, the program's standard output is written to that file.
+def runSubProcess(command, processName, outputFile=None):
 	try:
-		proc = Popen(command, shell=True)
-		status = proc.poll()
-		while status == None:
-			#print "Still runnig " + processName
-			time.sleep(0.05)
+		outputHandle = open(outputFile, "w") if outputFile else None
+		try:
+			proc = Popen(command, stdout=outputHandle)
 			status = proc.poll()
-		#print "Seems like finished " + processName + " " + str(status)
+			while status == None:
+				#print "Still runnig " + processName
+				time.sleep(0.05)
+				status = proc.poll()
+			#print "Seems like finished " + processName + " " + str(status)
+		finally:
+			if outputHandle:
+				outputHandle.close()
 	except OSError, osError:
 		print "osError " + osError
 		print traceback.print_exc()

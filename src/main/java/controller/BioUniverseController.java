@@ -3,6 +3,7 @@ package controller;
 import biojobs.BioJob;
 import biojobs.BioJobResult;
 import enums.Status;
+import converters.RequestValidator;
 import exceptions.IncorrectRequestException;
 import model.internal.ProtoTreeInternal;
 import model.request.ProtoTreeRequest;
@@ -62,6 +63,8 @@ public abstract class BioUniverseController {
     }
 
     public String processTreeRequestCommon(ProtoTreeRequest protoTreeRequest, PipelineService pipelineService) throws IncorrectRequestException, ExecutionException, InterruptedException {
+        // Reject any parameter outside the values the web form can produce before anything is stored or run.
+        RequestValidator.validate(protoTreeRequest);
         //Split it to several functions because 'PROTO_TREE' method is asynchronous
         //and files in 'listOfFiles' field of evolutionRequest are got cleared at the end of request processing.
         ProtoTreeInternal protoTreeInternal = pipelineService.storeFilesAndPrepareCommandArguments(protoTreeRequest);

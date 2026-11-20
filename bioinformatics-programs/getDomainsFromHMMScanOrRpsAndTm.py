@@ -531,7 +531,7 @@ def hmmscan():
 	#If hmmscan is not in the linux path then give it the program full path as a parameter. The same for 'rpsblast', 'rpsbproc' and 'tmhmm' programs
 	if HMMSCAN_PROGRAM != None:
 		hmmscan = HMMSCAN_PROGRAM
-	runSubProcess(" ".join([hmmscan, "--noali", "--cpu", str(CPU), HMMSCAN_DB_PATH+DB_NAME, INPUT_FILE_FASTA, ">", OUTPUT_RPSBLAST_OR_HMMSCAN]))
+	runSubProcess([hmmscan, "--noali", "--cpu", str(CPU), HMMSCAN_DB_PATH+DB_NAME, INPUT_FILE_FASTA], OUTPUT_RPSBLAST_OR_HMMSCAN)
 
 def rpsBlast():
 	rpsblast = "rpsblast"
@@ -541,24 +541,30 @@ def rpsBlast():
 	if RPSBPROC_PROGRAM != None:
 		rpsbproc = RPSBPROC_PROGRAM
 
-	runSubProcess(" ".join([rpsblast, "-num_threads", CPU, "-evalue", "0.01", "-seg", "no", "-outfmt", "5", "-db", RPSBLAST_DB_PATH+DB_NAME, "-query", INPUT_FILE_FASTA, "-out", OUTPUT_RPSBLAST_OR_HMMSCAN]))
-	runSubProcess(" ".join([rpsbproc, "-d", RPSBPROC_DB_PATH, "-i", OUTPUT_RPSBLAST_OR_HMMSCAN, "-o", OUTPUT_RPSBPROC]))
+	runSubProcess([rpsblast, "-num_threads", str(CPU), "-evalue", "0.01", "-seg", "no", "-outfmt", "5", "-db", RPSBLAST_DB_PATH+DB_NAME, "-query", INPUT_FILE_FASTA, "-out", OUTPUT_RPSBLAST_OR_HMMSCAN])
+	runSubProcess([rpsbproc, "-d", RPSBPROC_DB_PATH, "-i", OUTPUT_RPSBLAST_OR_HMMSCAN, "-o", OUTPUT_RPSBPROC])
 
 def tmhmm2scan():
 	tmhmm = "/home/vadim/Softs/tmhmm-2.0c/bin/tmhmm"
 	if TMHMMSCAN_PROGRAM != None:
 		tmhmm = TMHMMSCAN_PROGRAM
-	runSubProcess(" ".join([tmhmm, "--short", INPUT_FILE_FASTA, ">", OUTPUT_TMHMMSCAN]))
+	runSubProcess([tmhmm, "--short", INPUT_FILE_FASTA], OUTPUT_TMHMMSCAN)
 
 def segMasker():
 	segmasker = "segmasker"
 	if SEGMASKER_PROGRAM != None:
 		segmasker = SEGMASKER_PROGRAM
-	runSubProcess(" ".join([segmasker, "-infmt", "fasta", "-outfmt", "interval", "-in", INPUT_FILE_FASTA, "-out", OUTPUT_SEGMASKER]))
+	runSubProcess([segmasker, "-infmt", "fasta", "-outfmt", "interval", "-in", INPUT_FILE_FASTA, "-out", OUTPUT_SEGMASKER])
 
-def runSubProcess(command):
+# 'command' is a list of arguments. It is run without a shell, so no argument is ever interpreted
+# by the shell. If 'outputFile' is given, the program's standard output is written to that file.
+def runSubProcess(command, outputFile=None):
 	try:
-		call(command, shell=True)
+		if outputFile:
+			with open(outputFile, "w") as outputHandle:
+				call(command, stdout=outputHandle)
+		else:
+			call(command)
 	except OSError, osError:
 		print "osError " + osError
 		print traceback.print_exc()
