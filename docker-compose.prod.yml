@@ -1,13 +1,16 @@
-version: "3.3"
+version: '3.3'
 
 services:
+
   backend:
-    # Uncomment to build an image
-    # build:
-    #   context: .
-    #   dockerfile: docker/backend.Dockerfile
+    # v1.5.1 = v1.5.0 + security fixes; built by docker/backend.patch.Dockerfile.
+    # Published under biswasaneel/ until there is push access to bioliners/trend.
+    # For a full from-scratch image use docker/backend.Dockerfile.
     volumes:
-      - ./src/main/resources/application.properties:/app/application.properties:ro
+    #  - ./bioinformatics-programs:/app/bioinformatics-programs:ro
+    #  - ./util:/app/util
+      - ./application.properties:/app/application.properties:ro
+    restart: unless-stopped
     env_file: .env
     environment:
       - SPRING_DATASOURCE_URL
@@ -18,7 +21,7 @@ services:
       - db
     networks:
       - trend-net
-    image: bioliners/trend:v1.5.0
+    image: biswasaneel/trend:v1.5.1
 
   db:
     image: postgres:15
@@ -30,21 +33,22 @@ services:
       - trend-net
 
   nginx:
-    # Pinned (was the floating `stable-alpine` tag) so security updates are explicit
-    # and `docker-compose up` pulls the new image instead of reusing a stale cached one.
-    # 1.30.7 fixes the Nov 18 2026 advisories (CVE-2026-123007, -123633, -121810,
-    # -123634, -113425, -118899, -125283, -120967, -123640).
+    # Pinned so security updates are explicit and `docker compose up` pulls the new
+    # image instead of reusing a stale cached one. 1.30.7 fixes the Nov 18 2026
+    # advisories (CVE-2026-123007, -123633, -121810, -123634, -113425, -118899,
+    # -125283, -120967, -123640).
     # Debian-based, not -alpine: Alpine 3.24's musl writes files with pwritev2(), which
-    # older Docker seccomp profiles block with EPERM,
-    # so nginx:1.30.7-alpine dies at startup with `pwrite() "/run/nginx.pid" failed`.
+    # older Docker seccomp profiles block with EPERM, so nginx:1.30.7-alpine dies at
+    # startup with `pwrite() "/run/nginx.pid" failed`.
     image: nginx:1.30.7
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - /etc/letsencrypt/live/trend.evobionet.com/fullchain.pem:/etc/letsencrypt/live/trend.evobionet.com/fullchain.pem
-      - /etc/letsencrypt/live/trend.evobionet.com/privkey.pem:/etc/letsencrypt/live/trend.evobionet.com/privkey.pem
+      - /usr/share/nginx/html:/usr/share/nginx/html:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - backend
     networks:

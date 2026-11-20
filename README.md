@@ -72,9 +72,11 @@ $ ./dbshell.sh
 
 This command stops and removes the containers defined in `docker-compose.yml`. However, depending on your system and how the containers were started, some containers may persist. For a full teardown, ensure you're running it from the same directory where the stack was started, and consider using `--remove-orphans` or `docker system prune`. To stop and fully clean the development environment (including volumes), run: `make clean-dev`
 
-- **Use the prebuilt production image (optional)**: `docker pull bioliners/trend:v1.5.0`
+- **Use the prebuilt production image (optional)**: `docker pull biswasaneel/trend:v1.5.1`
 
 To avoid building locally, you can pull the latest production image from Docker Hub. This image is fully built, optimized for runtime, and does not include development tools or hot-reloading features.
+
+`v1.5.1` is `v1.5.0` plus security fixes (command injection fix and PostgreSQL JDBC 42.7.4), built with `docker/backend.patch.Dockerfile`. It is temporarily published as `biswasaneel/trend:v1.5.1` until it can be pushed to `bioliners/trend`. For a full from-scratch build use `docker/backend.Dockerfile`.
 
 ### Citation
 If you use TREND in your work, please cite:
